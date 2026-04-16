@@ -4,18 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fallstudie: Rohstoffmanagement – KabelWerke Deutschland GmbH</title>
-    <meta name="description" content="Interaktive Fallstudie zur Analyse von Preisänderungsrisiken im Rohstoffmanagement">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Notification Toast -->
     <div id="toast" class="toast">Gespeichert ✓</div>
 
-    <!-- ===================== LOGIN VIEW ===================== -->
+    <!-- ===================== LOGIN ===================== -->
     <div id="login-view" class="view-container active">
         <div class="login-wrapper">
             <div class="login-box glass-panel">
@@ -38,51 +35,46 @@
         <div class="bg-gradient-orb orb-3"></div>
     </div>
 
-    <!-- ===================== DASHBOARD VIEW ===================== -->
+    <!-- ===================== DASHBOARD ===================== -->
     <div id="dashboard-view" class="view-container">
-
-        <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">🏭</div>
                 <h2>Fallstudie</h2>
                 <div id="user-role-badge" class="badge">Gruppe 1</div>
             </div>
-
             <ul class="nav-links">
                 <li class="nav-section-title">Recherche</li>
-                <li><button class="nav-btn active" onclick="switchTab('tab-company')">🌐 Unternehmenswebsite</button></li>
+                <li><button class="nav-btn active" onclick="switchTab('tab-company')">🌐 Internetauftritt</button></li>
                 <li><button class="nav-btn" onclick="switchTab('tab-products')">📦 Produkte</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-bilanz')">📋 Bilanz (HGB)</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-guv')">📊 GuV</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-market')">📈 Aktuelle Marktdaten</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-bilanz')">📋 Jahresabschluss</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-lagebericht')">📄 Lagebericht</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-market')">📈 Marktdaten</button></li>
+
+                <li class="nav-section-title">Interviews</li>
+                <li><button class="nav-btn" onclick="switchTab('tab-chat-einkauf')">👔 Hr. Weber (Einkauf)</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-chat-finanzen')">👩‍💼 Fr. Keller (Finanzen)</button></li>
 
                 <li class="nav-section-title student-only">Aufgabe</li>
-                <li class="student-only"><button class="nav-btn nav-highlight" onclick="switchTab('tab-task')">✏️ Risikoanalyse bearbeiten</button></li>
+                <li class="student-only"><button class="nav-btn nav-highlight" onclick="switchTab('tab-task')">✏️ Risikoanalyse</button></li>
 
                 <li class="nav-section-title lecturer-only hidden">Dozent</li>
                 <li class="lecturer-only hidden"><button class="nav-btn nav-highlight" onclick="switchTab('tab-lecturer')">👨‍🏫 Gruppenübersicht</button></li>
             </ul>
-
             <div class="sidebar-footer">
-                <div class="connection-box">
-                    <span id="connection-status" class="status-dot offline"></span>
-                    <span id="connection-text">Lokal</span>
-                </div>
+                <div class="connection-box"><span id="connection-status" class="status-dot offline"></span><span id="connection-text">Lokal</span></div>
                 <button class="btn btn-outline-sm" onclick="logout()">Abmelden</button>
             </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="content-area">
             <header class="app-header">
-                <h1 id="current-tab-title">Unternehmenswebsite</h1>
+                <h1 id="current-tab-title">Internetauftritt</h1>
                 <div class="header-company">KabelWerke Deutschland GmbH</div>
             </header>
-
             <div class="scroll-container">
 
-                <!-- === TAB: COMPANY WEBSITE === -->
+                <!-- TAB: COMPANY -->
                 <div id="tab-company" class="tab-content active">
                     <div class="company-hero-banner">
                         <div class="hero-overlay">
@@ -92,130 +84,117 @@
                                 <div class="hero-stat"><span class="stat-number">100 Mio. €</span><span class="stat-label">Jahresumsatz</span></div>
                                 <div class="hero-stat"><span class="stat-number">420</span><span class="stat-label">Mitarbeiter</span></div>
                                 <div class="hero-stat"><span class="stat-number">Seit 1987</span><span class="stat-label">Gegründet</span></div>
-                                <div class="hero-stat"><span class="stat-number">50 LKW</span><span class="stat-label">Eigene Flotte</span></div>
+                                <div class="hero-stat"><span class="stat-number">48h</span><span class="stat-label">Lieferversprechen</span></div>
                             </div>
                         </div>
                     </div>
-
                     <div class="section-container">
-                        <div class="info-card glass-panel">
-                            <h3>🏢 Über uns</h3>
-                            <p id="about-text"></p>
-                        </div>
-                        <div class="info-card glass-panel">
-                            <h3>🎯 Unsere Mission</h3>
-                            <p id="mission-text"></p>
-                        </div>
-                    </div>
-
-                    <div class="section-container">
-                        <div class="info-card glass-panel full-width">
-                            <h3>⚙️ Produktion & Energie</h3>
-                            <p id="production-text"></p>
-                        </div>
+                        <div class="info-card glass-panel"><h3>🏢 Über uns</h3><p id="about-text"></p></div>
+                        <div class="info-card glass-panel"><h3>🎯 Unsere Mission</h3><p id="mission-text"></p></div>
                     </div>
                     <div class="section-container">
-                        <div class="info-card glass-panel">
-                            <h3>🚛 Logistik & Distribution</h3>
-                            <p id="logistics-text"></p>
-                        </div>
-                        <div class="info-card glass-panel">
-                            <h3>📦 Lagerhaltung & Bestandsrisiken</h3>
-                            <p id="warehouse-text"></p>
-                        </div>
+                        <div class="info-card glass-panel full-width"><h3>⚙️ Fertigung</h3><p id="production-text"></p></div>
+                    </div>
+                    <div class="section-container">
+                        <div class="info-card glass-panel"><h3>🚛 Logistik</h3><p id="logistics-text"></p></div>
+                        <div class="info-card glass-panel"><h3>📦 Lagerhaltung</h3><p id="warehouse-text"></p></div>
                     </div>
                 </div>
 
-                <!-- === TAB: PRODUCTS === -->
+                <!-- TAB: PRODUCTS -->
                 <div id="tab-products" class="tab-content">
-                    <div class="products-header">
-                        <h2>Unser Produktportfolio</h2>
-                        <p>Alle Produkte enthalten hochwertiges Elektrolyt-Kupfer (Cu-ETP, 99,99% Reinheit), das am LME-Markt beschafft wird.</p>
-                    </div>
-                    <div class="products-grid" id="products-grid">
-                        <!-- Injected via JS -->
-                    </div>
+                    <div class="products-header"><h2>Unser Produktportfolio</h2><p>Hochwertige Kupferkabel und Leitungen für Energieversorgung, Bau und Industrie.</p></div>
+                    <div class="products-grid" id="products-grid"></div>
                 </div>
 
-                <!-- === TAB: BILANZ === -->
+                <!-- TAB: BILANZ + GuV -->
                 <div id="tab-bilanz" class="tab-content">
                     <div class="finance-header glass-panel">
                         <div class="finance-header-inner">
-                            <div>
-                                <h2>Bilanz nach HGB</h2>
-                                <p>KabelWerke Deutschland GmbH | Stichtag: 31.12.2025</p>
-                            </div>
+                            <div><h2>Jahresabschluss</h2><p>KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p></div>
                             <span class="badge badge-red">VERTRAULICH</span>
                         </div>
                     </div>
-                    <div class="bilanz-grid">
-                        <div class="bilanz-side glass-panel" id="bilanz-aktiva">
-                            <!-- Injected via JS -->
-                        </div>
-                        <div class="bilanz-side glass-panel" id="bilanz-passiva">
-                            <!-- Injected via JS -->
+                    <!-- Sub-tabs for Bilanz/GuV -->
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" onclick="switchSubTab('sub-bilanz', this)">Bilanz</button>
+                        <button class="sub-tab" onclick="switchSubTab('sub-guv', this)">GuV</button>
+                    </div>
+                    <div id="sub-bilanz" class="sub-content active">
+                        <div class="bilanz-grid">
+                            <div class="bilanz-side glass-panel" id="bilanz-aktiva"></div>
+                            <div class="bilanz-side glass-panel" id="bilanz-passiva"></div>
                         </div>
                     </div>
-                    <div class="hint-box">
-                        <strong>📌 Analysehinweis:</strong> Achten Sie besonders auf die Positionen, deren Wert direkt von Rohstoffpreisen abhängt. Welche Bilanzpositionen sind bei steigenden – und welche bei <em>fallenden</em> – Preisen gefährdet?
+                    <div id="sub-guv" class="sub-content">
+                        <div class="guv-container glass-panel">
+                            <table class="finance-table" id="guv-table"><tbody></tbody></table>
+                        </div>
                     </div>
                 </div>
 
-                <!-- === TAB: GuV === -->
-                <div id="tab-guv" class="tab-content">
+                <!-- TAB: LAGEBERICHT -->
+                <div id="tab-lagebericht" class="tab-content">
                     <div class="finance-header glass-panel">
                         <div class="finance-header-inner">
-                            <div>
-                                <h2>Gewinn- und Verlustrechnung (GuV)</h2>
-                                <p>KabelWerke Deutschland GmbH | Geschäftsjahr 01.01.2025 – 31.12.2025 | Gesamtkostenverfahren</p>
-                            </div>
+                            <div><h2>Lagebericht der Geschäftsführung</h2><p>KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p></div>
                             <span class="badge badge-red">VERTRAULICH</span>
                         </div>
                     </div>
-                    <div class="guv-container glass-panel">
-                        <table class="finance-table" id="guv-table">
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div class="hint-box">
-                        <strong>📌 Analysehinweis:</strong> Identifizieren Sie alle Positionen, die von externen Rohstoff- oder Energiepreisen beeinflusst werden. Berechnen Sie deren Anteil an der Gesamtleistung.
-                    </div>
+                    <div class="lagebericht-container" id="lagebericht-container"></div>
                 </div>
 
-                <!-- === TAB: MARKET DATA === -->
+                <!-- TAB: MARKET DATA -->
                 <div id="tab-market" class="tab-content">
-                    <div class="market-header">
-                        <h2>📈 Aktuelle Marktdaten</h2>
-                        <p>Quelle: S-International Daily | Stand: <span id="market-date"></span></p>
-                    </div>
-                    <div class="market-grid" id="market-grid">
-                        <!-- Injected via JS -->
-                    </div>
-                    <div class="hint-box" style="margin-top: 24px;">
-                        <strong>📌 Analysehinweis:</strong> Vergleichen Sie die Spot- mit den Terminpreisen. Was bedeutet es, wenn die Terminkurve fällt (Backwardation)? Was bedeutet das für die Lagerbestände?
+                    <div class="market-header"><h2>📈 Aktuelle Marktdaten</h2><p>Quelle: S-International Daily | Stand: <span id="market-date"></span></p></div>
+                    <div class="market-grid" id="market-grid"></div>
+                </div>
+
+                <!-- TAB: CHAT EINKAUF -->
+                <div id="tab-chat-einkauf" class="tab-content">
+                    <div class="chat-container">
+                        <div class="chat-header glass-panel">
+                            <span class="chat-avatar">👔</span>
+                            <div><strong id="chat-einkauf-name"></strong><br><span class="chat-role" id="chat-einkauf-role"></span></div>
+                        </div>
+                        <div class="chat-messages" id="chat-einkauf-messages"></div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-einkauf-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('einkauf')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('einkauf')">Senden</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- === TAB: TASK / ANALYSIS FORM === -->
+                <!-- TAB: CHAT FINANZEN -->
+                <div id="tab-chat-finanzen" class="tab-content">
+                    <div class="chat-container">
+                        <div class="chat-header glass-panel">
+                            <span class="chat-avatar">👩‍💼</span>
+                            <div><strong id="chat-finanzen-name"></strong><br><span class="chat-role" id="chat-finanzen-role"></span></div>
+                        </div>
+                        <div class="chat-messages" id="chat-finanzen-messages"></div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-finanzen-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('finanzen')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('finanzen')">Senden</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: TASK -->
                 <div id="tab-task" class="tab-content">
                     <div class="task-header glass-panel">
                         <h2>✏️ Ihre Risikoanalyse</h2>
-                        <p>Nutzen Sie die Informationen aus dem Unternehmensprofil, der Bilanz, der GuV und den Marktdaten, um die folgenden Aufgaben zu bearbeiten. Ihre Antworten werden automatisch gespeichert und sind für den Dozenten live sichtbar.</p>
+                        <p>Nutzen Sie alle verfügbaren Quellen – den Internetauftritt, den Jahresabschluss, den Lagebericht, die Marktdaten und vor allem die Gespräche mit den Ansprechpartnern – um die folgenden Aufgaben zu bearbeiten.</p>
                     </div>
                     <form id="analysis-form" onsubmit="event.preventDefault(); saveFormData();">
-                        <div id="task-questions-container">
-                            <!-- Injected via JS -->
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-full">Alle Antworten jetzt übermitteln</button>
+                        <div id="task-questions-container"></div>
+                        <button type="submit" class="btn btn-primary btn-full">Alle Antworten übermitteln</button>
                     </form>
                 </div>
 
-                <!-- === TAB: LECTURER OVERVIEW === -->
+                <!-- TAB: LECTURER -->
                 <div id="tab-lecturer" class="tab-content">
-                    <div class="task-header glass-panel">
-                        <h2>👨‍🏫 Live-Übersicht der Gruppen</h2>
-                        <p>Wählen Sie eine Gruppe, um deren Analyse am Beamer zu präsentieren.</p>
-                    </div>
+                    <div class="task-header glass-panel"><h2>👨‍🏫 Live-Übersicht</h2><p>Wählen Sie eine Gruppe zur Präsentation.</p></div>
                     <div class="group-selector">
                         <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
                         <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
@@ -224,9 +203,7 @@
                     </div>
                     <div class="presentation-board hidden" id="presentation-board">
                         <h3 id="presentation-group-name" class="presentation-title"></h3>
-                        <div id="presentation-answers">
-                            <!-- Injected via JS -->
-                        </div>
+                        <div id="presentation-answers"></div>
                     </div>
                 </div>
 
@@ -234,11 +211,8 @@
         </main>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-    <!-- App Scripts -->
     <script src="data.js"></script>
     <script src="firebase-config.js"></script>
     <script src="app.js"></script>
