@@ -3,196 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fallstudie: Rohstoffmanagement Risiko-App</title>
-    
-    <!-- Premium Google Fonts -->
+    <title>Fallstudie: Rohstoffmanagement – KabelWerke Deutschland GmbH</title>
+    <meta name="description" content="Interaktive Fallstudie zur Analyse von Preisänderungsrisiken im Rohstoffmanagement">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- App Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Notification Toast -->
-    <div id="toast" class="toast hidden">Gespeichert</div>
+    <div id="toast" class="toast">Gespeichert ✓</div>
 
-    <!-- Login / Role Selection Screen -->
+    <!-- ===================== LOGIN VIEW ===================== -->
     <div id="login-view" class="view-container active">
-        <div class="login-box glass-panel">
-            <h1 class="login-title">Seminarmodul Rohstoffmanagement</h1>
-            <p class="login-subtitle">Fallstudie: KabelWerke Deutschland GmbH</p>
-            
-            <div class="role-selector">
-                <h3>Ich bin:</h3>
+        <div class="login-wrapper">
+            <div class="login-box glass-panel">
+                <div class="login-logo">🏭</div>
+                <h1 class="login-title">Seminarmodul<br>Rohstoffmanagement</h1>
+                <p class="login-subtitle">Interaktive Fallstudie: Preisänderungsrisiken erkennen und managen</p>
+                <div class="login-divider"></div>
+                <h3 class="login-prompt">Wählen Sie Ihre Gruppe:</h3>
                 <div class="role-grid">
-                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 1')">Gruppe 1</button>
-                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 2')">Gruppe 2</button>
-                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 3')">Gruppe 3</button>
-                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 4')">Gruppe 4</button>
+                    <button class="btn role-btn" onclick="loginAs('Gruppe 1')"><span class="role-icon">1</span>Gruppe 1</button>
+                    <button class="btn role-btn" onclick="loginAs('Gruppe 2')"><span class="role-icon">2</span>Gruppe 2</button>
+                    <button class="btn role-btn" onclick="loginAs('Gruppe 3')"><span class="role-icon">3</span>Gruppe 3</button>
+                    <button class="btn role-btn" onclick="loginAs('Gruppe 4')"><span class="role-icon">4</span>Gruppe 4</button>
                 </div>
-                
-                <div class="lecturer-login">
-                    <button class="btn role-btn alt-role" onclick="loginAs('Dozent')">Dozent (Präsentation & Übersicht)</button>
-                </div>
+                <button class="btn btn-lecturer" onclick="loginAs('Dozent')">👨‍🏫 Als Dozent eintreten</button>
             </div>
         </div>
-        
-        <div class="background-decor circle-1"></div>
-        <div class="background-decor circle-2"></div>
+        <div class="bg-gradient-orb orb-1"></div>
+        <div class="bg-gradient-orb orb-2"></div>
+        <div class="bg-gradient-orb orb-3"></div>
     </div>
 
-    <!-- Main Dashboard -->
+    <!-- ===================== DASHBOARD VIEW ===================== -->
     <div id="dashboard-view" class="view-container">
-        
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar glass-panel">
+
+        <!-- Sidebar -->
+        <nav class="sidebar">
             <div class="sidebar-header">
+                <div class="sidebar-logo">🏭</div>
                 <h2>Fallstudie</h2>
                 <div id="user-role-badge" class="badge">Gruppe 1</div>
             </div>
-            
+
             <ul class="nav-links">
-                <!-- Links für das fiktive Unternehmen -->
                 <li class="nav-section-title">Recherche</li>
-                <li><button class="nav-btn active" onclick="switchTab('tab-website')">📍 Firmenprofil / Web</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-financials')">📊 Bilanz & GuV</button></li>
-                
+                <li><button class="nav-btn active" onclick="switchTab('tab-company')">🌐 Unternehmenswebsite</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-products')">📦 Produkte</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-bilanz')">📋 Bilanz (HGB)</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-guv')">📊 GuV</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-market')">📈 Aktuelle Marktdaten</button></li>
+
                 <li class="nav-section-title student-only">Aufgabe</li>
-                <li class="student-only"><button class="nav-btn highlight" onclick="switchTab('tab-task')">📝 Risikoanalyse & Lösung</button></li>
-                
-                <li class="nav-section-title lecturer-only hidden">Präsentation</li>
-                <li class="lecturer-only hidden"><button class="nav-btn highlight" onclick="switchTab('tab-lecturer')">👨‍🏫 Gruppenübersicht</button></li>
+                <li class="student-only"><button class="nav-btn nav-highlight" onclick="switchTab('tab-task')">✏️ Risikoanalyse bearbeiten</button></li>
+
+                <li class="nav-section-title lecturer-only hidden">Dozent</li>
+                <li class="lecturer-only hidden"><button class="nav-btn nav-highlight" onclick="switchTab('tab-lecturer')">👨‍🏫 Gruppenübersicht</button></li>
             </ul>
-            
+
             <div class="sidebar-footer">
-                <button class="btn btn-outline" onclick="logout()">Abmelden</button>
+                <div class="connection-box">
+                    <span id="connection-status" class="status-dot offline"></span>
+                    <span id="connection-text">Lokal</span>
+                </div>
+                <button class="btn btn-outline-sm" onclick="logout()">Abmelden</button>
             </div>
         </nav>
 
-        <!-- Main Content Area -->
+        <!-- Main Content -->
         <main class="content-area">
-            
-            <!-- Header -->
-            <header class="app-header glass-panel">
-                <h1 id="current-tab-title">Firmenprofil</h1>
-                <div class="status-indicator">
-                    <span id="connection-status" class="status-dot offline"></span>
-                    <span id="connection-text">Lokal (Ohne Firebase)</span>
-                </div>
+            <header class="app-header">
+                <h1 id="current-tab-title">Unternehmenswebsite</h1>
+                <div class="header-company">KabelWerke Deutschland GmbH</div>
             </header>
 
             <div class="scroll-container">
-                <!-- TAB 1: WEBSITE (Company Profile) -->
-                <div id="tab-website" class="tab-content active">
-                    <div class="company-hero">
-                        <h1>KabelWerke Deutschland GmbH</h1>
-                        <p>Bundesweite Energie für morgen.</p>
+
+                <!-- === TAB: COMPANY WEBSITE === -->
+                <div id="tab-company" class="tab-content active">
+                    <div class="company-hero-banner">
+                        <div class="hero-overlay">
+                            <h1>KabelWerke Deutschland GmbH</h1>
+                            <p class="hero-tagline">Verbindungen, die Deutschland bewegen.</p>
+                            <div class="hero-stats">
+                                <div class="hero-stat"><span class="stat-number">100 Mio. €</span><span class="stat-label">Jahresumsatz</span></div>
+                                <div class="hero-stat"><span class="stat-number">420</span><span class="stat-label">Mitarbeiter</span></div>
+                                <div class="hero-stat"><span class="stat-number">Seit 1987</span><span class="stat-label">Gegründet</span></div>
+                                <div class="hero-stat"><span class="stat-number">50 LKW</span><span class="stat-label">Eigene Flotte</span></div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="grid-2-col" id="company-operations">
+
+                    <div class="section-container">
+                        <div class="info-card glass-panel">
+                            <h3>🏢 Über uns</h3>
+                            <p id="about-text"></p>
+                        </div>
+                        <div class="info-card glass-panel">
+                            <h3>🎯 Unsere Mission</h3>
+                            <p id="mission-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="section-container">
+                        <div class="info-card glass-panel full-width">
+                            <h3>⚙️ Produktion & Energie</h3>
+                            <p id="production-text"></p>
+                        </div>
+                    </div>
+                    <div class="section-container">
+                        <div class="info-card glass-panel">
+                            <h3>🚛 Logistik & Distribution</h3>
+                            <p id="logistics-text"></p>
+                        </div>
+                        <div class="info-card glass-panel">
+                            <h3>📦 Lagerhaltung & Bestandsrisiken</h3>
+                            <p id="warehouse-text"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === TAB: PRODUCTS === -->
+                <div id="tab-products" class="tab-content">
+                    <div class="products-header">
+                        <h2>Unser Produktportfolio</h2>
+                        <p>Alle Produkte enthalten hochwertiges Elektrolyt-Kupfer (Cu-ETP, 99,99% Reinheit), das am LME-Markt beschafft wird.</p>
+                    </div>
+                    <div class="products-grid" id="products-grid">
                         <!-- Injected via JS -->
                     </div>
                 </div>
 
-                <!-- TAB 2: FINANCIALS (Konzernbericht) -->
-                <div id="tab-financials" class="tab-content">
-                    <div class="glass-panel content-box">
-                        <div class="report-header">
-                            <h2>Konzernbericht & Finanzkennzahlen 2023</h2>
-                            <p>Interne Daten der Geschäftsführung. Vertraulich!</p>
-                        </div>
-                        
-                        <div class="grid-2-col">
-                            <div class="data-table-container">
-                                <h3>Gewinn- und Verlustrechnung (GuV)</h3>
-                                <table class="data-table" id="guv-table">
-                                    <tbody>
-                                        <!-- Injected via JS -->
-                                    </tbody>
-                                </table>
+                <!-- === TAB: BILANZ === -->
+                <div id="tab-bilanz" class="tab-content">
+                    <div class="finance-header glass-panel">
+                        <div class="finance-header-inner">
+                            <div>
+                                <h2>Bilanz nach HGB</h2>
+                                <p>KabelWerke Deutschland GmbH | Stichtag: 31.12.2025</p>
                             </div>
-                            
-                            <div class="data-table-container">
-                                <h3>Bilanz (Auszug)</h3>
-                                <table class="data-table" id="balance-table">
-                                    <tbody>
-                                        <!-- Injected via JS -->
-                                    </tbody>
-                                </table>
-                            </div>
+                            <span class="badge badge-red">VERTRAULICH</span>
                         </div>
-                        <div class="hint-box">
-                            <strong>Hinweis für die Analysten:</strong> Berechnen Sie nicht die genauen Margen, sondern identifizieren Sie die strukturellen Klumpenrisiken, die aus dem operativen Tagesgeschäft und der Logistik entstehen.
+                    </div>
+                    <div class="bilanz-grid">
+                        <div class="bilanz-side glass-panel" id="bilanz-aktiva">
+                            <!-- Injected via JS -->
                         </div>
+                        <div class="bilanz-side glass-panel" id="bilanz-passiva">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                    <div class="hint-box">
+                        <strong>📌 Analysehinweis:</strong> Achten Sie besonders auf die Positionen, deren Wert direkt von Rohstoffpreisen abhängt. Welche Bilanzpositionen sind bei steigenden – und welche bei <em>fallenden</em> – Preisen gefährdet?
                     </div>
                 </div>
 
-                <!-- TAB 3: TASK / RESEARCH FORM (Student View) -->
+                <!-- === TAB: GuV === -->
+                <div id="tab-guv" class="tab-content">
+                    <div class="finance-header glass-panel">
+                        <div class="finance-header-inner">
+                            <div>
+                                <h2>Gewinn- und Verlustrechnung (GuV)</h2>
+                                <p>KabelWerke Deutschland GmbH | Geschäftsjahr 01.01.2025 – 31.12.2025 | Gesamtkostenverfahren</p>
+                            </div>
+                            <span class="badge badge-red">VERTRAULICH</span>
+                        </div>
+                    </div>
+                    <div class="guv-container glass-panel">
+                        <table class="finance-table" id="guv-table">
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="hint-box">
+                        <strong>📌 Analysehinweis:</strong> Identifizieren Sie alle Positionen, die von externen Rohstoff- oder Energiepreisen beeinflusst werden. Berechnen Sie deren Anteil an der Gesamtleistung.
+                    </div>
+                </div>
+
+                <!-- === TAB: MARKET DATA === -->
+                <div id="tab-market" class="tab-content">
+                    <div class="market-header">
+                        <h2>📈 Aktuelle Marktdaten</h2>
+                        <p>Quelle: S-International Daily | Stand: <span id="market-date"></span></p>
+                    </div>
+                    <div class="market-grid" id="market-grid">
+                        <!-- Injected via JS -->
+                    </div>
+                    <div class="hint-box" style="margin-top: 24px;">
+                        <strong>📌 Analysehinweis:</strong> Vergleichen Sie die Spot- mit den Terminpreisen. Was bedeutet es, wenn die Terminkurve fällt (Backwardation)? Was bedeutet das für die Lagerbestände?
+                    </div>
+                </div>
+
+                <!-- === TAB: TASK / ANALYSIS FORM === -->
                 <div id="tab-task" class="tab-content">
-                    <div class="glass-panel content-box">
-                        <h2>Ihre Risiko- und Handlungsanalyse</h2>
-                        <p>Dokumentieren Sie hier die Ergebnisse Ihrer Gruppe. Speichern Sie regelmäßig ab. Der Dozent sieht Ihre Live-Eingaben.</p>
-                        
-                        <form id="analysis-form" onsubmit="event.preventDefault(); saveFormData();">
-                            <div class="form-group">
-                                <label>1. Rohstoffbeschaffung LME: Welche Risiken entstehen und wie können diese gemanagt werden?</label>
-                                <textarea id="ans-q1" rows="4" placeholder="Beispiel: Kupferpreis-Schwankung, Absicherung durch Commodity Forwards..."></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>2. Produktion, Energie & Bestand: Welche Gefahren birgt das 22 MW Kraftwerk und das volle Fertiglager?</label>
-                                <textarea id="ans-q2" rows="4" placeholder="Ihre Analyse..."></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>3. Bundesweite Logistik: Welche Risiken ergeben sich aus der bundesweiten 'Just-in-Time' LKW-Auslieferung?</label>
-                                <textarea id="ans-q3" rows="4" placeholder="Ihre Analyse..."></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Fazit: Zusammenfassung der Handlungsempfehlungen an die Geschäftsführung</label>
-                                <textarea id="ans-q4" rows="4" placeholder="Abschließende Empfehlungen..."></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Antworten an Dozent übermitteln</button>
-                        </form>
+                    <div class="task-header glass-panel">
+                        <h2>✏️ Ihre Risikoanalyse</h2>
+                        <p>Nutzen Sie die Informationen aus dem Unternehmensprofil, der Bilanz, der GuV und den Marktdaten, um die folgenden Aufgaben zu bearbeiten. Ihre Antworten werden automatisch gespeichert und sind für den Dozenten live sichtbar.</p>
                     </div>
+                    <form id="analysis-form" onsubmit="event.preventDefault(); saveFormData();">
+                        <div id="task-questions-container">
+                            <!-- Injected via JS -->
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Alle Antworten jetzt übermitteln</button>
+                    </form>
                 </div>
 
-                <!-- TAB 4: LECTURER DASHBOARD (Lecturer View) -->
+                <!-- === TAB: LECTURER OVERVIEW === -->
                 <div id="tab-lecturer" class="tab-content">
-                    <div class="glass-panel content-box">
-                        <h2>Live-Übersicht der Gruppen</h2>
-                        <p>Wählen Sie eine Gruppe aus, um deren Ergebnisse zur Präsentation am Screen anzuzeigen.</p>
-                        
-                        <div class="group-selector">
-                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 1')">Ergebnisse Gruppe 1</button>
-                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 2')">Ergebnisse Gruppe 2</button>
-                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 3')">Ergebnisse Gruppe 3</button>
-                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 4')">Ergebnisse Gruppe 4</button>
-                        </div>
-                        
-                        <div class="presentation-board hidden" id="presentation-board">
-                            <h3 id="presentation-group-name" class="presentation-title">Gruppe X</h3>
-                            
-                            <div class="presentation-item">
-                                <h4>1. Risiko Rohstoffbeschaffung</h4>
-                                <div id="pres-q1" class="presentation-text">Keine Antwort.</div>
-                            </div>
-                            <div class="presentation-item">
-                                <h4>2. Risiko Energie (22 MW) & Lagerwert</h4>
-                                <div id="pres-q2" class="presentation-text">Keine Antwort.</div>
-                            </div>
-                            <div class="presentation-item">
-                                <h4>3. Risiko Logistik (Diesel)</h4>
-                                <div id="pres-q3" class="presentation-text">Keine Antwort.</div>
-                            </div>
-                            <div class="presentation-item">
-                                <h4>Fazit & Handlungsempfehlung</h4>
-                                <div id="pres-q4" class="presentation-text">Keine Antwort.</div>
-                            </div>
+                    <div class="task-header glass-panel">
+                        <h2>👨‍🏫 Live-Übersicht der Gruppen</h2>
+                        <p>Wählen Sie eine Gruppe, um deren Analyse am Beamer zu präsentieren.</p>
+                    </div>
+                    <div class="group-selector">
+                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
+                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
+                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
+                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
+                    </div>
+                    <div class="presentation-board hidden" id="presentation-board">
+                        <h3 id="presentation-group-name" class="presentation-title"></h3>
+                        <div id="presentation-answers">
+                            <!-- Injected via JS -->
                         </div>
                     </div>
                 </div>
@@ -201,7 +234,7 @@
         </main>
     </div>
 
-    <!-- Firebase SDKs (v9 Compat für einfachere CDN-Nutzung ohne Modul-Bundler) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
