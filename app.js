@@ -7,13 +7,13 @@ let saveTimeout = null;
 
 // ---- INIT ----
 document.addEventListener("DOMContentLoaded", () => {
-    injectCompanyWebsite();
-    injectProducts();
-    injectBilanz();
-    injectGuV();
-    injectMarketData();
-    injectTaskQuestions();
-    updateConnectionStatus();
+    try { injectCompanyWebsite(); } catch(e) { console.error("injectCompanyWebsite:", e); }
+    try { injectProducts(); } catch(e) { console.error("injectProducts:", e); }
+    try { injectBilanz(); } catch(e) { console.error("injectBilanz:", e); }
+    try { injectGuV(); } catch(e) { console.error("injectGuV:", e); }
+    try { injectMarketData(); } catch(e) { console.error("injectMarketData:", e); }
+    try { injectTaskQuestions(); } catch(e) { console.error("injectTaskQuestions:", e); }
+    try { updateConnectionStatus(); } catch(e) { console.error("updateConnectionStatus:", e); }
 });
 
 // ============================================================
