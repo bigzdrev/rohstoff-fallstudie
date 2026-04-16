@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fallstudie: Rohstoffmanagement Risiko-App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast" class="toast hidden">Gespeichert</div>
+    <div id="login-view" class="view-container active">
+        <div class="login-box glass-panel">
+            <h1 class="login-title">Seminarmodul Rohstoffmanagement</h1>
+            <p class="login-subtitle">Fallstudie: KabelWerke Deutschland GmbH</p>
+            <div class="role-selector">
+                <h3>Ich bin:</h3>
+                <div class="role-grid">
+                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 1')">Gruppe 1</button>
+                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 2')">Gruppe 2</button>
+                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 3')">Gruppe 3</button>
+                    <button class="btn role-btn student-role" onclick="loginAs('Gruppe 4')">Gruppe 4</button>
+                </div>
+                <div class="lecturer-login">
+                    <button class="btn role-btn alt-role" onclick="loginAs('Dozent')">Dozent (Präsentation & Übersicht)</button>
+                </div>
+            </div>
+        </div>
+        <div class="background-decor circle-1"></div>
+        <div class="background-decor circle-2"></div>
+    </div>
+    <div id="dashboard-view" class="view-container">
+        <nav class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <h2>Fallstudie</h2>
+                <div id="user-role-badge" class="badge">Gruppe 1</div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-section-title">Recherche</li>
+                <li><button class="nav-btn active" onclick="switchTab('tab-website')">📍 Firmenprofil / Web</button></li>
+                <li><button class="nav-btn" onclick="switchTab('tab-financials')">📊 Bilanz & GuV</button></li>
+                <li class="nav-section-title student-only">Aufgabe</li>
+                <li class="student-only"><button class="nav-btn highlight" onclick="switchTab('tab-task')">📝 Risikoanalyse & Lösung</button></li>
+                <li class="nav-section-title lecturer-only hidden">Präsentation</li>
+                <li class="lecturer-only hidden"><button class="nav-btn highlight" onclick="switchTab('tab-lecturer')">👨🏫 Gruppenübersicht</button></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn btn-outline" onclick="logout()">Abmelden</button>
+            </div>
+        </nav>
+        <main class="content-area">
+            <header class="app-header glass-panel">
+                <h1 id="current-tab-title">Firmenprofil</h1>
+                <div class="status-indicator">
+                    <span id="connection-status" class="status-dot offline"></span>
+                    <span id="connection-text">Lokal (Ohne Firebase)</span>
+                </div>
+            </header>
+            <div class="scroll-container">
+                <div id="tab-website" class="tab-content active">
+                    <div class="company-hero">
+                        <h1>KabelWerke Deutschland GmbH</h1>
+                        <p>Bundesweite Energie für morgen.</p>
+                    </div>
+                    <div class="grid-2-col" id="company-operations"></div>
+                </div>
+                <div id="tab-financials" class="tab-content">
+                    <div class="glass-panel content-box">
+                        <div class="report-header">
+                            <h2>Konzernbericht & Finanzkennzahlen 2023</h2>
+                            <p>Interne Daten der Geschäftsführung. Vertraulich!</p>
+                        </div>
+                        <div class="grid-2-col">
+                            <div class="data-table-container">
+                                <h3>Gewinn- und Verlustrechnung (GuV)</h3>
+                                <table class="data-table" id="guv-table"><tbody></tbody></table>
+                            </div>
+                            <div class="data-table-container">
+                                <h3>Bilanz (Auszug)</h3>
+                                <table class="data-table" id="balance-table"><tbody></tbody></table>
+                            </div>
+                        </div>
+                        <div class="hint-box">
+                            <strong>Hinweis für die Analysten:</strong> Berechnen Sie nicht die genauen Margen, sondern identifizieren Sie die strukturellen Klumpenrisiken, die aus dem operativen Tagesgeschäft und der Logistik entstehen.
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-task" class="tab-content">
+                    <div class="glass-panel content-box">
+                        <h2>Ihre Risiko- und Handlungsanalyse</h2>
+                        <form id="analysis-form" onsubmit="event.preventDefault(); saveFormData();">
+                            <div class="form-group"><label>1. Rohstoffbeschaffung LME:</label><textarea id="ans-q1" rows="4"></textarea></div>
+                            <div class="form-group"><label>2. Produktion, Energie & Bestand (22 MW Kraftwerk):</label><textarea id="ans-q2" rows="4"></textarea></div>
+                            <div class="form-group"><label>3. Bundesweite Logistik (Just-in-time / Diesel):</label><textarea id="ans-q3" rows="4"></textarea></div>
+                            <div class="form-group"><label>Fazit: Handlungsempfehlungen</label><textarea id="ans-q4" rows="4"></textarea></div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Absenden</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="tab-lecturer" class="tab-content">
+                    <div class="glass-panel content-box">
+                        <h2>Live-Übersicht der Gruppen</h2>
+                        <div class="group-selector">
+                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
+                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
+                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
+                            <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
+                        </div>
+                        <div class="presentation-board hidden" id="presentation-board">
+                            <h3 id="presentation-group-name" class="presentation-title">Gruppe X</h3>
+                            <div class="presentation-item"><h4>1. Rohstoff</h4><div id="pres-q1" class="presentation-text"></div></div>
+                            <div class="presentation-item"><h4>2. Energie & Lager</h4><div id="pres-q2" class="presentation-text"></div></div>
+                            <div class="presentation-item"><h4>3. Logistik</h4><div id="pres-q3" class="presentation-text"></div></div>
+                            <div class="presentation-item"><h4>Fazit</h4><div id="pres-q4" class="presentation-text"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="data.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
