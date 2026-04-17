@@ -265,7 +265,7 @@ const companyData = {
                 {
                     keywords: ["guv", "gewinn", "verlust", "ergebnis", "ebit", "marge"],
                     topicSentence: "profit loss income statement EBIT margin result GuV Gewinn Verlust Ergebnis Marge Rentabilität profitabel",
-                    answer: "Unser EBIT liegt bei 4 Millionen Euro – das entspricht einer EBIT-Marge von gerade mal 4 Prozent. Bei einem Materialaufwand von 58,5 Millionen braucht es nur eine vergleichsweise geringe Schwankung der Einkaufspreise, um unser gesamtes Betriebsergebnis aufzuzehren. Anders gesagt: Wenn der Kupferpreis nur um 8-9 Prozent steigt und wir das nicht weitergeben können, wäre unser Gewinn praktisch null."
+                    answer: "Unser EBIT liegt bei 4 Millionen Euro – das entspricht einer EBIT-Marge von gerade mal 4 Prozent. Bei einem Materialaufwand von 58,5 Millionen braucht es nur eine vergleichsweise geringe Schwankung der Einkaufspreise, um unser gesamtes Betriebsergebnis aufzuzehren. Anders gesagt: Wenn der Kupferpreis nur um 8-9 Prozent steigt und we das nicht weitergeben können, wäre unser Gewinn praktisch null."
                 },
                 {
                     keywords: ["rückstellung", "sonstige"],

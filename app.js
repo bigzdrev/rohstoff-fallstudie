@@ -565,7 +565,7 @@ function loadGroupAnswers(groupName) {
 // ============================================================
 function formatEur(val) {
     if (!val) return "";
-    const str = val.toString().replace(/[+-]/g, '').trim();
+    const str = val.toString().replace(/[+\-]/g, '').trim();
     const prefix = val.toString().startsWith("-") ? "- " : (val.toString().startsWith("+") ? "+ " : "");
     return prefix + str + " €";
 }
