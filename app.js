@@ -1,14 +1,253 @@
-// ============================================================
-// APP.JS â KabelWerke Fallstudie v4 (KI-Chat mit Transformers.js)
-// ============================================================
-
 let currentRole = "";
 let saveTimeout = null;
-
-// ---- KI-MODUL ----
-let aiStatus = "idle"; // idle | loading | ready | error
+let aiStatus = "idle";
 let aiExtractor = null;
 let aiEmbeddingsCache = {};
+
+document.addEventListener("DOMContentLoaded", () => {
+        try { injectCompanyWebsite(); } catch(e) {}
+        try { injectProducts(); } catch(e) {}
+        try { injectBilanz(); } catch(e) {}
+        try { injectGuV(); } catch(e) {}
+        try { injectLagebericht(); } catch(e) {}
+        try { injectMarketData(); } catch(e) {}
+        try { injectTaskQuestions(); } catch(e) {}
+        try { initChats(); } catch(e) {}
+});
+
+function loginAs(role) {
+        currentRole = role;
+        document.getElementById("user-role-badge").innerText = role;
+        document.getElementById("login-view").classList.remove("active");
+        document.getElementById("dashboard-view").classList.add("active");
+        if (role === "Dozent") {
+                    document.querySelectorAll(".student-only").forEach(el => el.classList.add("hidden"));
+                    document.querySelectorAll(".lecturer-only").forEach(el => el.classList.remove("hidden"));
+                    switchTab("tab-lecturer");
+        } else {
+                    document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
+                    document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
+                    switchTab("tab-company");
+        }
+}
+function logout() { location.reload(); }
+function switchTab(tabId) {
+        document.querySelectorAll(".nav-btn").forEach(btn => {
+                    btn.classList.remove("active");
+                    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)) {
+                                    btn.classList.add("active");
+                                    document.getElementById("current-tab-title").innerText = btn.innerText.trim();
+                    }
+        });
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        if (tabId.startsWith("tab-chat-") && aiStatus === "idle") { initAI(); }
+}
+function switchSubTab(subId, btn) {
+        btn.parentElement.querySelectorAll(".sub-tab").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        btn.closest(".tab-content").querySelectorAll(".sub-content").forEach(c => c.classList.remove("active"));
+        document.getElementById(subId).classList.add("active");
+}
+function injectCompanyWebsite() {
+        const ws = companyData.website_sections;
+        document.getElementById("about-text").innerHTML = ws.about;
+        document.getElementById("mission-text").innerHTML = ws.mission;
+}
+function injectProducts() {
+        const grid = document.getElementById("products-grid");
+        if(grid) {
+                    grid.innerHTML = "";
+                    companyData.products.forEach(p => {
+                                    grid.innerHTML += `<div class="product-card"><h4>${p.name}</h4><p>${p.description}</p></div>`;
+                    });
+        }
+}
+function injectBilanz() {
+        renderBilanzSide("bilanz-aktiva", companyData.bilanz.aktiva);
+        renderBilanzSide("bilanz-passiva", companyData.bilanz.passiva);
+}
+function renderBilanzSide(containerId, sideData) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        let html = `<div class="bilanz-title">${sideData.title}</div>`;
+        sideData.sections.forEach(section => {
+                    if (section.title) html += `<div class="bilanz-section-title">${section.title}</div>`;
+                    html += `<table class="finance-table"><tbody>`;
+                    section.items.forEach(item => {
+                                    let cls = item.total ? "row-total" : item.bold ? "row-bold" : item.sub ? "row-sub" : "";
+                                    let val = item.value ? formatEur(item.value) : "";
+                                    let ind = item.indent ? ' class="indent"' : '';
+                                    html += `<tr class="${cls}"><td${ind}>${item.label}</td><td>${val}</td></tr>`;
+                    });
+                    html += `</tbody></table>`;
+        });
+        container.innerHTML = html;
+}
+function injectGuV() {
+        const tbody = document.getElementById("guv-table") ? document.getElementById("guv-table").querySelector("tbody") : null;
+        if(tbody) {
+                    tbody.innerHTML = "";
+                    companyData.guv.items.forEach(item => {
+                                    if (!item.label) { tbody.innerHTML += `<tr class="row-spacer"><td></td><td></td></tr>`; return; }
+                                    let cls = item.total ? "row-total" : item.line ? "row-bold row-line" : item.bold ? "row-bold" : item.sub ? "row-sub" : "";
+                                    let val = item.value ? formatEur(item.value) : "";
+                                    let ind = item.indent ? ' class="indent"' : '';
+                                    tbody.innerHTML += `<tr class="${cls}"><td${ind}>${item.label}</td><td>${val}</td></tr>`;
+                    });
+        }
+}
+function injectLagebericht() {
+        const container = document.getElementById("lagebericht-container");
+        if(container) {
+                    container.innerHTML = "";
+                    companyData.lagebericht.sections.forEach(s => {
+                                    container.innerHTML += `<div class="lagebericht-section glass-panel"><h3>${s.title}</h3><p>${s.text}</p></div>`;
+                    });
+        }
+}
+function injectMarketData() {
+        const mp = companyData.marketPrices;
+        const mdate = document.getElementById("market-date");
+        if(mdate) mdate.innerText = mp.date;
+        const grid = document.getElementById("market-grid");
+        if(grid) {
+                    grid.innerHTML = `<div class="market-card"><h3>Kupfer</h3><p>${mp.copper.spotUsd} USD</p></div>`;
+        }
+}
+function formatEur(val) { return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(val); }
+function injectTaskQuestions() {
+        const container = document.getElementById('task-questions-container');
+        if(container) {
+                    container.innerHTML = '';
+                    companyData.questions.forEach(q => {
+                                    container.innerHTML += `<div class="task-card"><h4>${q.title}</h4><div class="task-prompt">${q.prompt}</div><textarea id="ans-${q.id}" rows="6" placeholder="Ihre Analyse..."></textarea></div>`;
+                    });
+                    setTimeout(() => {
+                                    document.querySelectorAll("textarea").forEach(ta => {
+                                                        ta.addEventListener("input", () => {
+                                                                                clearTimeout(saveTimeout);
+                                                                                saveTimeout = setTimeout(() => saveFormData(), 3000);
+                                                        });
+                                    });
+                    }, 100);
+        }
+}
+async function initAI() {
+        aiStatus = "loading"; updateAIBadges();
+        try {
+                    const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
+                    env.allowLocalModels = false;
+                    aiExtractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+                    aiStatus = "ready";
+        } catch (e) { aiStatus = "error"; }
+        updateAIBadges();
+}
+function updateAIBadges() {
+        document.querySelectorAll(".ai-status-badge").forEach(badge => {
+                    if (aiStatus === "loading") badge.innerText = "'Lade KI...';
+                                else if (aiStatus === "ready") badge.innerText = 'KI aktiv';
+                    else badge.innerText = 'Smart-Matching';
+        });
+}
+function findChatResponseSmart(contactId, question) {
+        const contact = companyData.chatContacts[contactId];
+        const q = question.toLowerCase();
+        let bestMatch = null; let bestScore = 0;
+        contact.responses.forEach(r => {
+                    let score = 0;
+                    r.keywords.forEach(kw => { if (q.includes(kw.toLowerCase())) score += 2; });
+                    if (score > bestScore) { bestScore = score; bestMatch = r; }
+        });
+        return { match: bestMatch, score: bestScore };
+}
+function initChats() {
+        ['unternehmen', 'bank'].forEach(id => {
+                    const contact = companyData.chatContacts[id];
+                    document.getElementById('chat-' + id + '-name').innerText = contact.name;
+                    document.getElementById('chat-' + id + '-role').innerText = contact.role;
+                    addChatMessage(id, contact.avatar, contact.greeting, false);
+        });
+}
+function sendChatMessage(contactId) {
+        const input = document.getElementById('chat-' + contactId + '-input');
+        const text = input.value.trim();
+        if (!text) return;
+        addChatMessage(contactId, 'User', text, true);
+        input.value = '';
+        setTimeout(() => {
+                    const result = findChatResponseSmart(contactId, text);
+                    const contact = companyData.chatContacts[contactId];
+                    const response = result.match ? result.match.answer : contact.fallback;
+                    addChatMessage(contactId, contact.avatar, response, false);
+        }, 800);
+}
+function addChatMessage(contactId, avatar, text, isUser) {
+        const container = document.getElementById('chat-' + contactId + '-messages');
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble' + (isUser ? ' chat-user' : '');
+        bubble.innerHTML = '<div class="bubble-avatar">' + avatar + '</div><div class="bubble-text">' + text + '</div>';
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+}
+function saveFormData() {
+        const answers = {};
+        companyData.questions.forEach(q => {
+                    answers[q.id] = document.getElementById('ans-' + q.id).value;
+        });
+        localStorage.setItem('kabelwerke_answers_' + currentRole, JSON.stringify(answers));
+        const t = document.getElementById('toast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+}
+function loadSavedAnswers() {
+        const saved = localStorage.getItem('kabelwerke_answers_' + currentRole);
+        if (saved) {
+                    const answers = JSON.parse(saved);
+                    Object.keys(answers).forEach(id => {
+                                    const el = document.getElementById('ans-' + id);
+                                    if (el) el.value = answers[id];
+                    });
+        }
+}
+function loadGroupAnswers(group) {
+        currentRole = group;
+        const saved = localStorage.getItem('kabelwerke_answers_' + group);
+        document.getElementById('presentation-board').classList.remove('hidden');
+        document.getElementById('presentation-group-name').innerText = group;
+        const container = document.getElementById('presentation-answers');
+        container.innerHTML = '';
+        if (saved) {
+                    const answers = JSON.parse(saved);
+                    companyData.questions.forEach(q => {
+                                    container.innerHTML += '<div class="pres-item"><h4>' + q.title + '</h4><div class="pres-item-text">' + (answers[q.id] || 'Keine Antwort.') + '</div></div>';
+                    });
+        }
+}
+function updateConnectionStatus() {}
+// ============================================================
+// APP.JS (restored)
+// ============================================================
+let currentRole = "";
+let saveTimeout = null;
+let aiStatus = "idle";
+let aiExtractor = null;
+let aiEmbeddingsCache = {};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     try { injectCompanyWebsite(); } catch(e) { console.error("company:", e); }
@@ -22,9 +261,21 @@ document.addEventListener("DOMContentLoaded", () => {
     try { updateConnectionStatus(); } catch(e) { console.error("firebase:", e); }
 });
 
-// ============================================================
-// LOGIN & NAV
-// ============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function loginAs(role) {
     currentRole = role;
     document.getElementById("user-role-badge").innerText = role;
@@ -41,196 +292,95 @@ function loginAs(role) {
         switchTab("tab-company");
     }
 }
-
 function logout() {
     currentRole = "";
     document.getElementById("dashboard-view").classList.remove("active");
     document.getElementById("login-view").classList.add("active");
 }
-
+function switchTab(tabId) {
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)) {
+function loginAs(role) {
+    currentRole = role;
+    document.getElementById("user-role-badge").innerText = role;
+    document.getElementById("login-view").classList.remove("active");
+    document.getElementById("dashboard-view").classList.add("active");
+    if (role === "Dozent") {
+        document.querySelectorAll(".student-only").forEach(el => el.classList.add("hidden"));
+        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.remove("hidden"));
+        switchTab("tab-lecturer");
+    } else {
+        document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
+        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
+        loadSavedAnswers();
+        switchTab("tab-company");
+    }
+}
+function logout() {
+    currentRole = "";
+    document.getElementById("dashboard-view").classList.remove("active");
+    document.getElementById("login-view").classList.add("active");
+}
 function switchTab(tabId) {
     document.querySelectorAll(".nav-btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)) {
             btn.classList.add("active");
-            const title = btn.innerText.replace(/^[^\wÃ¤Ã¶Ã¼ÃÃÃ\s]*/i, '').trim();
+            const title = btn.innerText.replace(/^[^\wäöüÄÖÜ\s]*/i, '').trim();
             document.getElementById("current-tab-title").innerText = title;
         }
     });
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
     document.getElementById(tabId).classList.add("active");
-
-    // Lazy-load KI wenn ein Chat-Tab geÃ¶ffnet wird
     if (tabId.startsWith("tab-chat-") && aiStatus === "idle") {
         initAI();
     }
 }
-
 function switchSubTab(subId, btn) {
-    btn.parentElement.querySelectorAll(".sub-tab").forEach(btn => btn.classList.remove("active"));
+    btn.parentElement.querySelectorAll(".sub-tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    btn.closest(".tab-content").querySelectorAll(".sub-content").forEach(c( => c.classList.remove("active"));
+    btn.closest(".tab-content").querySelectorAll(".sub-content").forEach(c => c.classList.remove("active"));
+    document.getElementById(subId).classList.add("active");
+function loginAs(role) {
+    currentRole = role;
+    document.getElementById("user-role-badge").innerText = role;
+    document.getElementById("login-view").classList.remove("active");
+    document.getElementById("dashboard-view").classList.add("active");
+    if (role === "Dozent") {
+        document.querySelectorAll(".student-only").forEach(el => el.classList.add("hidden"));
+        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.remove("hidden"));
+        switchTab("tab-lecturer");
+    } else {
+        document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
+        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
+        loadSavedAnswers();
+        switchTab("tab-company");
+    }
+}
+function logout() {
+    currentRole = "";
+    document.getElementById("dashboard-view").classList.remove("active");
+    document.getElementById("login-view").classList.add("active");
+}
+function switchTab(tabId) {
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)) {
+            btn.classList.add("active");
+            const title = btn.innerText.replace(/^[^\\\\wäöüÄÖÜ\\\\s]*/i, '').trim();
+            document.getElementById("current-tab-title").innerText = title;
+        }
+    });
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
+    if (tabId.startsWith("tab-chat-") && aiStatus === "idle") {
+        initAI();
+    }
+}
+function switchSubTab(subId, btn) {
+    btn.parentElement.querySelectorAll(".sub-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    btn.closest(".tab-content").querySelectorAll(".sub-content").forEach(c => c.classList.remove("active"));
     document.getElementById(subId).classList.add("active");
 }
-
-// ============================================================
-// INJECT: COMPANY WEBSITE
-// ============================================================
-function inject6ö×çvV'6FR°¢6öç7Bw2Ò6ö×çFFçvV'6FU÷6V7Föç3°¢Fö7VÖVçBævWDVÆVÖVçD'B&&÷WB×FWB"æææW$DÔÂÒw2æ&÷WC°¢Fö7VÖVçBævWDVÆVÖVçD'B&Ö76öâ×FWB"æææW$DÔÂÒw2æÖ76öã°¢Fö7VÖVçBævWDVÆVÖVçD'B'&öGV7Föâ×FWB"æææW$DÔÂÒw2ç&öGV7Föã°¢Fö7VÖVçBævWDVÆVÖVçD'B&Æöv7F72×FWB"æææW$DÔÂÒw2æÆöv7F73°¢Fö7VÖVçBævWDVÆVÖVçD'B'v&V÷W6R×FWB"æææW$DÔÂÒw2çv&V÷W6S°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¢òòä¤T5C¢$ôET5E0¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâæ¦V7E&öGV7G2°¢6öç7Bw&BÒFö7VÖVçBævWDVÆVÖVçD'B'&öGV7G2Öw&B"°¢6ö×çFFç&öGV7G2æf÷$V6Óâ°¢w&BæææW$DÔÂ³ÒÆFb6Æ73Ò'&öGV7BÖ6&B#ãÇ7â6Æ73Ò'&öGV7BÖVÖö¦#âG·æÖvUöVÖö¦ÓÂ÷7ããÇ7â6Æ73Ò'&öGV7BÖ6FVv÷'#âG·æ6FVv÷'ÓÂ÷7ããÆCâG·ææÖWÓÂöCãÇâG·æFW67&FöçÓÂ÷ãÂöFcæ°¢Ò°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¢òòä¤T5C¢$Äå ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâæ¦V7D&Æç¢°¢&VæFW$&Æç¥6FR&&Æç¢Ö·Ff"Â6ö×çFFæ&Æç¢æ·Ff°¢&VæFW$&Æç¥6FR&&Æç¢×76f"Â6ö×çFFæ&Æç¢ç76f°§Ð¦gVæ7Föâ&VæFW$&Æç¥6FR6öçFæW$BÂ6FTFF°¢6öç7B6öçFæW"ÒFö7VÖVçBævWDVÆVÖVçD'B6öçFæW$B°¢ÆWBFÖÂÒÆFb6Æ73Ò&&Æç¢×FFÆR#âG·6FTFFçFFÆWÓÂöFcæ°¢6FTFFç6V7Föç2æf÷$V66V7FöâÓâ°¢b6V7FöâçFFÆRFÖÂ³ÒÆFb6Æ73Ò&&Æç¢×6V7Föâ×FFÆR#âG·6V7FöâçFFÆWÓÂöFcæ°¢FÖÂ³ÒÇF&ÆR6Æ73Ò&fææ6R×F&ÆR#ãÇF&öGæ°¢6V7FöâæFV×2æf÷$V6FVÒÓâ°¢ÆWB6Ç2ÒFVÒçF÷FÂò'&÷r×F÷FÂ"¢FVÒæ&öÆBò'&÷rÖ&öÆB"¢FVÒç7V"ò'&÷r×7V""¢"#°¢ÆWBfÂÒFVÒçfÇVRòf÷&ÖDWW"FVÒçfÇVR¢"#°¢ÆWBæBÒFVÒææFVçBòr6Æ73Ò&æFVçB"r¢rs°¢FÖÂ³ÒÇG"6Æ73Ò"G¶6Ç7Ò#ãÇFBG¶æGÓâG¶FVÒæÆ&VÇÓÂ÷FCãÇFCâG·fÇÓÂ÷FCãÂ÷G#æ°¢Ò°¢FÖÂ³ÒÂ÷F&öGãÂ÷F&ÆSæ°¢Ò°¢6öçFæW"æææW$DÔÂÒFÖÃ°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¢òòä¤T5C¢wU`¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâæ¦V7DwUb°¢6öç7BF&öGÒFö7VÖVçBævWDVÆVÖVçD'B&wWb×F&ÆR"çVW'6VÆV7F÷"'F&öG"°¢6ö×çFFæwWbæFV×2æf÷$V6FVÒÓâ°¢bFVÒæÆ&VÂ²F&öGæææW$DÔÂ³ÒÇG"6Æ73Ò'&÷r×76W"#ãÇFCãÂ÷FCãÇFCãÂ÷FCãÂ÷G#æ²&WGW&ã²Ð¢ÆWB6Ç2ÒFVÒçF÷FÂò'&÷r×F÷FÂ"¢FVÒæÆæRò'&÷rÖ&öÆB&÷rÖÆæR"¢FVÒæ&öÆBò'&÷rÖ&öÆB"¢FVÒç7V"ò'&÷r×7V""¢"#°¢ÆWBfÂÒFVÒçfÇVRòf÷&ÖDWW"FVÒçfÇVR¢"#°¢ÆWBæBÒFVÒææFVçBòr6Æ73Ò&æFVçB"r¢rs°¢F&öGæææW$DÔÂ³ÒÇG"6Æ73Ò"G¶6Ç7Ò#ãÇFBG¶æGÓâG¶FVÒæÆ&VÇÓÂ÷FCãÇFCâG·fÇÓÂ÷FCãÂ÷G#æ°¢Ò°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¢òòä¤T5C¢ÄtT$U$4@¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâæ¦V7DÆvV&W&6B°¢6öç7B6öçFæW"ÒFö7VÖVçBævWDVÆVÖVçD'B&ÆvV&W&6BÖ6öçFæW""°¢6ö×çFFæÆvV&W&6Bç6V7Föç2æf÷$V62Óâ°¢6öçFæW"æææW$DÔÂ³ÒÆFb6Æ73Ò&ÆvV&W&6B×6V7FöâvÆ72×æVÂ#ãÆ3âG·2çFFÆWÓÂö3ãÇâG·2çFWGÓÂ÷ãÂöFcæ°¢Ò°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¢òòä¤T5C¢Ô$´UBDD¢òòÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâæ¦V7DÖ&¶WDFF°¢6öç7B×Ò6ö×çFFæÖ&¶WE&6W3°¢Fö7VÖVçBævWDVÆVÖVçD'B&Ö&¶WBÖFFR"æææW%FWBÒ×æFFS°¢6öç7Bw&BÒFö7VÖVçBævWDVÆVÖVçD'B&Ö&¶WBÖw&B"°¢w&BæææW$DÔÂÒ ¢ÆFb6Æ73Ò&Ö&¶WBÖ6&B#à¢ÆFb6Æ73Ò&Ö&¶WBÖ6&BÖVFW"#ãÆ3ä·WfW"ÄÔRÂö3ãÇ7â6Æ73Ò&Ö&¶WBÖ6&BÖ6öâ#ãÂ÷7ããÂöFcà¢ÇF&ÆR6Æ73Ò&Ö&¶WB×F&ÆR#à¢ÇG#ãÇFCå7÷B66Â÷FCãÇFB6Æ73Ò&Ö&¶WB×7÷B#âG¶×æ6÷W"ç7÷EW6BçFôÆö6ÆU7G&ærÒU4B÷CÂ÷FCãÂ÷G#à¢ÇG#ãÇFCå7÷BâUU#Â÷FCãÇFB6Æ73Ò&Ö&¶WB×7÷B#âG¶×æ6÷W"ç7÷DWW"çFôÆö6ÆU7G&ærÒUU"÷CÂ÷FCãÂ÷G#à¢ÍÓHÜØ\ÝÛ\ÛÜ\ÜØ\ÛKÓØØ[TÝ[Ê
-_HTÑÝÝÝHÜØ\ÝÛ\ÛÜ\ÜØ\KÓØØ[TÝ[Ê
-_HTÑÝÝÝLHÜØ\ÝÛ\ÛÜ\ÜØ\LKÓØØ[TÝ[Ê
-_HTÑÛOÝÝÝXOÙ]]Û\ÜÏHX\Ù]XØ\Â]Û\ÜÏHX\Ù]XØ\ZXY\ÏØ\ÛÚ[
-PÑJOÚÏÜ[Û\ÜÏHX\Ù]XØ\ZXÛÛ¸¦ïOÜÜ[Ù]XHÛ\ÜÏHX\Ù]]XHÜÝ
-ÈØ\ÛÚ[
-OÝÛ\ÜÏHX\Ù]\ÜÝÛ\Y\Ù[ÜÝ\ÙÓØØ[TÝ[Ê
-_HTÑÛUÝÝÜÝ[UTÝÛ\ÜÏHX\Ù]\ÜÝÛ\Y\Ù[ÜÝ]\ÓØØ[TÝ[Ê
-_HUTÛUÝÝHÜØ\ÝÛ\Y\Ù[ÜØ\KÓØØ[TÝ[Ê
-_HTÑÛUÝÝLHÜØ\ÝÛ\Y\Ù[ÜØ\LKÓØØ[TÝ[Ê
-_HTÑÛUÝÝÝXOÙ]]Û\ÜÏHX\Ù]XØ\]Û\ÜÏHX\Ù]XØ\ZXY\ÏUPH
-PÑJOÚÏÜ[Û\ÜÏHX\Ù]XØ\ZXÛÛÜÜ[Ù]XHÛ\ÜÏHX\Ù]]XHÜÝÝÛ\ÜÏHX\Ù]\ÜÝÛ\]XKÜÝÑ^Y
-_HUTÝÓø  ÝÝLHÜØ\ÝÛ\]XKÜØ\LKÑ^Y
-_HUTÝÓø  ÝÝÝXOÙ]]Û\ÜÏHX\Ù]XØ\]Û\ÜÏHX\Ù]XØ\ZXY\ÏUTÕTÑÚÏÜ[Û\ÜÏHX\Ù]XØ\ZXÛÛÜÜ[Ù]XHÛ\ÜÏHX\Ù]]XHÜÝÝÛ\ÜÏHX\Ù]\ÜÝÛ\]\\ÙÑ^Y
-
-_OÝÝÝXOÙ]ÂBËÈOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOBËÈSPÕTÒÈUQTÕSÓÂËÈOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB[Ý[Û[XÝ\ÚÔ]Y\Ý[ÛÊ
-HÂÛÛÝÛÛZ[\HØÝ[Y[Ù][[Y[RY
-\ÚË\]Y\Ý[ÛËXÛÛZ[\NÂÛÛ\[Q]K]Y\Ý[ÛËÜXXÚ
-HOÂÛÛZ[\[\S
-ÏH]Û\ÜÏH\ÚËXØ\ÜK]_OÚ]Û\ÜÏH\ÚË\Û\ÜKÛ\OÙ]^\XHYH[ËIÜKYHÝÜÏHXÙZÛ\HZH[[\ÙKÝ^\XOÙ]ÂJNÂÙ][Y[Ý]
-
-
-HOÂØÝ[Y[]Y\TÙ[XÝÜ[
-Ø[[\Ú\ËYÜH^\XHKÜXXÚ
-HOÂKY][\Ý[\[]
-
-HOÈÛX\[Y[Ý]
-Ø]U[Y[Ý]
-NÈØ]U[Y[Ý]HÙ][Y[Ý]
-
-
-HOØ]QÜQ]J
-KÌ
-NÈJNÂJNÂKL
-NÂBËÈOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOBËÈÒKSSÑS[ÙÜY\ËÈ
-Ü[TÛÝ\ÙK0éY[HÝÜÙ\BËÈOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB\Þ[È[Ý[Û[]RJ
-HÂZTÝ]\ÈHØY[ÈÂ\]PRPYÙ\Ê
-NÂHÂËÈ[[Z\ØÚ\[\ÜÛ[ÙÜY\ËÈ
-YÙÚ[ÈXÙKÜ[ÛÝ\ÙJBÛÛÝÈ\[[K[HH]ØZ][\Ü
-ÎËØÙÙ[]]ÛKÐ[ÝKÝ[ÙÜY\ÐMËNÂËÈ[Ù[H]\ÈYÙÚ[ÑXÙHÑY[ÙZ[ÚØ[\Ù\\°íYÂ[[ÝÓØØ[[Ù[ÈH[ÙNÂËÈÛZ[\ËY^Y[\È[XY[ËS[Ù[Y[
-ÈPÚ\[HÝÜÙ\ÙXØXÚ
-BZQ^XÝÜH]ØZ]\[[JX]\KY^XÝ[Û[ÝKØ[SZ[SKS]ÂÙÜ\Ü×ØØ[XÚÎ
-ÙÜ\ÜÊHOÂY
-ÙÜ\ÜËÝ]\ÈOOHÙÜ\ÜÈ	ÙÜ\ÜËÙÜ\ÜÊHÂÛÛÝÝHX]Ý[
-ÙÜ\ÜËÙÜ\ÜÊNÂØÝ[Y[]Y\TÙ[XÝÜ[
-ZK\ÙÜ\ÜË]^KÜXXÚ
-[OÂ[[\^HÒH0é	ÜÝIXÂJNÂBBJNÂËÈ[XY[ÜÈ°ï[H[Y[TðéHÜ\XÚ[Ü
-ÛÛÝÛÛXÝYÙÈ[\ZY[[ÈJHÂÛÛÝÛÛXÝHÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYNÂZQ[XY[ÜÐØXÚVØÛÛXÝYHH×NÂÜ
-ÛÛÝÙÛÛXÝ\ÜÛÙ\ÊHÂY
-ÜXÔÙ[[ÙJHÂÛÛÝÝ]]H]ØZ]ZQ^XÝÜÜXÔÙ[[ÙKÈÛÛ[ÎYX[ÜX[^NYHJNÂZQ[XY[ÜÐØXÚVØÛÛXÝYK\Ú
-Â\ÜÛÙN[XY[Î\^KÛJÝ]]]JBJNÂBBBZTÝ]\ÈHXYHÂÛÛÛÛKÙÊ¸§!HÒKS[Ù[Ù[Y[[[XY[ÜÈ\XÚ]HNÂHØ]Ú
-JHÂÛÛÛÛKØ\¸¦¨;î#ÈÒHÛÛHXÚÙ[Y[Ù\[\Ù[H[[YÙ[\ÈÙ^]ÛÜSX]Ú[ÎJNÂZTÝ]\ÈH\ÜÂB\]PRPYÙ\Ê
-NÂB[Ý[Û\]PRPYÙ\Ê
-HÂØÝ[Y[]Y\TÙ[XÝÜ[
-ZK\Ý]\ËXYÙHKÜXXÚ
-YÙHOÂYÙKÛ\ÜÓ[YHHZK\Ý]\ËXYÙHÂY
-ZTÝ]\ÈOOHØY[ÈHÂYÙKÛ\ÜÓ\ÝY
-ZK[ØY[ÈNÂYÙK[\SHÜ[Û\ÜÏHZK\Ü[\ÜÜ[Ü[Û\ÜÏHZK\ÙÜ\ÜË]^ÒH0éÜÜ[ÂH[ÙHY
-ZTÝ]\ÈOOHXYHHÂYÙKÛ\ÜÓ\ÝY
-ZK\XYHNÂYÙK[\SHÒHZÝ]ÂH[ÙHY
-ZTÝ]\ÈOOH\ÜHÂYÙKÛ\ÜÓ\ÝY
-ZKY[XÚÈNÂYÙK[\SH8¦¨HÛX\SX]Ú[ØÂH[ÙHÂYÙKÛ\ÜÓ\ÝY
-ZKZYHNÂYÙK[\SH8£ìÈÒH\Z]ÂBJNÂBËÈÛÜÚ[\ËpáXÚÙZ]°ï[XY[ËUZÝÜ[[Ý[ÛÛÜÚ[TÚ[Z[\]JKHÂ]ÝHÜPHHÜPHÂÜ
-]HHÈHK[ÝÈJÊÊHÂÝ
-ÏHVÚWH
-ÚWNÂÜPH
-ÏHVÚWH
-VÚWNÂÜP
-ÏHÚWH
-ÚWNÂB]\ÝÈ
-X]Ü\
-ÜPJH
-X]Ü\
-ÜPJNÂB[Ý[Û[Ú]\ÜÛÙTÛX\
-ÛÛXÝY]Y\Ý[ÛHÂÛÛÝÛÛXÝHÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYNÂÛÛÝHH]Y\Ý[ÛÓÝÙ\Ø\ÙJ
-NÂ]\ÝX]ÚH[Â]\ÝØÛÜHHÂÛÛXÝ\ÜÛÙ\ËÜXXÚ
-OÂ]ØÛÜHHÂÙ^]ÛÜËÜXXÚ
-ÝÈOÂY
-[[ÛY\ÊÝËÓÝÙ\Ø\ÙJ
-JJHØÛÜH
-ÏHJNÂY
-ØÛÜH\ÝØÛÜJHÈ\ÝØÛÜHHØÛÜNÈ\ÝX]ÚHÈBJNÂ]\ÈX]Ú\ÝX]ÚØÛÜN\ÝØÛÜHNÂB[Ý[Û[]Ú]Ê
-HÂÈ[\ZY[[ÈKÜXXÚ
-ÛÛXÝYOÂÛÛÝÛÛXÝHÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYNÂØÝ[Y[Ù][[Y[RY
-Ú]IØÛÛXÝYK[[YP
-K[\^HÛÛXÝ[YNÂØÝ[Y[Ù][[Y[RY
-Ú]IØÛÛXÝYK\ÛPK[\SHÛÛXÝÛNÂYÚ]XJÛÛXÝYÛÛXÝÜY][ËÛÛXÝNÂJNÂB[Ý[ÛÙ[Ú]Y\ÜØYÙJÛÛXÝY
-HÂÛÛÝ[]HØÝ[Y[Ù][[Y[RY
-Ú]IØÛÛXÝYKZ[]
-NÂÛÛÝY\ÜØYÙHH[][YK[J
-NÂY
-[Y\ÜØYÙJH]\Â[][YHHÂYÚ]XJÛÛXÝYY\ÜØYÙK\Ù\NÂ
-\Þ[È
-
-HOÂ]ØZ]]ÈÛZ\ÙJ\ÛÛHOÙ][Y[Ý]
-\ÛÛK
-ÈX][ÛJ
-H
-L
-JNÂ]\ÜÛÙNÂY
-ZTÝ]\ÈOOHXYH	ZQ[XY[ÜÐØXÚVØÛÛXÝYJHÂHÂÛÛÝ]Y\Ý[ÛÝ]]H]ØZ]ZQ^XÝÜY\ÜØYÙKÈÛÛ[ÎYX[ÜX[^NYHJNÂÛÛÝUXÈH\^KÛJ]Y\Ý[ÛÝ]]]JNÂ]\ÝRSX]ÚH[Â]\ÝRTØÛÜHHLNÂZQ[XY[ÜÐØXÚVØÛÛXÝYKÜXXÚ
-][HOÂÛÛÝÚ[HHÛÜÚ[TÚ[Z[\]JUXË][K[XY[ÊNÂY
-Ú[H\ÝRTØÛÜJHÂ\ÝRTØÛÜHHÚ[NÂ\ÝRSX]ÚH][K\ÜÛÙNÂBJNÂY
-\ÝRTØÛÜHJH\ÜÛÙHH\ÝRSX]Ú[ÝÙ\Â[ÙHÈÛÛÝÜÛX\H[Ú]\ÜÛÙTÛX\
-ÛÛXÝYY\ÜØYÙJNÈ\ÜÛÙHHÜÛX\ØÛÜHÈÜÛX\X]Ú[ÝÙ\ÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYK[XÚÎÈBHØ]Ú
-JHÂÛÛÝÜÛX\H[Ú]\ÜÛÙTÛX\
-ÛÛXÝYY\ÜØYÙJNÂ\ÜÛÙHHÜÛX\ØÛÜHÈÜÛX\X]Ú[ÝÙ\ÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYK[XÚÎÂBH[ÙHÂÛÛÝÜÛX\H[Ú]\ÜÛÙTÛX\
-ÛÛXÝYY\ÜØYÙJNÂ\ÜÛÙHHÜÛX\ØÛÜHÈÜÛX\X]Ú[ÝÙ\ÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYK[XÚÎÂBYÚ]XJÛÛXÝY\ÜÛÙKÛÛXÝNÂJJ
-NÂB[Ý[ÛYÚ]XJÛÛXÝY^Ù[\HÂÛÛÝÛÛZ[\HØÝ[Y[Ù][[Y[RY
-Ú]IØÛÛXÝYK[Y\ÜØYÙ\Ð
-NÂÛÛÝXHHØÝ[Y[ÜX]Q[[Y[
-]NÂXKÛ\ÜÓ[YHHÚ]XXHÚ]IÜÙ[\PÂÛÛÝ]]\HÙ[\OOHÛÛXÝÈÛÛ\[Q]KÚ]ÛÛXÝÖØÛÛXÝYK]]\ÂYK[\SH\Ü[Û\ÜÏHXKX]]\Ø]]\OÜÜ[]Û\ÜÏHXK]^Ý^OÙ]ÂÛÛZ[\\[Ú[
-XJNÂÛÛZ[\ØÜÛÜHÛÛZ[\ØÜÛZYÚÂB[Ý[ÛØ]QÜQ]J
-HÂÛÛÝ]SØHÈÜ\NÝ\[ÛK[Y\Ý[\]È]J
-KÙ][YJ
-HNÂÛÛ\[Q]K]Y\Ý[ÛËÜXXÚ
-HOÈ]SØÜKYHHØÝ[Y[Ù][[Y[RY
-[ËIÜKYX
-K[YNÈJNÂØØ[ÝÜYÙKÙ]][J[ÝYYWÈ
-ÈÝ\[ÛKÓÓÝ[ÚYJ]SØJNÂÚÝÕØ\Ý
-
-NÂB[Ý[ÛØYØ]Y[ÝÙ\Ê
-HÂÛÛÝØØ[HØØ[ÝÜYÙKÙ]][J[ÝYYWÈ
-ÈÝ\[ÛKÓÓÝ[ÚYJ]SØJNÂÚÝÕØ\Ý
-
-NÂB[Ý[ÛØYØ]Y[ÝÙ\Ê
-HÂÛÛÝØØ[HØØ[ÝÜYÙKÙ]][J[ÝYYWÈ
-ÈÝ\[ÛJNÂY
-ØØ[
-HÈÛÛÝHÓÓ\ÙJØØ[
-NÈÛÛ\[Q]K]Y\Ý[ÛËÜXXÚ
-HOÈÛÛÝ[HØÝ[Y[Ù][[Y[RY
-[ËIÜKYX
-NÈY
-[
-H[[YHH
-ÜKYHÈJNÈBB[Ý[ÛÜX]]\[
-HÂY
-][
-H]\ÂÛÛÝÝH[ÔÝ[Ê
-K\XÙJÖ×
-×WKÙË	ÉÊK[J
-NÂÛÛÝY^H[ÔÝ[Ê
-KÝ\ÕÚ]
-HHÈH
-[ÔÝ[Ê
-KÝ\ÕÚ]
-ÈHÈÈNÂ]\Y^
-ÈÝ
-È8 «ÂB[Ý[ÛÚÝÕØ\Ý
-
-HÂÛÛÝHØÝ[Y[Ù][[Y[RY
-Ø\ÝNÈÛ\ÜÓ\ÝY
-ÚÝÈNÂÙ][Y[Ý]
-
-
-HOÛ\ÜÓ\Ý[[ÝJÚÝÈKL
-NÂB
