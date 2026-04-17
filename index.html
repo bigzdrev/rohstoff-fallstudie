@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fallstudie: Rohstoffmanagement – KabelWerke GmbH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast" class="toast">Gespeichert ✓</div>
+
+    <!-- ===================== LOGIN ===================== -->
+    <div id="login-view" class="view login-view active">
+        <div class="login-card">
+            <h1>Fallstudie</h1>
+            <h2 style="font-size: 1.2rem; color: var(--text-primary); margin-bottom: 8px;">Seminarmodul Rohstoffmanagement</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Interaktive Fallstudie: Preisänderungsrisiken erkennen und managen</p>
+
+            <div id="student-login-area">
+                <div id="dynamic-login-buttons" class="login-buttons">
+                    <p style="color: var(--warning); font-size: 0.85rem;">Die Gruppen werden geladen... (Falls hier nichts passiert, muss der Admin erst die Gruppenanzahl definieren).</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase;">Dozenten & Admin Bereich</p>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <input type="password" id="admin-password" placeholder="Passwort" class="sidebar-input" style="width: 150px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);" onkeydown="if(event.key==='Enter') tryAdminLogin()">
+                    <button class="btn btn-secondary" onclick="tryAdminLogin()">Login</button>
+                </div>
+                <p id="admin-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 8px; display: none;">Passwort falsch.</p>
+            </div>
+            
+            <div id="admin-config-area" style="display: none; margin-top: 24px; background: #FFF5F5; padding: 16px; border-radius: var(--radius-md); border: 1px solid #FED7D7; text-align: left;">
+                <h3 style="color: var(--brand-red); font-size: 1rem; margin-bottom: 12px;">Gruppenkonfiguration</h3>
+                <label style="font-size: 0.85rem; color: var(--text-primary); display: block; margin-bottom: 8px;">Wie viele Gruppen nehmen teil (1-12)?</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 80px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);">
+                    <button class="btn btn-primary" onclick="saveGroupConfig()">Übernehmen & Speichern</button>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Studierende können sich anschließend zuordnen.</p>
+                
+                <hr style="border: none; border-top: 1px solid #FED7D7; margin: 16px 0;">
+                <button class="btn btn-secondary" style="width: 100%;" onclick="loginAs('Dozent')">Zur Dozentenansicht (Lösungen)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <div id="dashboard-view" class="view dashboard-view">
+        
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h2>Fallstudie</h2>
+                <div class="user-info">Angemeldet: <span id="user-role-badge"></span></div>
+            </div>
+            
+            <div class="nav-menu">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 12px 16px 4px;">Recherche</div>
+                <button class="nav-btn active" onclick="switchTab('tab-company')">Profil</button>
+                <button class="nav-btn" onclick="switchTab('tab-products')">Produkte</button>
+                <button class="nav-btn" onclick="switchTab('tab-bilanz')">Jahresabschluss</button>
+                <button class="nav-btn" onclick="switchTab('tab-lagebericht')">Lagebericht</button>
+                <button class="nav-btn" onclick="switchTab('tab-market')">Marktdaten</button>
+
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Interviews</div>
+                <button class="nav-btn" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
+                <button class="nav-btn" onclick="switchTab('tab-chat-bank')">Chat: Handel (Bank)</button>
+
+                <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>
+                <button class="nav-btn student-only" onclick="switchTab('tab-task')">Risikoanalyse</button>
+
+                <div class="lecturer-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Seminarleitung</div>
+                <button class="nav-btn lecturer-only" onclick="switchTab('tab-lecturer')">Ergebnisse</button>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-secondary" onclick="logout()">Abmelden</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="current-tab-title">Profil</h1>
+                <span class="badge badge-red">STAND: Q1 2026</span>
+            </header>
+
+            <div class="content-wrapper">
+                
+                <!-- TAB: COMPANY -->
+                <div id="tab-company" class="tab-content active">
+                    <div class="company-header">
+                        <h2>KabelWerke Deutschland GmbH</h2>
+                        <p>Führender Hersteller von Hochleistungskabeln für die Energiewende.</p>
+                    </div>
+                    <div class="company-grid">
+                        <div class="section-container">
+                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text"></p></div>
+                        </div>
+                        <div class="section-container">
+                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text"></p></div>
+                        </div>
+                        <div class="section-container">
+                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text"></p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: PRODUCTS -->
+                <div id="tab-products" class="tab-content">
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Unser Produktportfolio</h2>
+                        <p>Hochwertige Kupferkabel und Leitungen für Energieversorgung, Bau und Industrie.</p>
+                    </div>
+                    <div class="products-grid" id="products-grid"></div>
+                </div>
+
+                <!-- TAB: BILANZ + GuV -->
+                <div id="tab-bilanz" class="tab-content">
+                    <div class="finance-header glass-panel">
+                        <div>
+                            <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 4px;">Jahresabschluss (HGB)</h2>
+                            <p style="color: var(--text-secondary);">KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p>
+                        </div>
+                        <span class="badge badge-red">VERTRAULICH</span>
+                    </div>
+
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" onclick="switchSubTab('sub-bilanz-view', this)">Bilanz</button>
+                        <button class="sub-tab" onclick="switchSubTab('sub-guv-view', this)">Gewinn- und Verlustrechnung</button>
+                    </div>
+
+                    <!-- Sub-Content: Bilanz -->
+                    <div id="sub-bilanz-view" class="sub-content active">
+                        <div class="finance-container">
+                            <div class="finance-side" id="bilanz-aktiva"></div>
+                            <div class="finance-side" id="bilanz-passiva"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sub-Content: GuV -->
+                    <div id="sub-guv-view" class="sub-content">
+                        <div class="finance-side">
+                            <div class="bilanz-title">Gewinn- und Verlustrechnung (Gesamtkostenverfahren)</div>
+                            <table class="finance-table" id="guv-table">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: LAGEBERICHT -->
+                <div id="tab-lagebericht" class="tab-content">
+                    <div class="finance-header glass-panel">
+                        <div>
+                            <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 4px;">Lagebericht der Geschäftsführung</h2>
+                            <p style="color: var(--text-secondary);">KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p>
+                        </div>
+                        <span class="badge badge-red">VERTRAULICH</span>
+                    </div>
+                    <div class="lagebericht-container" id="lagebericht-container"></div>
+                </div>
+
+                <!-- TAB: MARKET DATA -->
+                <div id="tab-market" class="tab-content">
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Aktuelle Marktdaten</h2>
+                        <p>Quelle: Handelsdaten | Stand: <span id="market-date"></span></p>
+                    </div>
+                    <div class="market-grid" id="market-grid"></div>
+                </div>
+
+                <!-- TAB: CHAT UNTERNEHMEN -->
+                <div id="tab-chat-unternehmen" class="tab-content">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div style="flex-grow: 1;">
+                                <strong id="chat-unternehmen-name"></strong><br>
+                                <span class="chat-role" id="chat-unternehmen-role"></span>
+                            </div>
+                            <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
+                        </div>
+                        <div class="chat-messages" id="chat-unternehmen-messages"></div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-unternehmen-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('unternehmen')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('unternehmen')">Senden</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: CHAT BANK -->
+                <div id="tab-chat-bank" class="tab-content">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div style="flex-grow: 1;">
+                                <strong id="chat-bank-name"></strong><br>
+                                <span class="chat-role" id="chat-bank-role"></span>
+                            </div>
+                            <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
+                        </div>
+                        <div class="chat-messages" id="chat-bank-messages"></div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chat-bank-input" placeholder="Sicherungsgeschäft anfragen..." onkeydown="if(event.key==='Enter') sendChatMessage('bank')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('bank')">Senden</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: TASK (STUDENT) -->
+                <div id="tab-task" class="tab-content">
+                    <div class="company-header" style="text-align: left;">
+                        <h2 style="color: var(--brand-red);">Aufgabe: Risikoanalyse & Hedging</h2>
+                        <p>Analysieren Sie die Rohstoffpreisrisiken und leiten Sie Handlungsempfehlungen ab.</p>
+                    </div>
+                    <form id="analysis-form" style="max-width: 900px;" onsubmit="event.preventDefault()">
+                        <div id="task-questions-container"></div>
+                        <button type="submit" class="btn btn-primary" style="margin-top:20px; font-size: 1rem; padding: 14px 28px;" onclick="saveFormData()">Speichern</button>
+                        <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">Tipp: Ihre Eingaben werden beim Tippen automatisch gespeichert.</p>
+                    </form>
+                </div>
+
+                <!-- TAB: LECTURER (DOZENT) -->
+                <div id="tab-lecturer" class="tab-content">
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Ergebnisse einsehen</h2>
+                        <p>Wählen Sie eine Gruppe aus, um deren gespeicherte Risikoanalysen live zu überprüfen.</p>
+                    </div>
+                    <div class="group-selector">
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
+                    </div>
+                    <div id="presentation-board" class="presentation-board hidden">
+                        <h3 class="presentation-title">Ergebnisse: <span id="presentation-group-name" style="font-weight: 800;">-</span></h3>
+                        <div id="presentation-answers"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase + Fallback logic (App) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
