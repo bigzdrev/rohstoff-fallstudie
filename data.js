@@ -234,40 +234,40 @@ const companyData = {
             name: "Trading Desk",
             role: "Financial Markets & Commodities Bank",
             avatar: "GlobalBank",
-            greeting: "Guten Tag, hier spricht der Derivate-Handel. Wir koennen Ihnen Absicherungsinstrumente (Forwards, Swaps, Optionen) fuer Kupfer (LME-Quotierung), ICE Gasoil oder EUA-Zertifikate stellen. Welche Sicherungsgeschaefte moechten Sie abfragen?",
+            greeting: "OTC Derivate-Handel (Commodities). Bitte fordern Sie Prices unter genauer Angabe des Instruments (Forward, Asian Swap), des Underlyings (LME Kupfer, EUA, ICE Gasoil), der Tonnage/Stückzahl und des Abwicklungszeitraums an.",
             responses: [
                 {
                     keywords: ["kupfer", "copper", "vonovia", "svm", "angebot"],
                     topicSentence: "kupfer copper LME absicherung Angebot Projekt",
-                    answer: "Trader: Für das Kupfer-Großprojekt mit der SVM GmbH benötigen wir zur Bepreisung genaue Parameter. Welches Volumen benötigen Sie und über welchen Zeitraum? Handelt es sich um ein einmaliges Geschäft oder um mehrere Fixings?"
+                    answer: "Handel: Wir pricen LME Copper. Für eine Quote fehlen zwingende Parameter. Benennen Sie genau: 1. Instrument. 2. Ziel-Liefermonate (Start bis Ende). 3. Volumina pro Monat."
                 },
                 {
                     keywords: ["200", "200mt", "monat", "6 monat", "sechs monat", "februar"],
                     topicSentence: "200mt 6 monate laufzeit asian style kupfer rtg monatlich",
-                    answer: "Trader: Alles klar. Für 200mt monatlich über 6 Monate ab Februar 2027 ist ein Optionsgeschäft nicht notwendig, da Sie ohnehin eine Preisgleitklausel bis zur Zusage haben. Die perfekte Lösung ist ein Sammel-Rohwarentermingeschäft auf Kupfer, Asian Style mit monatlichem Settlement. (Start Februar 2027 – einschließlich Juli 2027, 200 mt pro Monat). Die Risikolinie hierfür beträgt 20% bis 1 Jahr und danach 25% (in Summe ca. 3.105.000 EUR). Die Ziel-Marge für das Geschäft berechnen wir mit 4% auf das Aval (ca. 103,5 EUR/mt Marge auf den Terminpreis)."
+                    answer: "Handel: Quote accepted. Sammel-Rohwarentermingeschäft auf Kupfer, Asian Style (monatliches Settlement). Zeitraum: Februar 2027 bis inkl. Juli 2027, 200 mt/Monat. Terminpreis wird zur Zusage auf LME-Base gefixed in EUR. Konditionen: Risikolimitauslastung 20% (<1 Jahr) / 25% (>1 Jahr) -> Summe ca. 3.105.000 EUR. Interne Bankmarge 4% p.a. auf Aval (ca. 103,5 EUR/mt Margin-Aufschlag)."
                 },
                 {
-                    keywords: ["eua", "co2", "zertifikat"],
+                    keywords: ["eua", "co2", "zertifikat", "emission"],
                     topicSentence: "eua emission zertifikate absicherung co2 eex",
-                    answer: "Trader: Zur CO2-Absicherung (EUA) müssen wir wissen: Wie hoch ist der Gesamtbedarf und wie hoch ist die freie Zuteilung, die der Kunde erhält?"
+                    answer: "Handel: Wir pricen EUAs über EEX/ICE. Sie müssen Ihre Allokations/Zuteilungs-Rechnungen intern klären. Fordern Sie eine Quote an mit: 1. Instrument (European/Asian Style). 2. Exakte Stückzahl. 3. Fälligkeitsmonat."
                 },
                 {
-                    keywords: ["30000", "30.000", "10000", "10.000", "20000", "20.000", "zuteilung"],
-                    topicSentence: "30000 bedarf 10000 zuteilung 20000 eua absicherung dezember 2026",
-                    answer: "Trader: Verstanden. Bei 30.000t Bedarf und 10.000t Freizuteilung müssen Sie 20.000 EUAs sichern. Wir offerieren ein Rohwarentermingeschäft auf EUAs, European Style. Lieferung Mitte Dezember 2026 für 20.000 Stück. Die Risikolinie kalkulieren wir mit 20% vom Volumen (ca. 296.000 EUR Risikolimitauslastung bei 1.48 Mio EUR Gesamtvolumen). Unsere Marge liegt zielgerichtet bei 4% auf das Aval (ca. 2,96 EUR/EUA auf den Terminpreis)."
+                    keywords: ["20000", "20.000", "dezember"],
+                    topicSentence: "20000 eua absicherung dezember 2026 european style forward",
+                    answer: "Handel: Quote accepted. EUA Forward (European Style). Lieferung Mitte Dezember 2026. Volumen: 20.000 Stück. Konditionen: Risikolinie 20% auf Nominal (ca. 296.000 EUR Limitbelastung bei 1.48 Mio. Nominal). Bankmarge: 4% auf Aval (ca. 2,96 EUR/EUA Margin)."
                 },
                 {
                     keywords: ["diesel", "gasoil", "lkw", "flotte"],
                     topicSentence: "diesel gasoil ice abstimmung logistik",
-                    answer: "Trader: Zur Absicherung der Dieselflotte (ICE Gasoil) im zweiten Halbjahr benötigen wir zuerst das genaue Volumen. Wie viel Tonnen verbraucht die Flotte im Monat?"
+                    answer: "Handel: Einen direkten Diesel-Forward bieten wir standardmäßig nicht an. Underlying ist ICE Low Sulphur Gasoil. Berechnen Sie intern Ihr präzises Tonnage-Volumen ('mt') pro Monat! Quote-Anforderung muss Instrument, Monate und mt beinhalten."
                 },
                 {
-                    keywords: ["135000", "135.000", "liter", "114", "tonnen"],
-                    topicSentence: "114 tonnen 135000 liter asian style gasoil absicherung",
-                    answer: "Trader: Richtig kalkuliert (135.000 Liter / 1.183 = ca. 114 Tonnen p.m.). Wir offerieren ein Sammel-Rohwarentermingeschäft auf Gasoil, Asian Style mit monatlichem Settlement. Start Juli 2026 – einschließlich Dez 2026 mit 114 mt pro Monat. Unser Terminkurs ist 757 EUR/mt. Die Risikolinie beträgt 20% (ca. 103.500 EUR aus 517.788 EUR Nominal). Unsere Marge liegt bei 8% auf das Aval (ca. 12 EUR/mt auf den Terminpreis)."
+                    keywords: ["114", "tonnen", "juli", "asian"],
+                    topicSentence: "114 tonnen asian style gasoil absicherung juli dezember",
+                    answer: "Handel: Quote accepted. Sammel-Rohwarentermingeschäft auf ICE Gasoil, Asian Style (monatliches Settlement), Juli 2026 bis inkl. Dezember 2026. 114 mt pro Monat. Terminkurs: 757 EUR/mt. Konditionen: Risikolinie 20% auf Nominal (Standard) -> ca. 103.500 EUR (aus ca. 518k). Bankmarge: 8% auf Aval (ca. 12 EUR/mt Margin-Aufschlag)."
                 }
             ],
-            fallback: "Trader: Bitte spezifizieren Sie Ihre Parameter. Wenn Sie Kupfer-Sicherungen für das Vonovia Projekt, EUAs für das Kraftwerk oder Gasoil für die Dieselflotte anfragen, benötige ich Laufzeiten, Tonnagen oder Angaben zur Zuteilung."
+            fallback: "Handel: Unvollständige oder irreführende Quote-Anfrage. Bitte fordern Sie Derivate-Preise nur unter präziser Nennung aller Parameter an (Underlying, Instrumententyp, Gesamt-Stückzahl/Tonnage, Monate)."
         }
     },
 
