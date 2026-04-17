@@ -163,7 +163,7 @@
                                 <strong id="chat-unternehmen-name"></strong><br>
                                 <span class="chat-role" id="chat-unternehmen-role"></span>
                             </div>
-                            <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
+                            
                         </div>
                         <div class="chat-messages" id="chat-unternehmen-messages"></div>
                         <div class="chat-input-row">
@@ -181,12 +181,12 @@
                                 <strong id="chat-bank-name"></strong><br>
                                 <span class="chat-role" id="chat-bank-role"></span>
                             </div>
-                            <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
+                            
                         </div>
-                        <div class="chat-messages" id="chat-bank-messages"></div>
+                        <div class="chat-messages" id="bank-chat-messages"></div>
                         <div class="chat-input-row">
-                            <input type="text" id="chat-bank-input" placeholder="Sicherungsgeschäft anfragen..." onkeydown="if(event.key==='Enter') sendChatMessage('bank')">
-                            <button class="btn btn-primary" onclick="sendChatMessage('bank')">Senden</button>
+                            <input type="text" id="bank-chat-input" placeholder="Sicherungsgeschäft anfragen..." onkeydown="if(event.key==='Enter') sendBankMessage()">
+                            <button class="btn btn-primary" onclick="sendBankMessage()">Senden</button>
                         </div>
                     </div>
                 </div>
