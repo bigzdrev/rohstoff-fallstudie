@@ -1,7 +1,9 @@
-let currentGroupChat = "Gruppe 1";
+let currentAdminGroup = "Gruppe 1";
 let totalGroups = 4;
+let unsubSettings = null;
+let unsubGlobal = null;
 let unsubChat = null;
-let unsubTasks = [];
+let unsubTasks = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     // Hide dashboard initially
@@ -11,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function loginAdmin() {
     const pw = document.getElementById("admin-password").value;
     if (pw === "ZWRMSVM") {
-        document.getElementById("login-view").style.display = "none";
+        document.getElementById("login-view").classList.remove("active");
         document.getElementById("dashboard-view").style.display = "flex";
         initAdminData();
     } else {
@@ -20,16 +22,70 @@ function loginAdmin() {
 }
 
 function initAdminData() {
-    if (!db) {
-        alert("Firebase ist nicht geladen/konfiguriert!");
-        return;
+    if (!db) return alert("Firebase ist nicht geladen/konfiguriert!");
+
+    unsubGlobal = db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
+        if (doc.exists) {
+            totalGroups = doc.data().group_count || 4;
+            document.getElementById("group-count-input").value = totalGroups;
+            renderGroupTabs();
+        } else {
+            renderGroupTabs();
+        }
+    });
+}
+
+function updateTotalGroups() {
+    if(!db) return;
+    const count = parseInt(document.getElementById("group-count-input").value) || 4;
+    db.collection("fallstudie_config").doc("settings").set({ group_count: count }, { merge: true });
+}
+
+function renderGroupTabs() {
+    const container = document.getElementById("admin-group-tabs");
+    container.innerHTML = "";
+    
+    // Safety check if active group doesn't exist anymore
+    let groupNum = parseInt(currentAdminGroup.replace("Gruppe ", "")) || 1;
+    if (groupNum > totalGroups) currentAdminGroup = "Gruppe 1";
+
+    for (let i = 1; i <= totalGroups; i++) {
+        const name = `Gruppe ${i}`;
+        const active = name === currentAdminGroup ? 'background: var(--brand-red); color: white; border-color: var(--brand-red);' : 'background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);';
+        container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.8rem; padding: 6px 12px; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
     }
 
-    // 1. Listen to global configuration
-    db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
-        if (doc.exists) {
+    // Auto-Bind context if nothing binds yet
+    if(!unsubChat) { switchGroupContext(currentAdminGroup); }
+}
+
+function switchGroupContext(groupName) {
+    currentAdminGroup = groupName;
+    renderGroupTabs(); // repopulate styling
+    
+    document.getElementById("current-group-title").innerText = `Regiepult: ${groupName}`;
+    document.querySelectorAll(".active-group-name").forEach(el => el.innerText = groupName);
+
+    bindSettings();
+    bindChat();
+    bindTasks();
+}
+
+function bindSettings() {
+    if (unsubSettings) unsubSettings();
+    
+    // Clear checks
+    document.getElementById("check-produkte").checked = false;
+    document.getElementById("check-bilanz").checked = false;
+    document.getElementById("check-lagebericht").checked = false;
+    document.getElementById("check-marktdaten").checked = false;
+    document.getElementById("check-chat").checked = false;
+    document.getElementById("check-bank-chat").checked = false;
+    document.getElementById("check-aufgaben").checked = false;
+
+    unsubSettings = db.collection("group_controls").doc(currentAdminGroup).onSnapshot(doc => {
+        if(doc.exists) {
             const d = doc.data();
-            document.getElementById("group-count-input").value = d.group_count || 4;
             document.getElementById("check-produkte").checked = !!d.show_produkte;
             document.getElementById("check-bilanz").checked = !!d.show_bilanz;
             document.getElementById("check-lagebericht").checked = !!d.show_lagebericht;
@@ -37,24 +93,13 @@ function initAdminData() {
             document.getElementById("check-chat").checked = !!d.show_chat;
             document.getElementById("check-bank-chat").checked = !!d.show_bank_chat;
             document.getElementById("check-aufgaben").checked = !!d.show_aufgaben;
-
-            if (d.group_count !== totalGroups) {
-                totalGroups = d.group_count;
-                updateGroupSelector();
-                bindTaskListeners();
-            }
-        } else {
-            updateGroupSelector();
-            bindTaskListeners();
         }
     });
-
 }
 
-function saveAdminSettings() {
+function saveGroupSettings(forceTabTarget = null) {
     if(!db) return;
     const payload = {
-        group_count: parseInt(document.getElementById("group-count-input").value) || 4,
         show_produkte: document.getElementById("check-produkte").checked,
         show_bilanz: document.getElementById("check-bilanz").checked,
         show_lagebericht: document.getElementById("check-lagebericht").checked,
@@ -63,44 +108,33 @@ function saveAdminSettings() {
         show_bank_chat: document.getElementById("check-bank-chat").checked,
         show_aufgaben: document.getElementById("check-aufgaben").checked
     };
-    db.collection("fallstudie_config").doc("settings").set(payload, { merge: true });
-}
-
-function updateGroupSelector() {
-    const sel = document.getElementById("chat-group-selector");
-    const currentVal = sel.value || "Gruppe 1";
-    sel.innerHTML = "";
-    for(let i=1; i<=totalGroups; i++) {
-        sel.innerHTML += `<option value="Gruppe ${i}">Gruppe ${i}</option>`;
-    }
-    sel.value = currentVal;
-    switchAdminChat();
-}
-
-function switchAdminChat() {
-    const sel = document.getElementById("chat-group-selector");
-    currentGroupChat = sel.value;
     
+    // If the admin checked it (meaning it's transitioning to True and we pass a target)
+    // we want to force navigation. We'll simply append a trigger.
+    if (forceTabTarget) {
+        payload.force_tab = forceTabTarget;
+        payload.force_time = Date.now();
+    }
+
+    db.collection("group_controls").doc(currentAdminGroup).set(payload, { merge: true });
+}
+
+function bindChat() {
     if (unsubChat) unsubChat();
     const cont = document.getElementById("admin-chat-messages");
     cont.innerHTML = "";
 
-    if (!db) return;
-    unsubChat = db.collection("chat_rooms").doc(currentGroupChat).onSnapshot(doc => {
+    unsubChat = db.collection("chat_rooms").doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
-            triggerChatRender(doc.data().messages || []);
+            const msgs = doc.data().messages || [];
+            cont.innerHTML = "";
+            msgs.forEach(m => {
+                const isBot = m.sender === 'bank';
+                cont.innerHTML += `<div class="msg-bubble ${isBot ? 'bot-msg' : 'user-msg'}">${m.text}</div>`;
+            });
+            cont.scrollTo(0, cont.scrollHeight);
         }
     });
-}
-
-function triggerChatRender(msgs) {
-    const cont = document.getElementById("admin-chat-messages");
-    cont.innerHTML = "";
-    msgs.forEach(m => {
-        const isBot = m.sender === 'bank';
-        cont.innerHTML += `<div class="msg-bubble ${isBot ? 'bot-msg' : 'user-msg'}">${m.text}</div>`;
-    });
-    cont.scrollTo(0, cont.scrollHeight);
 }
 
 function sendAdminMessage() {
@@ -109,44 +143,30 @@ function sendAdminMessage() {
     if(!text || !db) return;
     inp.value = "";
 
-    db.collection("chat_rooms").doc(currentGroupChat).get().then(doc => {
+    db.collection("chat_rooms").doc(currentAdminGroup).get().then(doc => {
         let msgs = doc.exists ? doc.data().messages || [] : [];
         msgs.push({ sender: 'bank', text: text, time: Date.now() });
-        db.collection("chat_rooms").doc(currentGroupChat).set({ messages: msgs });
+        db.collection("chat_rooms").doc(currentAdminGroup).set({ messages: msgs });
     });
 }
 
-// Monitoring Tasks
-function bindTaskListeners() {
-    // Clear old unsubs
-    unsubTasks.forEach(u => u());
-    unsubTasks = [];
+function bindTasks() {
+    if (unsubTasks) unsubTasks();
+    const mon = document.getElementById("monitoring-container");
+    mon.innerHTML = "Wacht auf Eingaben der Gruppe...";
 
-    const container = document.getElementById("monitoring-container");
-    container.innerHTML = "";
-
-    for(let i=1; i<=totalGroups; i++) {
-        const groupName = `Gruppe ${i}`;
-        const card = document.createElement("div");
-        card.className = "info-card";
-        card.style.marginBottom = "16px";
-        card.innerHTML = `<h4 style="margin-bottom:8px; color:var(--brand-red);">${groupName}</h4>
-                          <div id="mon-${i}" style="font-size:0.8rem; white-space:pre-wrap; color:var(--text-secondary);">Wartet auf Eingabe...</div>`;
-        container.appendChild(card);
-
-        if(db) {
-            const u = db.collection("student_tasks").doc(groupName).onSnapshot(doc => {
-                const tg = document.getElementById(`mon-${i}`);
-                if(doc.exists) {
-                    const d = doc.data();
-                    let html = "";
-                    Object.keys(d).forEach(k => {
-                        html += `<b>${k}:</b>\n` + (d[k] || "---") + "\n\n";
-                    });
-                    tg.innerHTML = html || "Leeres Dokument gesichert.";
-                }
+    unsubTasks = db.collection("student_tasks").doc(currentAdminGroup).onSnapshot(doc => {
+        if(doc.exists) {
+            const d = doc.data();
+            let html = "";
+            let keys = Object.keys(d).sort();
+            keys.forEach(k => {
+                html += `<div style="background: rgba(0,0,0,0.2); padding: 8px; margin-bottom: 8px; border-radius: 4px;">
+                    <span style="color:var(--brand-red); font-weight:600; display:block; margin-bottom:4px;">${k.toUpperCase()}</span>
+                    ${d[k] || "-"}
+                </div>`;
             });
-            unsubTasks.push(u);
+            mon.innerHTML = html || "Die Gruppe hat noch nichts in den Risiko-Formularen abgespeichert.";
         }
-    }
+    });
 }
