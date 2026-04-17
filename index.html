@@ -1,253 +1,193 @@
 <!DOCTYPE html>
-<html lang="de"><head>
+<html lang="de">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fallstudie: Rohstoffmanagement – KabelWerke Deutschland GmbH</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <title>Fallstudie: Rohstoffmanagement – KabelWerke GmbH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="">
     <div id="toast" class="toast">Gespeichert ✓</div>
-
-    <!-- ===================== LOGIN ===================== -->
-    <div id="login-view" class="view-container active">
-        <div class="login-wrapper">
-            <div class="login-box glass-panel">
-                <div class="login-logo">🏭</div>
-                <h1 class="login-title">Seminarmodul<br>Rohstoffmanagement</h1>
-                <p class="login-subtitle">Interaktive Fallstudie: Preisänderungsrisiken erkennen und managen</p>
-                <div class="login-divider"></div>
-                <h3 class="login-prompt">Wählen Sie Ihre Gruppe:</h3>
-                <div class="role-grid">
-                    <button class="btn role-btn" onclick="loginAs('Gruppe 1')"><span class="role-icon">1</span>Gruppe 1</button>
-                    <button class="btn role-btn" onclick="loginAs('Gruppe 2')"><span class="role-icon">2</span>Gruppe 2</button>
-                    <button class="btn role-btn" onclick="loginAs('Gruppe 3')"><span class="role-icon">3</span>Gruppe 3</button>
-                    <button class="btn role-btn" onclick="loginAs('Gruppe 4')"><span class="role-icon">4</span>Gruppe 4</button>
-                </div>
-                <button class="btn btn-lecturer" onclick="loginAs('Dozent')">👨‍🏫 Als Dozent eintreten</button>
+    <div id="login-view" class="view active">
+        <div class="login-card">
+            <h1><span style="color: var(--brand-red); font-weight: 800; margin-right: 8px;">S</span> Fallstudie</h1>
+            <h2 style="font-size: 1.2rem; color: var(--text-primary); margin-bottom: 8px;">Seminarmodul Rohstoffmanagement</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Interaktive Fallstudie: Preisänderungsrisiken erkennen und managen</p>
+            <div class="login-buttons">
+                <button class="btn btn-secondary" onclick="loginAs('Gruppe 1')">Gruppe 1</button>
+                <button class="btn btn-secondary" onclick="loginAs('Gruppe 2')">Gruppe 2</button>
+                <button class="btn btn-secondary" onclick="loginAs('Gruppe 3')">Gruppe 3</button>
+                <button class="btn btn-secondary" onclick="loginAs('Gruppe 4')">Gruppe 4</button>
+                <button class="btn btn-primary" style="margin-top: 12px;" onclick="loginAs('Dozent')">Dozent Login</button>
             </div>
         </div>
-        <div class="bg-gradient-orb orb-1"></div>
-        <div class="bg-gradient-orb orb-2"></div>
-        <div class="bg-gradient-orb orb-3"></div>
     </div>
-
-    <!-- ===================== DASHBOARD ===================== -->
-    <div id="dashboard-view" class="view-container">
+    <div id="dashboard-view" class="view dashboard-view">
         <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">🏭</div>
-                <h2>Fallstudie</h2>
-                <div id="user-role-badge" class="badge">Gruppe 1</div>
+            <div class="brand">
+                <h2><span class="brand-s">S</span> Fallstudie</h2>
+                <div class="user-info">Angemeldet: <span id="user-role-badge"></span></div>
             </div>
-            <ul class="nav-links">
-                <li class="nav-section-title">Recherche</li>
-                <li><button class="nav-btn active" onclick="switchTab('tab-company')">🌐 Internetauftritt</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-products')">📦 Produkte</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-bilanz')">📋 Jahresabschluss</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-lagebericht')">📄 Lagebericht</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-market')">📈 Marktdaten</button></li>
-
-                <li class="nav-section-title">Interviews</li>
-                <li><button class="nav-btn" onclick="switchTab('tab-chat-einkauf')">👔 Hr. Weber (Einkauf)</button></li>
-                <li><button class="nav-btn" onclick="switchTab('tab-chat-finanzen')">👩‍💼 Fr. Keller (Finanzen)</button></li>
-
-                <li class="nav-section-title student-only">Aufgabe</li>
-                <li class="student-only"><button class="nav-btn nav-highlight" onclick="switchTab('tab-task')">✏️ Risikoanalyse</button></li>
-
-                <li class="nav-section-title lecturer-only hidden">Dozent</li>
-                <li class="lecturer-only hidden"><button class="nav-btn nav-highlight" onclick="switchTab('tab-lecturer')">👨‍🏫 Gruppenübersicht</button></li>
-            </ul>
+            <div class="nav-menu">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 12px 16px 4px;">Recherche</div>
+                <button class="nav-btn active" onclick="switchTab('tab-company')">Profil</button>
+                <button class="nav-btn" onclick="switchTab('tab-products')">Produkte</button>
+                <button class="nav-btn" onclick="switchTab('tab-bilanz')">Jahresabschluss</button>
+                <button class="nav-btn" onclick="switchTab('tab-lagebericht')">Lagebericht</button>
+                <button class="nav-btn" onclick="switchTab('tab-market')">Marktdaten</button>
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Interviews</div>
+                <button class="nav-btn" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
+                <button class="nav-btn" onclick="switchTab('tab-chat-bank')">Chat: Handel (Bank)</button>
+                <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>
+                <button class="nav-btn student-only" onclick="switchTab('tab-task')">Risikoanalyse</button>
+                <div class="lecturer-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Seminarleitung</div>
+                <button class="nav-btn lecturer-only" onclick="switchTab('tab-lecturer')">Ergebnisse</button>
+            </div>
             <div class="sidebar-footer">
-                <div class="connection-box"><span id="connection-status" class="status-dot online"></span><span id="connection-text">Verbunden (Live)</span></div>
-                <button class="btn btn-outline-sm" onclick="logout()">Abmelden</button>
+                <button class="btn btn-secondary" onclick="logout()">Abmelden</button>
             </div>
         </nav>
-
-        <main class="content-area">
-            <header class="app-header">
-                <h1 id="current-tab-title">Internetauftritt</h1>
-                <div class="header-company">KabelWerke Deutschland GmbH</div>
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="current-tab-title">Profil</h1>
+                <span class="badge badge-red">STAND: Q1 2026</span>
             </header>
-            <div class="scroll-container">
-
-                <!-- TAB: COMPANY -->
+            <div class="content-wrapper">
                 <div id="tab-company" class="tab-content active">
-                    <div class="company-hero-banner">
-                        <div class="hero-overlay">
-                            <h1>KabelWerke Deutschland GmbH</h1>
-                            <p class="hero-tagline">Verbindungen, die Deutschland bewegen.</p>
-                            <div class="hero-stats">
-                                <div class="hero-stat"><span class="stat-number">100 Mio. €</span><span class="stat-label">Jahresumsatz</span></div>
-                                <div class="hero-stat"><span class="stat-number">420</span><span class="stat-label">Mitarbeiter</span></div>
-                                <div class="hero-stat"><span class="stat-number">Seit 1987</span><span class="stat-label">Gegründet</span></div>
-                                <div class="hero-stat"><span class="stat-number">48h</span><span class="stat-label">Lieferversprechen</span></div>
-                            </div>
+                    <div class="company-header">
+                        <h2>KabelWerke Deutschland GmbH</h2>
+                        <p>Führender Hersteller von Hochleistungskabeln für die Energiewende.</p>
+                    </div>
+                    <div class="company-grid">
+                        <div class="section-container">
+                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text"></p></div>
+                        </div>
+                        <div class="section-container">
+                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text"></p></div>
+                        </div>
+                        <div class="section-container">
+                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text"></p></div>
                         </div>
                     </div>
-                    <div class="section-container">
-                        <div class="info-card glass-panel"><h3>🏢 Über uns</h3><p id="about-text">Die KabelWerke Deutschland GmbH ist seit over 35 Jahren ein verlässlicher Partner für hochwertige Kabel- und Leitungstechnik. Am Standort Wuppertal fertigen wir mit rund 420 Mitarbeitern ein breites Sortiment an Kupferkabeln für Energieversorgung, Bauwesen und Industrie. Qualität und Liefertreue sind die Grundpfeiler unseres Erfolgs.</p></div>
-                        <div class="info-card glass-panel"><h3>🎯 Unsere Mission</h3><p id="mission-text">Als mittelständisches Familienunternehmen stehen wir für nachhaltige Wertschöpfung am Standort Deutschland. Unsere Kunden schätzen unsere hohe Produktqualität, individuelle Beratung und die Fähigkeit, auch kurzfristige Großaufträge zuverlässig zu bedienen.</p></div>
-                    </div>
-                    <div class="section-container">
-                        <div class="info-card glass-panel full-width"><h3>⚙️ Fertigung</h3><p id="production-text">In unserer modernen Fertigungsanlage verarbeiten wir Kupfer in mehrstufigen Prozessen zu hochwertigen Kabelprodukten. Am Standort betreiben wir ein eigenes Blockheizkraftwerk zur Versorgung mit Strom und Prozesswärme, um unsere Unabhängigkeit von externen Energielieferanten zu sichern.</p></div>
-                    </div>
-                    <div class="section-container">
-                        <div class="info-card glass-panel"><h3>🚛 Logistik</h3><p id="logistics-text">Unser Versprechen: Bundesweite Lieferung innerhalb von 48 Stunden. Mit unserer eigenen LKW-Flotte bringen wir Ihr Material direkt auf die Baustelle – zuverlässig und termingerecht, von Flensburg bis Garmisch.</p></div>
-                        <div class="info-card glass-panel"><h3>📦 Lagerhaltung</h3><p id="warehouse-text">Durch unser großzügiges Zentrallager in Wuppertal können wir eine außergewöhnlich hohe Lieferbereitschaft garantieren. Unsere Kunden profitieren von sofort verfügbaren Standardprodukten und kurzen Vorlaufzeiten bei Sonderkonfektionen.</p></div>
-                    </div>
                 </div>
-
-                <!-- TAB: PRODUCTS -->
                 <div id="tab-products" class="tab-content">
-                    <div class="products-header"><h2>Unser Produktportfolio</h2><p>Hochwertige Kupferkabel und Leitungen für Energieversorgung, Bau und Industrie.</p></div>
-                    <div class="products-grid" id="products-grid"><div class="product-card"><span class="product-emoji">⚡</span><span class="product-category">Niederspannung</span><h4>NYY-J Starkstromkabel</h4><p>Für die feste Verlegung in Gebäuden, Außenanlagen und Erdreich.</p></div><div class="product-card"><span class="product-emoji">🏠</span><span class="product-category">Installation</span><h4>H07V-K Aderleitung</h4><p>Flexible Aderleitung für Gebäudeinstallation und Renovierung.</p></div><div class="product-card"><span class="product-emoji">🏗️</span><span class="product-category">Mittelspannung</span><h4>NYCWY Mittelspannungskabel</h4><p>Für Energieverteilnetze und kommunale Infrastruktur.</p></div><div class="product-card"><span class="product-emoji">🏭</span><span class="product-category">Industrie</span><h4>ÖLFLEX® CLASSIC Steuerleitung</h4><p>Steuer- und Anschlussleitung für Maschinenbau und Automatisierung.</p></div></div>
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Unser Produktportfolio</h2>
+                        <p>Hochwertige Kupferkabel und Leitungen für Energieversorgung, Bau und Industrie.</p>
+                    </div>
+                    <div class="products-grid" id="products-grid"></div>
                 </div>
-
-                <!-- TAB: BILANZ + GuV -->
                 <div id="tab-bilanz" class="tab-content">
                     <div class="finance-header glass-panel">
-                        <div class="finance-header-inner">
-                            <div><h2>Jahresabschluss</h2><p>KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p></div>
-                            <span class="badge badge-red">VERTRAULICH</span>
+                        <div>
+                            <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 4px;">Jahresabschluss (HGB)</h2>
+                            <p style="color: var(--text-secondary);">KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p>
                         </div>
+                        <span class="badge badge-red">VERTRAULICH</span>
                     </div>
-                    <!-- Sub-tabs for Bilanz/GuV -->
                     <div class="sub-tabs">
-                        <button class="sub-tab active" onclick="switchSubTab('sub-bilanz', this)">Bilanz</button>
-                        <button class="sub-tab" onclick="switchSubTab('sub-guv', this)">GuV</button>
+                        <button class="sub-tab active" onclick="switchSubTab('sub-bilanz-view', this)">Bilanz</button>
+                        <button class="sub-tab" onclick="switchSubTab('sub-guv-view', this)">Gewinn- und Verlustrechnung</button>
                     </div>
-                    <div id="sub-bilanz" class="sub-content active">
-                        <div class="bilanz-grid">
-                            <div class="bilanz-side glass-panel" id="bilanz-aktiva"><div class="bilanz-title">AKTIVA</div><div class="bilanz-section-title">A. Anlagevermögen</div><table class="finance-table"><tbody><tr class=""><td>I. Immaterielle Vermögensgegenstände</td><td>850.000 €</td></tr><tr class="row-sub"><td>II. Sachanlagen</td><td></td></tr><tr class=""><td class="indent">1. Grundstücke und Gebäude</td><td>12.500.000 €</td></tr><tr class=""><td class="indent">2. Technische Anlagen und Maschinen</td><td>18.200.000 €</td></tr><tr class=""><td class="indent">3. Kraft- und Wärmeerzeugungsanlage</td><td>6.800.000 €</td></tr><tr class=""><td class="indent">4. Fuhrpark</td><td>5.500.000 €</td></tr><tr class=""><td class="indent">5. Betriebs- und Geschäftsausstattung</td><td>1.200.000 €</td></tr><tr class="row-bold"><td>Summe Anlagevermögen</td><td>45.050.000 €</td></tr></tbody></table><div class="bilanz-section-title">B. Umlaufvermögen</div><table class="finance-table"><tbody><tr class="row-sub"><td>I. Vorräte</td><td></td></tr><tr class=""><td class="indent">1. Roh-, Hilfs- und Betriebsstoffe</td><td>8.200.000 €</td></tr><tr class=""><td class="indent">2. Unfertige Erzeugnisse</td><td>3.800.000 €</td></tr><tr class=""><td class="indent">3. Fertige Erzeugnisse und Waren</td><td>22.000.000 €</td></tr><tr class=""><td>II. Forderungen aus Lieferungen und Leistungen</td><td>11.500.000 €</td></tr><tr class=""><td>III. Kassenbestand, Bankguthaben</td><td>3.450.000 €</td></tr><tr class="row-bold"><td>Summe Umlaufvermögen</td><td>48.950.000 €</td></tr></tbody></table><table class="finance-table"><tbody><tr class="row-total"><td>Bilanzsumme</td><td>94.000.000 €</td></tr></tbody></table></div>
-                            <div class="bilanz-side glass-panel" id="bilanz-passiva"><div class="bilanz-title">PASSIVA</div><div class="bilanz-section-title">A. Eigenkapital</div><table class="finance-table"><tbody><tr class=""><td>I. Gezeichnetes Kapital</td><td>5.000.000 €</td></tr><tr class=""><td>II. Kapitalrücklage</td><td>3.000.000 €</td></tr><tr class=""><td>III. Gewinnrücklagen</td><td>12.000.000 €</td></tr><tr class=""><td>IV. Jahresüberschuss</td><td>2.700.000 €</td></tr><tr class="row-bold"><td>Summe Eigenkapital</td><td>22.700.000 €</td></tr></tbody></table><div class="bilanz-section-title">B. Rückstellungen</div><table class="finance-table"><tbody><tr class=""><td>1. Pensionsrückstellungen</td><td>4.800.000 €</td></tr><tr class=""><td>2. Steuerrückstellungen</td><td>1.200.000 €</td></tr><tr class=""><td>3. Sonstige Rückstellungen</td><td>2.300.000 €</td></tr><tr class="row-bold"><td>Summe Rückstellungen</td><td>8.300.000 €</td></tr></tbody></table><div class="bilanz-section-title">C. Verbindlichkeiten</div><table class="finance-table"><tbody><tr class=""><td>1. Verbindlichkeiten ggü. Kreditinstituten</td><td>38.000.000 €</td></tr><tr class=""><td>2. Verbindlichkeiten aus Lieferungen und Leistungen</td><td>18.500.000 €</td></tr><tr class=""><td>3. Sonstige Verbindlichkeiten</td><td>6.500.000 €</td></tr><tr class="row-bold"><td>Summe Verbindlichkeiten</td><td>63.000.000 €</td></tr></tbody></table><table class="finance-table"><tbody><tr class="row-total"><td>Bilanzsumme</td><td>94.000.000 €</td></tr></tbody></table></div>
+                    <div id="sub-bilanz-view" class="sub-content active">
+                        <div class="finance-container">
+                            <div class="finance-side" id="bilanz-aktiva"></div>
+                            <div class="finance-side" id="bilanz-passiva"></div>
                         </div>
                     </div>
-                    <div id="sub-guv" class="sub-content">
-                        <div class="guv-container glass-panel">
-                            <table class="finance-table" id="guv-table"><tbody><tr class="row-bold"><td>1. Umsatzerlöse</td><td>100.000.000 €</td></tr><tr class=""><td>2. Bestandsveränderungen</td><td>+ 1.200.000 €</td></tr><tr class="row-bold row-line"><td>Gesamtleistung</td><td>101.200.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class="row-sub"><td>3. Materialaufwand</td><td></td></tr><tr class=""><td class="indent">a) Aufwendungen für Roh-, Hilfs- und Betriebsstoffe</td><td>- 54.800.000 €</td></tr><tr class=""><td class="indent">b) Aufwendungen für bezogene Leistungen</td><td>- 3.700.000 €</td></tr><tr class="row-bold"><td>Summe Materialaufwand</td><td>- 58.500.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class=""><td>4. Personalaufwand</td><td>- 16.800.000 €</td></tr><tr class=""><td>5. Abschreibungen</td><td>- 5.200.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class=""><td>6. Sonstige betriebliche Aufwendungen</td><td>- 16.700.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class="row-bold row-line"><td>Betriebsergebnis (EBIT)</td><td>4.000.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class=""><td>7. Zinsen und ähnliche Aufwendungen</td><td>- 1.300.000 €</td></tr><tr class="row-spacer"><td></td><td></td></tr><tr class="row-bold row-line"><td>Ergebnis vor Steuern (EBT)</td><td>2.700.000 €</td></tr></tbody></table>
+                    <div id="sub-guv-view" class="sub-content">
+                        <div class="finance-side">
+                            <div class="bilanz-title">Gewinn- und Verlustrechnung (Gesamtkostenverfahren)</div>
+                            <table class="finance-table" id="guv-table"><tbody></tbody></table>
                         </div>
                     </div>
                 </div>
-
-                <!-- TAB: LAGEBERICHT -->
                 <div id="tab-lagebericht" class="tab-content">
                     <div class="finance-header glass-panel">
-                        <div class="finance-header-inner">
-                            <div><h2>Lagebericht der Geschäftsführung</h2><p>KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p></div>
-                            <span class="badge badge-red">VERTRAULICH</span>
+                        <div>
+                            <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 4px;">Lagebericht der Geschäftsführung</h2>
+                            <p style="color: var(--text-secondary);">KabelWerke Deutschland GmbH | Geschäftsjahr 2025</p>
                         </div>
+                        <span class="badge badge-red">VERTRAULICH</span>
                     </div>
-                    <div class="lagebericht-container" id="lagebericht-container"><div class="lagebericht-section glass-panel"><h3>1. Geschäftsverlauf und Lage der Gesellschaft</h3><p>Das Geschäftsjahr 2025 war geprägt von einer soliden Nachfrageentwicklung im Bereich der Kabel- und Leitungstechnik. Die Umsatzerlöse konnten auf 100,0 Mio. EUR gesteigert werden. Die Auftragslage blieb über das gesamte Jahr stabil, insbesondere im Bereich der Infrastrukturprojekte und des Wohnungsbaus. Der Materialaufwand stellt mit 58,5 Mio. EUR (57,8% der Gesamtleistung) den mit Abstand größten Kostenblock dar und wird maßgeblich durch die Entwicklung der internationalen Metallpreise beeinflusst.</p></div><div class="lagebericht-section glass-panel"><h3>2. Beschaffung und Produktion</h3><p>Der Einkauf unseres wesentlichen Vormaterials erfolgt zu marktüblichen Konditionen an internationalen Rohstoffmärkten. Die Beschaffungspreise unterliegen teils erheblichen Schwankungen, die sich unmittelbar auf unsere Herstellungskosten auswirken. Im Berichtsjahr konnte die Fertigungskapazität unserer Produktionsanlagen durch gezielte Investitionen weiter optimiert werden. Unsere unternehmenseigene Kraft-Wärme-Kopplungsanlage zur Eigenversorgung ist seit 2008 in Betrieb und sichert die energetische Unabhängigkeit der Fertigungsprozesse. Das Unternehmen unterliegt den Regularien des europäischen Emissionshandels und beschafft die erforderlichen Zertifikate am Markt.</p></div><div class="lagebericht-section glass-panel"><h3>3. Logistik und Vertrieb</h3><p>Unsere Vertriebsstrategie basiert auf einer hohen Lieferbereitschaft und bundesweiter Distribution. Die Auslieferung erfolgt über eine eigene Fahrzeugflotte, die eine Just-in-Time-Belieferung unserer Kunden ermöglicht. Die Kraftstoffkosten stellen einen wesentlichen Bestandteil der Distributionskosten dar und sind von der allgemeinen Preisentwicklung am Energiemarkt abhängig.</p></div><div class="lagebericht-section glass-panel"><h3>4. Vermögens- und Finanzlage</h3><p>Die Bilanzsumme beläuft sich zum Stichtag auf 94,0 Mio. EUR. Die Eigenkapitalquote liegt bei 24,1% und dokumentiert eine solide, wenn auch ausbaufähige finanzielle Basis. Die Vorräte an fertigen und unfertigen Erzeugnissen stellen mit 25,8 Mio. EUR den wertmäßig bedeutendsten Posten des Umlaufvermögens dar. Die Bewertung erfolgt zu Herstellungskosten unter Beachtung des strengen Niederstwertprinzips gemäß § 253 Abs. 4 HGB. Bei einem anhaltenden Rückgang der Materialpreise bestünde das Risiko einer Wertminderung auf den niedrigeren beizulegenden Wert.</p></div><div class="lagebericht-section glass-panel"><h3>5. Risiko- und Chancenbericht</h3><p><strong>Beschaffungsmarktrisiken:</strong> Die Gesellschaft ist in erheblichem Umfang von der Preisentwicklung auf den internationalen Rohstoffmärkten abhängig. Insbesondere die Entwicklung des Preises für unser Kernvormaterial stellt ein wesentliches Ergebnisrisiko dar. Derzeit verfügt die Gesellschaft nicht über systematische Sicherungsstrategien für Rohstoffpreise.<br><br><strong>Energiekosten und regulatorische Risiken:</strong> Die Kosten für den Betrieb unserer Eigenversorgungsanlage sowie die mit dem europäischen Emissionshandel verbundenen Aufwendungen unterliegen marktpreislichen Schwankungen. Die schrittweise Reduktion der kostenlosen Zuteilung von Emissionsrechten wird die Beschaffungskosten in den kommenden Jahren voraussichtlich weiter erhöhen.<br><br><strong>Logistikkosten:</strong> Die Kosten für den Betrieb unserer Fahrzeugflotte sind von der allgemeinen Kraftstoffpreisentwicklung abhängig. Angesichts der hohen Fahrleistung stellt dies ein nicht unerhebliches Kostenrisiko dar.<br><br><strong>Bestandsbewertungsrisiken:</strong> Die hohe Kapitalbindung in Fertigerzeugnissen birgt bei rückläufigen Materialpreisen das Risiko bilanzwirksamer Wertminderungen.</p></div><div class="lagebericht-section glass-panel"><h3>6. Prognosebericht</h3><p>Für das laufende Geschäftsjahr 2026 rechnet die Geschäftsführung mit einer weiterhin stabilen Nachfragesituation. Die Ergebnisentwicklung wird maßgeblich davon abhängen, inwieweit es gelingt, Schwankungen der Einkaufspreise an die Kunden weiterzugeben oder anderweitig abzufangen. Die Geschäftsführung prüft derzeit die Einführung eines systematischen Rohstoff-Risikomanagements.</p></div></div>
+                    <div class="lagebericht-container" id="lagebericht-container"></div>
                 </div>
-
-                <!-- TAB: MARKET DATA -->
                 <div id="tab-market" class="tab-content">
-                    <div class="market-header"><h2>📈 Aktuelle Marktdaten</h2><p>Quelle: S-International Daily | Stand: <span id="market-date">16.04.2026</span></p></div>
-                    <div class="market-grid" id="market-grid">
-        <div class="market-card">
-            <div class="market-card-header"><h3>Kupfer (LME)</h3><span class="market-card-icon">🔶</span></div>
-            <table class="market-table">
-                <tbody><tr><td>Spot (Cash)</td><td class="market-spot">13.248 USD/t</td></tr>
-                <tr><td>Spot in EUR</td><td class="market-spot">11.221 EUR/t</td></tr>
-                <tr><td>3M Forward</td><td>13.100 USD/t</td></tr>
-                <tr><td>6M Forward</td><td>12.800 USD/t</td></tr>
-                <tr><td>12M Forward</td><td>12.500 USD/t</td></tr>
-            </tbody></table>
-        </div>
-        <div class="market-card">
-            <div class="market-card-header"><h3>Gasoil (ICE)</h3><span class="market-card-icon">⛽</span></div>
-            <table class="market-table">
-                <tbody><tr><td>Spot (LS Gasoil)</td><td class="market-spot">1.160 USD/mT</td></tr>
-                <tr><td>Spot in EUR</td><td class="market-spot">983 EUR/mT</td></tr>
-                <tr><td>6M Forward</td><td>900 USD/mT</td></tr>
-                <tr><td>12M Forward</td><td>800 USD/mT</td></tr>
-            </tbody></table>
-        </div>
-        <div class="market-card">
-            <div class="market-card-header"><h3>EUA (ICE)</h3><span class="market-card-icon">🌍</span></div>
-            <table class="market-table">
-                <tbody><tr><td>Spot</td><td class="market-spot">68.50 EUR/t CO₂</td></tr>
-                <tr><td>12M Forward</td><td>72.00 EUR/t CO₂</td></tr>
-            </tbody></table>
-        </div>
-        <div class="market-card">
-            <div class="market-card-header"><h3>EUR/USD</h3><span class="market-card-icon">💱</span></div>
-            <table class="market-table">
-                <tbody><tr><td>Spot</td><td class="market-spot">1.1806</td></tr>
-            </tbody></table>
-        </div>
-    </div>
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Aktuelle Marktdaten</h2>
+                        <p>Quelle: Handelsdaten | Stand: <span id="market-date"></span></p>
+                    </div>
+                    <div class="market-grid" id="market-grid"></div>
                 </div>
-
-                <!-- TAB: CHAT EINKAUF -->
-                <div id="tab-chat-einkauf" class="tab-content">
+                <div id="tab-chat-unternehmen" class="tab-content">
                     <div class="chat-container">
-                        <div class="chat-header glass-panel">
-                            <span class="chat-avatar">👔</span>
-                            <div style="flex-grow: 1;"><strong id="chat-einkauf-name">Thomas Weber</strong><br><span class="chat-role" id="chat-einkauf-role">Leiter Einkauf &amp; Logistik</span></div>
+                        <div class="chat-header">
+                            <div style="flex-grow: 1;">
+                                <strong id="chat-unternehmen-name"></strong><br>
+                                <span class="chat-role" id="chat-unternehmen-role"></span>
+                            </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
-                        <div class="chat-messages" id="chat-einkauf-messages"><div class="chat-bubble chat-contact"><span class="bubble-avatar">👔</span><div class="bubble-text">Guten Tag! Thomas Weber, Leiter Einkauf und Logistik. Wie kann ich Ihnen weiterhelfen? Fragen Sie mich gerne zu unseren Beschaffungsprozessen, der Logistik oder unserer Lagerhaltung.</div></div></div>
+                        <div class="chat-messages" id="chat-unternehmen-messages"></div>
                         <div class="chat-input-row">
-                            <input type="text" id="chat-einkauf-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('einkauf')">
-                            <button class="btn btn-primary" onclick="sendChatMessage('einkauf')">Senden</button>
+                            <input type="text" id="chat-unternehmen-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('unternehmen')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('unternehmen')">Senden</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- TAB: CHAT FINANZEN -->
-                <div id="tab-chat-finanzen" class="tab-content">
+                <div id="tab-chat-bank" class="tab-content">
                     <div class="chat-container">
-                        <div class="chat-header glass-panel">
-                            <span class="chat-avatar">👩‍💼</span>
-                            <div style="flex-grow: 1;"><strong id="chat-finanzen-name">Sandra Keller</strong><br><span class="chat-role" id="chat-finanzen-role">Leiterin Finanzen &amp; Controlling</span></div>
+                        <div class="chat-header">
+                            <div style="flex-grow: 1;">
+                                <strong id="chat-bank-name"></strong><br>
+                                <span class="chat-role" id="chat-bank-role"></span>
+                            </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
-                        <div class="chat-messages" id="chat-finanzen-messages"><div class="chat-bubble chat-contact"><span class="bubble-avatar">👩‍💼</span><div class="bubble-text">Sandra Keller, Finanzen und Controlling. Schön, dass Sie sich die Zeit nehmen. Ich stehe Ihnen für Fragen zur Bilanz, den Finanzkennzahlen und unserem Risikomanagement zur Verfügung.</div></div></div>
+                        <div class="chat-messages" id="chat-bank-messages"></div>
                         <div class="chat-input-row">
-                            <input type="text" id="chat-finanzen-input" placeholder="Stellen Sie Ihre Frage..." onkeydown="if(event.key==='Enter') sendChatMessage('finanzen')">
-                            <button class="btn btn-primary" onclick="sendChatMessage('finanzen')">Senden</button>
+                            <input type="text" id="chat-bank-input" placeholder="Sicherungsgeschäft anfragen..." onkeydown="if(event.key==='Enter') sendChatMessage('bank')">
+                            <button class="btn btn-primary" onclick="sendChatMessage('bank')">Senden</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- TAB: TASK -->
                 <div id="tab-task" class="tab-content">
-                    <div class="task-header glass-panel">
-                        <h2>✏️ Ihre Risikoanalyse</h2>
-                        <p>Nutzen Sie alle verfügbaren Quellen – den Internetauftritt, den Jahresabschluss, den Lagebericht, die Marktdaten und vor allem die Gespräche mit den Ansprechpartnern – um die folgenden Aufgaben zu bearbeiten.</p>
+                    <div class="company-header" style="text-align: left;">
+                        <h2 style="color: var(--brand-red);">Aufgabe: Risikoanalyse & Hedging</h2>
+                        <p>Analysieren Sie die Rohstoffpreisrisiken und leiten Sie Handlungsempfehlungen ab.</p>
                     </div>
-                    <form id="analysis-form" onsubmit="event.preventDefault(); saveFormData();">
-                        <div id="task-questions-container"><div class="task-card"><h4>Aufgabe 1: Identifikation der Preisänderungsrisiken</h4><div class="task-prompt">Analysieren Sie anhand der verfügbaren Informationen (Unternehmenswebsite, Bilanz, GuV, Lagebericht, Marktdaten und Gespräche mit den Ansprechpartnern) alle wesentlichen Preisänderungsrisiken der KabelWerke Deutschland GmbH. Unterscheiden Sie dabei zwischen Risiken aus steigenden und Risiken aus fallenden Preisen.</div><textarea id="ans-q1" rows="6" placeholder="Ihre Analyse..."></textarea></div><div class="task-card"><h4>Aufgabe 2: Quantifizierung der Risiken</h4><div class="task-prompt">Quantifizieren Sie die identifizierten Preisänderungsrisiken so weit wie möglich. Nutzen Sie die verfügbaren Kennzahlen aus Bilanz und GuV sowie die aktuellen Marktdaten, um die potenzielle Ergebnisauswirkung bei einer Preisveränderung von +/- 10% zu berechnen.</div><textarea id="ans-q2" rows="6" placeholder="Ihre Analyse..."></textarea></div><div class="task-card"><h4>Aufgabe 3: Absicherungsstrategie</h4><div class="task-prompt">Entwickeln Sie eine ganzheitliche Absicherungsstrategie für die identifizierten Risiken. Berücksichtigen Sie dabei die am Markt verfügbaren Instrumente und begründen Sie Ihre Empfehlung. Priorisieren Sie die Maßnahmen nach Wesentlichkeit.</div><textarea id="ans-q3" rows="6" placeholder="Ihre Analyse..."></textarea></div><div class="task-card"><h4>Aufgabe 4: Handlungsempfehlung an die Geschäftsführung</h4><div class="task-prompt">Verfassen Sie eine strukturierte Handlungsempfehlung an die Geschäftsführung der KabelWerke Deutschland GmbH. Fassen Sie die Risikosituation zusammen, priorisieren Sie die dringendsten Maßnahmen und skizzieren Sie einen Umsetzungsplan.</div><textarea id="ans-q4" rows="6" placeholder="Ihre Analyse..."></textarea></div></div>
-                        <button type="submit" class="btn btn-primary btn-full">Alle Antworten übermitteln</button>
+                    <form id="analysis-form" style="max-width: 900px;" onsubmit="event.preventDefault()">
+                        <div id="task-questions-container"></div>
+                        <button type="submit" class="btn btn-primary" style="margin-top:20px; font-size: 1rem; padding: 14px 28px;" onclick="saveFormData()">Speichern</button>
+                        <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">Tipp: Ihre Eingaben werden beim Tippen automatisch gespeichert.</p>
                     </form>
                 </div>
-
-                <!-- TAB: LECTURER -->
                 <div id="tab-lecturer" class="tab-content">
-                    <div class="task-header glass-panel"><h2>👨‍🏫 Live-Übersicht</h2><p>Wählen Sie eine Gruppe zur Präsentation.</p></div>
-                    <div class="group-selector">
-                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
-                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
-                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
-                        <button class="btn btn-outline" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
+                    <div class="company-header" style="text-align: left;">
+                        <h2>Ergebnisse einsehen</h2>
+                        <p>Wählen Sie eine Gruppe aus, um deren gespeicherte Risikoanalysen live zu überprüfen.</p>
                     </div>
-                    <div class="presentation-board hidden" id="presentation-board">
-                        <h3 id="presentation-group-name" class="presentation-title"></h3>
+                    <div class="group-selector">
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
+                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
+                    </div>
+                    <div id="presentation-board" class="presentation-board hidden">
+                        <h3 class="presentation-title">Ergebnisse: <span id="presentation-group-name" style="font-weight: 800;">-</span></h3>
                         <div id="presentation-answers"></div>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <script src="data.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
+    <script src="data.js"></script>
     <script src="app.js"></script>
-</body></html>
+</body>
+</html>

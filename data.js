@@ -1,76 +1,84 @@
 // ============================================================
-// FIKTIVE UNTERNEHMENSDATEN: KabelWerke Deutschland GmbH
-// Version 3 – Realistische Darstellung ohne offensichtliche Hinweise
+// DATENSTRUKTUR: Rohstoffmanagement Fallstudie (PDF Integration & Bank Chat)
 // ============================================================
 
 const companyData = {
-
-    name: "KabelWerke Deutschland GmbH",
-    slogan: "Verbindungen, die Deutschland bewegen.",
-
-    // ---- WEBSITE (Marketingsprache, keine internen Details) ----
+    // ---- UNTERNEHMENSPROFIL ----
     website_sections: {
-        about: `Die KabelWerke Deutschland GmbH ist seit über 35 Jahren ein verlässlicher Partner für hochwertige Kabel- und Leitungstechnik. Am Standort Wuppertal fertigen wir mit rund 420 Mitarbeitern ein breites Sortiment an Kupferkabeln für Energieversorgung, Bauwesen und Industrie. Qualität und Liefertreue sind die Grundpfeiler unseres Erfolgs.`,
-
-        mission: `Als mittelständisches Familienunternehmen stehen wir für nachhaltige Wertschöpfung am Standort Deutschland. Unsere Kunden schätzen unsere hohe Produktqualität, individuelle Beratung und die Fähigkeit, auch kurzfristige Großaufträge zuverlässig zu bedienen.`,
-
-        production: `In unserer modernen Fertigungsanlage verarbeiten wir Kupfer in mehrstufigen Prozessen zu hochwertigen Kabelprodukten. Am Standort betreiben wir ein eigenes Blockheizkraftwerk zur Versorgung mit Strom und Prozesswärme, um unsere Unabhängigkeit von externen Energielieferanten zu sichern.`,
-
-        logistics: `Unser Versprechen: Bundesweite Lieferung innerhalb von 48 Stunden. Mit unserer eigenen LKW-Flotte bringen wir Ihr Material direkt auf die Baustelle – zuverlässig und termingerecht, von Flensburg bis Garmisch.`,
-
-        warehouse: `Durch unser großzügiges Zentrallager in Wuppertal können wir eine außergewöhnlich hohe Lieferbereitschaft garantieren. Unsere Kunden profitieren von sofort verfügbaren Standardprodukten und kurzen Vorlaufzeiten bei Sonderkonfektionen.`
+        about: "Die KabelWerke Deutschland GmbH ist seit ueber 35 Jahren ein verlaesslicher Partner fuer hochwertige Kabel- und Leitungstechnik. Am Standort Wuppertal fertigen wir mit rund 420 Mitarbeitern ein breites Sortiment an Kupferkabeln fuer Energieversorgung, Bauwesen und Industrie. Qualitaet und Liefertreue sind die Grundpfeiler unseres Erfolgs.",
+        mission: "Als mittelstaendisches Familienunternehmen stehen wir fuer nachhaltige Wertschoepfung am Standort Deutschland. Unsere Kunden schaetzen unsere hohe Produktqualitaet, individuelle Beratung und die Faehigkeit, auch kurzfristige Grossauftraege zuverlaessig zu bedienen.",
+        production: "In unserer modernen Fertigungsanlage verarbeiten wir Kupfer in mehrstufigen Prozessen zu hochwertigen Kabelprodukten. Am Standort betreiben wir ein eigenes Blockheizkraftwerk zur Versorgung mit Strom und Prozesswaerme, um unsere Unabhaengigkeit von externen Energielieferanten zu sichern.",
+        logistics: "Um unsere versprochenen Lieferzeiten europaweit einzuhalten, setzen wir neben Speditionspartnern verstaerkt auf unseren eigenen, unternehmenseigenen Fuhrpark. Dies gewaehrleistet maximale Flexibilitaet und Kontrolle ueber die Lieferketten.",
+        warehouse: "Unser großraeumiges Zentrallager am Standort Wuppertal ermoeglicht es uns, eine hohe Verfuegbarkeit unserer Standardprodukte sicherzustellen und als Puffer zwischen Produktion und Kundenauslieferung zu dienen."
     },
 
-    // ---- PRODUKTE ----
+    // ---- PRODUCT PORTFOLIO ----
     products: [
-        { name: "NYY-J Starkstromkabel", category: "Niederspannung", description: "Für die feste Verlegung in Gebäuden, Außenanlagen und Erdreich.", image_emoji: "⚡" },
-        { name: "H07V-K Aderleitung", category: "Installation", description: "Flexible Aderleitung für Gebäudeinstallation und Renovierung.", image_emoji: "🏠" },
-        { name: "NYCWY Mittelspannungskabel", category: "Mittelspannung", description: "Für Energieverteilnetze und kommunale Infrastruktur.", image_emoji: "🏗️" },
-        { name: "ÖLFLEX® CLASSIC Steuerleitung", category: "Industrie", description: "Steuer- und Anschlussleitung für Maschinenbau und Automatisierung.", image_emoji: "🏭" }
+        { 
+            name: "Starkstromkabel (NYY-J)", 
+            category: "Energieversorgung", 
+            description: "Robuste Kabel zur Energieuebertragung im Netz, in der Industrie und in Gebaeuden.",
+            image_emoji: "KV" 
+        },
+        { 
+            name: "Mittelspannungskabel", 
+            category: "Infrastruktur", 
+            description: "Spezialkabel fuer Stromnetze (10-30 kV) mit optimiertem Kupferquerschnitt.",
+            image_emoji: "MK" 
+        },
+        { 
+            name: "Flexible Steuerleitungen (YSLY)", 
+            category: "Industrie & Anlagenbau", 
+            description: "Hochflexible Leitungen fuer Mess-, Steuer- und Regelungstechnik.",
+            image_emoji: "SL"
+        },
+        { 
+            name: "Installationskabel (NYM-J)", 
+            category: "Bauwesen", 
+            description: "Der Standard fuer die Verlegung ueber, auf, im und unter Putz in trockenen, feuchten und nassen Raeumen.",
+            image_emoji: "IN"
+        }
     ],
 
-    // ---- MARKTDATEN (S-International Daily 16.04.2026) ---- 
-    marketPrices: {
-        date: "16.04.2026",
-        source: "S-International Daily / LME / ICE",
-        eurUsd: 1.1806,
-        copper: { spotUsd: 13248, spotEur: 11221, forward3m: 13100, forward6m: 12800, forward12m: 12500, unit: "USD/t bzw. EUR/t" },
-        diesel: { spotUsd: 1160, spotEur: 983, forward6m: 900, forward12m: 800, unit: "USD/mT (Low Sulphur Gasoil ICE)" },
-        eua: { spot: 68.50, forward12m: 72.00, unit: "EUR/t CO₂" }
-    },
-
-    // ---- BILANZ (clean, ohne erklärende Hinweise) ----
+    // ---- BILANZ ----
     bilanz: {
-        stichtag: "31.12.2025",
         aktiva: {
             title: "AKTIVA",
             sections: [
                 {
-                    title: "A. Anlagevermögen",
+                    title: "A. Anlagevermoegen",
                     items: [
-                        { label: "I. Immaterielle Vermögensgegenstände", value: "850.000" },
-                        { label: "II. Sachanlagen", sub: true },
-                        { label: "1. Grundstücke und Gebäude", value: "12.500.000", indent: true },
-                        { label: "2. Technische Anlagen und Maschinen", value: "18.200.000", indent: true },
-                        { label: "3. Kraft- und Wärmeerzeugungsanlage", value: "6.800.000", indent: true },
-                        { label: "4. Fuhrpark", value: "5.500.000", indent: true },
-                        { label: "5. Betriebs- und Geschäftsausstattung", value: "1.200.000", indent: true },
-                        { label: "Summe Anlagevermögen", value: "45.050.000", bold: true }
+                        { label: "I. Immaterielle Vermoegensgegenstaende", value: 1200000 },
+                        { label: "II. Sachanlagen", value: 33500000, bold: true },
+                        { label: "1. Grundstuecke und Bauten", value: 14000000, indent: true },
+                        { label: "2. Technische Anlagen und Maschinen", value: 16500000, indent: true },
+                        { label: "3. Fuhrpark und Betriebs- und Geschaeftsausstattung", value: 3000000, indent: true },
+                        { label: "III. Finanzanlagen", value: 0 }
                     ]
                 },
                 {
-                    title: "B. Umlaufvermögen",
+                    title: "B. Umlaufvermoegen",
                     items: [
-                        { label: "I. Vorräte", sub: true },
-                        { label: "1. Roh-, Hilfs- und Betriebsstoffe", value: "8.200.000", indent: true },
-                        { label: "2. Unfertige Erzeugnisse", value: "3.800.000", indent: true },
-                        { label: "3. Fertige Erzeugnisse und Waren", value: "22.000.000", indent: true },
-                        { label: "II. Forderungen aus Lieferungen und Leistungen", value: "11.500.000" },
-                        { label: "III. Kassenbestand, Bankguthaben", value: "3.450.000" },
-                        { label: "Summe Umlaufvermögen", value: "48.950.000", bold: true }
+                        { label: "I. Vorraete", value: 38200000, bold: true },
+                        { label: "1. Roh-, Hilfs- und Betriebsstoffe", value: 12300000, indent: true },
+                        { label: "2. Fertige Erzeugnisse und Waren", value: 25900000, indent: true },
+                        { label: "II. Forderungen und sonstige Vermoegensgegenstaende", value: 15400000 },
+                        { label: "III. Wertpapiere", value: 500000 },
+                        { label: "IV. Kassenbestand, Guthaben bei Kreditinstituten", value: 5200000 }
                     ]
                 },
-                { title: "", items: [{ label: "Bilanzsumme", value: "94.000.000", bold: true, total: true }] }
+                {
+                    title: "C. Rechnungsabgrenzungsposten",
+                    items: [
+                        { label: "", value: 150000 }
+                    ]
+                },
+                {
+                    title: "",
+                    items: [
+                        { label: "Bilanzsumme", value: 94150000, total: true }
+                    ]
+                }
             ]
         },
         passiva: {
@@ -79,225 +87,231 @@ const companyData = {
                 {
                     title: "A. Eigenkapital",
                     items: [
-                        { label: "I. Gezeichnetes Kapital", value: "5.000.000" },
-                        { label: "II. Kapitalrücklage", value: "3.000.000" },
-                        { label: "III. Gewinnrücklagen", value: "12.000.000" },
-                        { label: "IV. Jahresüberschuss", value: "2.700.000" },
-                        { label: "Summe Eigenkapital", value: "22.700.000", bold: true }
+                        { label: "I. Gezeichnetes Kapital", value: 5000000 },
+                        { label: "II. Kapitalruecklage", value: 2000000 },
+                        { label: "III. Gewinnruecklagen", value: 13500000 },
+                        { label: "IV. Bilanzgewinn", value: 2200000 },
+                        { label: "Eigenkapital gesamt", value: 22700000, sub: true }
                     ]
                 },
                 {
-                    title: "B. Rückstellungen",
+                    title: "B. Rueckstellungen",
                     items: [
-                        { label: "1. Pensionsrückstellungen", value: "4.800.000" },
-                        { label: "2. Steuerrückstellungen", value: "1.200.000" },
-                        { label: "3. Sonstige Rückstellungen", value: "2.300.000" },
-                        { label: "Summe Rückstellungen", value: "8.300.000", bold: true }
+                        { label: "1. Pensionsrueckstellungen", value: 4500000 },
+                        { label: "2. Steuerrueckstellungen", value: 1200000 },
+                        { label: "3. Sonstige Rueckstellungen", value: 2300000 }
                     ]
                 },
                 {
                     title: "C. Verbindlichkeiten",
                     items: [
-                        { label: "1. Verbindlichkeiten ggü. Kreditinstituten", value: "38.000.000" },
-                        { label: "2. Verbindlichkeiten aus Lieferungen und Leistungen", value: "18.500.000" },
-                        { label: "3. Sonstige Verbindlichkeiten", value: "6.500.000" },
-                        { label: "Summe Verbindlichkeiten", value: "63.000.000", bold: true }
+                        { label: "1. Verbindlichkeiten gegenueber Kreditinstituten", value: 38500000, bold: true },
+                        { label: "davon mit Restlaufzeit bis zu 1 Jahr", value: 12500000, indent: true },
+                        { label: "davon mit Restlaufzeit groesser 1 Jahr", value: 26000000, indent: true },
+                        { label: "2. Verbindlichkeiten aus Lieferungen und Leistungen", value: 22800000, bold: true },
+                        { label: "3. Sonstige Verbindlichkeiten", value: 2000000 }
                     ]
                 },
-                { title: "", items: [{ label: "Bilanzsumme", value: "94.000.000", bold: true, total: true }] }
+                {
+                    title: "D. Rechnungsabgrenzungsposten",
+                    items: [
+                        { label: "", value: 150000 }
+                    ]
+                },
+                {
+                    title: "",
+                    items: [
+                        { label: "Bilanzsumme", value: 94150000, total: true }
+                    ]
+                }
             ]
         }
     },
 
-    // ---- GuV (clean, ohne erklärende Hinweise) ----
+    // ---- GEWINN- UND VERLUSTRECHNUNG ----
     guv: {
-        period: "01.01.2025 – 31.12.2025",
         items: [
-            { label: "1. Umsatzerlöse", value: "100.000.000", bold: true },
-            { label: "2. Bestandsveränderungen", value: "+1.200.000" },
-            { label: "Gesamtleistung", value: "101.200.000", bold: true, line: true },
-            { label: "" },
-            { label: "3. Materialaufwand", sub: true },
-            { label: "a) Aufwendungen für Roh-, Hilfs- und Betriebsstoffe", value: "-54.800.000", indent: true },
-            { label: "b) Aufwendungen für bezogene Leistungen", value: "-3.700.000", indent: true },
-            { label: "Summe Materialaufwand", value: "-58.500.000", bold: true },
-            { label: "" },
-            { label: "4. Personalaufwand", value: "-16.800.000" },
-            { label: "5. Abschreibungen", value: "-5.200.000" },
-            { label: "" },
-            { label: "6. Sonstige betriebliche Aufwendungen", value: "-16.700.000" },
-            { label: "" },
-            { label: "Betriebsergebnis (EBIT)", value: "4.000.000", bold: true, line: true },
-            { label: "" },
-            { label: "7. Zinsen und ähnliche Aufwendungen", value: "-1.300.000" },
-            { label: "" },
-            { label: "Ergebnis vor Steuern (EBT)", value: "2.700.000", bold: true, line: true },
+            { label: "1. Umsatzerloese", value: 98500000, bold: true },
+            { label: "2. Erhoehung/Verminderung des Bestands an fertigen und unfertigen Erzeugnissen", value: 2300000 },
+            { label: "3. Andere aktivierte Eigenleistungen", value: 120000 },
+            { label: "4. Sonstige betriebliche Ertraege", value: 650000 },
+            { label: "Gesamtleistung", value: 101570000, sub: true },
+            { label: "", value: null },
+            { label: "5. Materialaufwand", value: -58500000, bold: true },
+            { label: "a) Aufwendungen fuer Roh-, Hilfs- und Betriebsstoffe", value: -56200000, indent: true },
+            { label: "b) Aufwendungen fuer bezogene Leistungen", value: -2300000, indent: true },
+            { label: "6. Personalaufwand", value: -18800000 },
+            { label: "7. Abschreibungen", value: -7200000 },
+            { label: "8. Sonstige betriebliche Aufwendungen", value: -13000000, bold: true },
+            { label: "Rohergebnis", value: null },
+            { label: "", value: null },
+            { label: "Betriebsergebnis (EBIT)", value: 4070000, line: true },
+            { label: "", value: null },
+            { label: "9. Finanz- und Beteiligungsergebnis", value: -1150000 },
+            { label: "Ergebnis der gewoehnlichen Geschaeftstaetigkeit", value: 2920000, sub: true },
+            { label: "10. Steuern vom Einkommen und vom Ertrag", value: -720000 },
+            { label: "Jahresueberschuss", value: 2200000, total: true }
         ]
     },
 
-    // ---- LAGEBERICHT (wie ein echter Geschäftsbericht, subtile Hinweise) ----
+    // ---- LAGEBERICHT ----
     lagebericht: {
         sections: [
             {
-                title: "1. Geschäftsverlauf und Lage der Gesellschaft",
-                text: `Das Geschäftsjahr 2025 war geprägt von einer soliden Nachfrageentwicklung im Bereich der Kabel- und Leitungstechnik. Die Umsatzerlöse konnten auf 100,0 Mio. EUR gesteigert werden. Die Auftragslage blieb über das gesamte Jahr stabil, insbesondere im Bereich der Infrastrukturprojekte und des Wohnungsbaus. Der Materialaufwand stellt mit 58,5 Mio. EUR (57,8% der Gesamtleistung) den mit Abstand größten Kostenblock dar und wird maßgeblich durch die Entwicklung der internationalen Metallpreise beeinflusst.`
+                title: "1. Wirtschaftsbericht & Rahmenbedingungen",
+                text: "Das Geschaeftsjahr 2025 war durch ein anhaltend anspruchsvolles Marktumfeld gepraegt. Die Nachfrage aus dem Sektor Erneuerbare Energien und Ladeinfrastruktur zeigte sich robust, waehrend der traditionelle Hochbau deutliche Schwaechen aufwies. Die Materialverfuegbarkeit war im Berichtsjahr stabil, wenngleich wir erhebliche Volatilitaeten an den internationalen Rohstoffmaerkten verzeichneten."
             },
             {
-                title: "2. Beschaffung und Produktion",
-                text: `Der Einkauf unseres wesentlichen Vormaterials erfolgt zu marktüblichen Konditionen an internationalen Rohstoffmärkten. Die Beschaffungspreise unterliegen teils erheblichen Schwankungen, die sich unmittelbar auf unsere Herstellungskosten auswirken. Im Berichtsjahr konnte die Fertigungskapazität unserer Produktionsanlagen durch gezielte Investitionen weiter optimiert werden. Unsere unternehmenseigene Kraft-Wärme-Kopplungsanlage zur Eigenversorgung ist seit 2008 in Betrieb und sichert die energetische Unabhängigkeit der Fertigungsprozesse. Das Unternehmen unterliegt den Regularien des europäischen Emissionshandels und beschafft die erforderlichen Zertifikate am Markt.`
+                title: "2. Geschaeftsverlauf & Ertragslage",
+                text: "Die Umsatzerloese konnten leicht auf 98,5 Mio. Euro gesteigert werden. Parallel dazu stieg jedoch auch die Materialeinsatzquote. Das Betriebsergebnis (EBIT) liegt bei 4,1 Mio. Euro. Um unsere Wettbewerbsfaehigkeit und Liefertreue zu sichern, haben wir unsere Vorraete, insbesondere das Fertiglager, bewusst hoch gehalten. Dies spiegelt sich entsprechend in der Kapitalbindung wider."
             },
             {
-                title: "3. Logistik und Vertrieb",
-                text: `Unsere Vertriebsstrategie basiert auf einer hohen Lieferbereitschaft und bundesweiter Distribution. Die Auslieferung erfolgt über eine eigene Fahrzeugflotte, die eine Just-in-Time-Belieferung unserer Kunden ermöglicht. Die Kraftstoffkosten stellen einen wesentlichen Bestandteil der Distributionskosten dar und sind von der allgemeinen Preisentwicklung am Energiemarkt abhängig.`
+                title: "3. Beschaffungsmarkt, Logistik und Energie & CO2",
+                text: "Unser groesster Kostenblock bleibt die Beschaffung von metallischen Vormaterialien. Zur Sicherstellung unserer Lieferketten betreiben wir weiterhin unseren Eigenfuhrpark. \nEine wichtige Entwicklung ergab sich im Bereich Umweltschutz: Unser in Wuppertal betriebenes Blockheizkraftwerk faellt als energieintensive Grossanlage unter das Europaeische Emissionshandelssystem (EU-ETS 1) und wir verzeichnen wachsende Ausgaben fuer CO2-Zertifikate. Beachten Sie zusaetzlich, dass die Logistik unserer 50-LKW-Flotte spaetestens 2027 in das erweiterte System (EU-ETS 2) fallen wird. Bis dahin unterliegt der Dieselkraftstoff dem nationalen Emissionshandel (nEHS)."
             },
             {
-                title: "4. Vermögens- und Finanzlage",
-                text: `Die Bilanzsumme beläuft sich zum Stichtag auf 94,0 Mio. EUR. Die Eigenkapitalquote liegt bei 24,1% und dokumentiert eine solide, wenn auch ausbaufähige finanzielle Basis. Die Vorräte an fertigen und unfertigen Erzeugnissen stellen mit 25,8 Mio. EUR den wertmäßig bedeutendsten Posten des Umlaufvermögens dar. Die Bewertung erfolgt zu Herstellungskosten unter Beachtung des strengen Niederstwertprinzips gemäß § 253 Abs. 4 HGB. Bei einem anhaltenden Rückgang der Materialpreise bestünde das Risiko einer Wertminderung auf den niedrigeren beizulegenden Wert.`
-            },
-            {
-                title: "5. Risiko- und Chancenbericht",
-                text: `<strong>Beschaffungsmarktrisiken:</strong> Die Gesellschaft ist in erheblichem Umfang von der Preisentwicklung auf den internationalen Rohstoffmärkten abhängig. Insbesondere die Entwicklung des Preises für unser Kernvormaterial stellt ein wesentliches Ergebnisrisiko dar. Derzeit verfügt die Gesellschaft nicht über systematische Sicherungsstrategien für Rohstoffpreise.<br><br><strong>Energiekosten und regulatorische Risiken:</strong> Die Kosten für den Betrieb unserer Eigenversorgungsanlage sowie die mit dem europäischen Emissionshandel verbundenen Aufwendungen unterliegen marktpreislichen Schwankungen. Die schrittweise Reduktion der kostenlosen Zuteilung von Emissionsrechten wird die Beschaffungskosten in den kommenden Jahren voraussichtlich weiter erhöhen.<br><br><strong>Logistikkosten:</strong> Die Kosten für den Betrieb unserer Fahrzeugflotte sind von der allgemeinen Kraftstoffpreisentwicklung abhängig. Angesichts der hohen Fahrleistung stellt dies ein nicht unerhebliches Kostenrisiko dar.<br><br><strong>Bestandsbewertungsrisiken:</strong> Die hohe Kapitalbindung in Fertigerzeugnissen birgt bei rückläufigen Materialpreisen das Risiko bilanzwirksamer Wertminderungen.`
-            },
-            {
-                title: "6. Prognosebericht",
-                text: `Für das laufende Geschäftsjahr 2026 rechnet die Geschäftsführung mit einer weiterhin stabilen Nachfragesituation. Die Ergebnisentwicklung wird maßgeblich davon abhängen, inwieweit es gelingt, Schwankungen der Einkaufspreise an die Kunden weiterzugeben oder anderweitig abzufangen. Die Geschäftsführung prüft derzeit die Einführung eines systematischen Rohstoff-Risikomanagements.`
+                title: "4. Prognose- und Risikobericht",
+                text: "Die Geschaeftsfuehrung sieht grundsaetzlich positive Perspektiven in den Schluesselmaerkten der Energiewende. Als wesentliche Risiken fuer das kommende Geschaeftsjahr indentifizieren wir Schwankungen der Beschaffungspreise fuer unser Kernmaterial, moegliche Bewertungsrisiken im Umlaufvermoegen aufgrund der Lagerhaltung an Fertigwaren, steigende Preise durch den nationalen und europaeischen Emissionshandel (CO2-Zertifikate) sowie allgemeine Preissteigerungen im Bereich der Logistikkraftstoffe. Die Geschaeftsfuehrung laesst derzeit pruefen, inwiefern finanzmathematische Instrumente oder Termingeschafte zur Risikoreduktion eingesetzt werden koennen."
             }
         ]
     },
 
-    // ---- CHAT-SYSTEM: ANSPRECHPARTNER UND IHRE ANTWORTEN ----
+    // ---- MARKTDATEN ----
+    marketPrices: {
+        date: "16. April 2026",
+        copper: { spotUsd: 11250, spotEur: 10416, forward3m: 11300, forward6m: 11350, forward12m: 11420 },
+        diesel: { spotUsd: 875.50, spotEur: 810.65, forward6m: 865.00, forward12m: 850.00 },
+        eua: { spot: 68.40, forward12m: 72.10 },
+        eurUsd: 1.0800
+    },
+
+    // ---- CHAT-SYSTEM: UNTERNEHMEN & BANK ----
     chatContacts: {
-        einkauf: {
-            name: "Thomas Weber",
-            role: "Leiter Einkauf & Logistik",
-            avatar: "👔",
-            greeting: "Guten Tag! Thomas Weber, Leiter Einkauf und Logistik. Wie kann ich Ihnen weiterhelfen? Fragen Sie mich gerne zu unseren Beschaffungsprozessen, der Logistik oder unserer Lagerhaltung.",
+        unternehmen: {
+            name: "Team KabelWerke",
+            role: "Thomas Weber (Einkauf) & Sandra Keller (Finanzen)",
+            avatar: "KabelWerke",
+            greeting: "Willkommen! Thomas Weber (Beschaffung & Logistik) und Sandra Keller (Finanzen & Controlling) sind fuer Sie da. Stellen Sie Fragen zum Materialeinkauf, zur Logistik, zur Bilanz oder zum Risikomanagement.",
             responses: [
+                // Weber - Kupfer
                 {
-                    keywords: ["kupfer", "rohstoff", "material", "vormaterial", "metall"],
+                    keywords: ["kupfer", "rohstoff", "material", "vormaterial", "metall", "einkauf"],
                     topicSentence: "copper procurement purchasing raw material metal supply Kupfer Beschaffung Einkauf Rohstoff Metall Vormaterial woher beziehen kaufen",
-                    answer: "Kupfer ist unser mit Abstand wichtigstes Vormaterial. Wir verarbeiten jährlich rund 6.500 Tonnen Kupferkathoden der Güteklasse Cu-ETP. Der Einkauf erfolgt über unsere Handelspartner zu Preisen, die sich am Kurs der London Metal Exchange – der LME – orientieren. Wir kaufen in der Regel monatlich zu den jeweils gültigen Tagespreisen ein. Eine langfristige Preisfixierung betreiben wir derzeit nicht."
+                    answer: "Weber: Kupfer ist unser wichtigstes Vormaterial. Wir verarbeiten jaehrlich rund 6.500 Tonnen. Der Einkauf erfolgt am Kurs der London Metal Exchange (LME). Wir kaufen in der Regel monatlich zu den Tagespreisen ein. Eine echte Preisabsicherung betreiben wir im Moment noch nicht."
                 },
                 {
-                    keywords: ["lme", "börse", "preis", "preisbildung", "marktpreis", "kurs"],
-                    topicSentence: "LME London Metal Exchange price pricing stock exchange Börse Preis Preisbildung Marktpreis Kurs Dollar Notierung Schwankung",
-                    answer: "Die Preise richten sich nach der LME, der Londoner Metallbörse. Das ist der internationale Referenzmarkt für Industriemetalle. Unsere Einkaufspreise bewegen sich entsprechend mit dem LME-Kupferpreis, der in US-Dollar pro Tonne notiert wird. Dazu kommt natürlich das Währungsrisiko EUR/USD. In den letzten Monaten lag der LME-Kupferpreis zwischen 10.000 und 14.000 USD pro Tonne – das sind schon erhebliche Schwankungen."
+                    keywords: ["lm", "boerse", "preis", "preisbildung", "marktpreis", "kurs"],
+                    topicSentence: "LME London Metal Exchange price pricing stock exchange Boerse Preis Preisbildung Marktpreis Kurs Dollar Notierung Schwankung",
+                    answer: "Weber: Die Preise richten sich nach der LME. Unsere Einkaufspreise bewegen sich entsprechend mit dem LME-Kupferpreis in US-Dollar pro Tonne. In den letzten Monaten lag der Kupferpreis oft ueber 10.000 USD/Tonne, was erhebliche Volatilitaet mit sich bringt."
                 },
+                // Weber - Logistik 
                 {
-                    keywords: ["lkw", "flotte", "fahrzeug", "transport", "lieferung", "spedition"],
+                    keywords: ["lkw", "flotte", "fahrzeug", "transport", "logistik", "lieferung", "spedition"],
                     topicSentence: "truck fleet vehicle transport delivery logistics LKW Flotte Fahrzeug Transport Lieferung Spedition Sattelzug",
-                    answer: "Wir unterhalten eine eigene Flotte von 50 Sattelzügen, allesamt 40-Tonner mit Dieselantrieb. Die Fahrzeuge sind im Durchschnitt 280 Tage im Jahr auf der Straße und legen pro Tag etwa 450 Kilometer zurück. Das sind natürlich erhebliche Fahrleistungen, die sich auch in den Kraftstoffkosten niederschlagen."
+                    answer: "Weber: Wir unterhalten eine eigene Flotte von 50 Sattelzuegen, allesamt 40-Tonner mit Dieselantrieb. Pro Tag legt ein LKW im Schnitt 450 Kilometer zurueck. Da fallen enorme Kraftstoffkosten an."
                 },
                 {
-                    keywords: ["diesel", "kraftstoff", "tankst", "sprit", "benzin", "treibstoff"],
+                    keywords: ["diesel", "kraftstoff", "tanken", "sprit", "benzin", "treibstoff"],
                     topicSentence: "diesel fuel gasoline petrol cost consumption Diesel Kraftstoff Sprit Benzin Treibstoff tanken Verbrauch Kosten",
-                    answer: "Ja, die Dieselkosten sind ein großes Thema bei uns. Bei 50 LKW mit durchschnittlich 32 Litern auf 100 Kilometer kommen Sie auf einen jährlichen Verbrauch von gut zwei Millionen Litern. Das summiert sich auf über sechs Millionen Euro pro Jahr. Wir tanken über Rahmenverträge mit großen Mineralölkonzernen, aber der Preis orientiert sich letztlich am Markt."
+                    answer: "Weber: Ja, Diesel ist ein Riesenthema. 50 LKW bei ca. 32 Litern auf 100km – wir verbrauchen jaehrlich gut zwei Millionen Liter! Das sind ungesichert ueber 6 Millionen Euro pro Jahr."
+                },
+                // Keller - Bilanz & Vorraete
+                {
+                    keywords: ["lager", "bestand", "vorraete", "vorrat", "fertig", "trommel", "lagerbestand"],
+                    topicSentence: "warehouse inventory stock storage finished goods Lager Bestand Vorraete Fertigerzeugnisse Trommel Lagerbestand lagern",
+                    answer: "Keller: Aktuell lagern wir Fertigware im Bilanzwert von knapp 26 Mio. Euro (Herstellungskosten). Der Kupferanteil am Materialwert liegt meist bei uener 70 Prozent. Wir muessen viel auf Lager halten, um schnell lieferfaehig zu sein."
                 },
                 {
-                    keywords: ["lager", "bestand", "vorräte", "vorrat", "fertig", "trommel", "lagerbestand"],
-                    topicSentence: "warehouse inventory stock storage finished goods Lager Bestand Vorräte Fertigerzeugnisse Trommel Lagerbestand lagern",
-                    answer: "Unser Zentrallager umfasst über 12.000 Quadratmeter. Aktuell lagern dort fertige Kabeltrommeln im Wert von etwa 22 Millionen Euro – Bilanzwert zu Herstellungskosten. Der Kupferanteil am Materialwert liegt je nach Kabeltyp zwischen 48 und 72 Prozent. Das ist schon eine erhebliche Kapitalbindung. Wir brauchen diese Bestände aber, um unsere 48-Stunden-Liefergarantie halten zu können."
+                    keywords: ["bewertung", "niederstwert", "abschreibung", "wertminderung", "hgb", "abwertung"],
+                    topicSentence: "inventory valuation write-down impairment lower of cost principle Vorraete Bewertung Niederstwertprinzip Abschreibung Wertminderung HGB",
+                    answer: "Keller: Genau das ist mein groesster Sorgenpunkt. Nach dem strengen Niederstwertprinzip (§ 253 Abs. 4 HGB) drohen bei stark fallenden Kupferpreisen massive Abschreibungen auf unsere 26 Mio. Euro Vorraete, da der reale Marktwert unter die Urspruenglichen Herstellungskosten fallen koennte."
                 },
-                {
-                    keywords: ["absicherung", "hedging", "sicherung", "forward", "future", "termin", "derivat"],
-                    topicSentence: "hedging risk management forward future derivative protection Absicherung Sicherung Termin Derivat absichern schützen",
-                    answer: "Ehrlich gesagt: Wir haben derzeit keine systematische Rohstoffpreisabsicherung. Wir kaufen zu Tagespreisen und versuchen, Preisänderungen über Anpassungen unserer Verkaufspreise weiterzugeben. Das gelingt aber nicht immer zeitnah – unsere Kundenverträge haben oft Laufzeiten von drei bis sechs Monaten mit festen Preisen. Die Geschäftsführung hat uns beauftragt, das Thema Hedging zu prüfen."
-                },
-                {
-                    keywords: ["kunde", "vertrag", "verkaufspreis", "preisanpassung", "weitergabe"],
-                    topicSentence: "customer contract sales price adjustment passing on Kunde Vertrag Verkaufspreis Preisanpassung Weitergabe Konditionen",
-                    answer: "Unsere Kundenverträge laufen meist über drei bis sechs Monate mit fixen Preisen. Preisanpassungen können wir daher nicht sofort weitergeben. Bei starken Kupferpreisschwankungen entsteht dadurch ein zeitlicher Versatz – wenn die Rohstoffpreise steigen, tragen wir das Risiko bis zur nächsten Preisanpassung. Das kann bei 6.500 Tonnen im Jahr schon ins Geld gehen."
-                },
-                {
-                    keywords: ["risiko", "problem", "schwierig", "herausforderung", "sorge"],
-                    topicSentence: "risk problem challenge concern worry Risiko Problem Herausforderung Sorge schwierig Volatilität Schwankung",
-                    answer: "Unsere größten Herausforderungen? Ganz klar die Volatilität auf der Beschaffungsseite. Wenn der Kupferpreis innerhalb eines Quartals um 10 Prozent steigt, reden wir schnell über mehrere Millionen Mehrkosten. Und auf der Lagerseite ist es genau umgekehrt: Fällt der Kupferpreis, dann steht unser gesamter Lagerbestand mit zu hohen Herstellungskosten in den Büchern. Frau Keller aus dem Controlling kann Ihnen da mehr zu den bilanziellen Auswirkungen sagen."
-                }
-            ],
-            fallback: "Da bin ich nicht der richtige Ansprechpartner. Fragen Sie mich gerne zu unseren Einkaufsprozessen, der Rohstoffbeschaffung, unserer LKW-Flotte, dem Diesel, oder unserem Lagermanagement. Für Finanzfragen empfehle ich Ihnen Fr. Keller."
-        },
-        finanzen: {
-            name: "Sandra Keller",
-            role: "Leiterin Finanzen & Controlling",
-            avatar: "👩‍💼",
-            greeting: "Sandra Keller, Finanzen und Controlling. Schön, dass Sie sich die Zeit nehmen. Ich stehe Ihnen für Fragen zur Bilanz, den Finanzkennzahlen und unserem Risikomanagement zur Verfügung.",
-            responses: [
-                {
-                    keywords: ["bilanz", "bilanzsumme", "vermögen", "aktiva", "passiva"],
-                    topicSentence: "balance sheet total assets liabilities equity Bilanz Bilanzsumme Vermögen Aktiva Passiva Zahlen",
-                    answer: "Unsere Bilanzsumme liegt bei 94 Millionen Euro. Was mich als Controllerin beschäftigt: Die Vorräte an fertigen und unfertigen Erzeugnissen machen mit knapp 26 Millionen Euro den größten Einzelposten im Umlaufvermögen aus. Das ist eine enorme Kapitalbindung, deren Wert unmittelbar von der Rohstoffpreisentwicklung abhängt."
-                },
-                {
-                    keywords: ["vorräte", "bestand", "bewertung", "niederstwert", "abschreibung", "wertminderung"],
-                    topicSentence: "inventory valuation write-down impairment lower of cost principle Vorräte Bewertung Niederstwertprinzip Abschreibung Wertminderung HGB",
-                    answer: "Die Vorräte bewerten wir zu Herstellungskosten – das schreibt das HGB vor. Aber nach dem strengen Niederstwertprinzip gemäß § 253 Abs. 4 HGB müssen wir zum Bilanzstichtag prüfen, ob der Marktpreis unter die Herstellungskosten gefallen ist. Wenn ja, müssen wir auf den niedrigeren Wert abschreiben. Bei unserem Lagerbestand von 22 Millionen Euro Fertigerzeugnissen, wovon gut 70 Prozent des Materialwerts auf Kupfer entfallen – das sind rund 17 bis 18 Millionen Euro reiner Kupferwert – wäre ein Kupferpreisverfall von 10 Prozent potenziell ein Abwertungsbedarf von fast 2 Millionen Euro. Das geht direkt ins Ergebnis."
-                },
-                {
-                    keywords: ["materialaufwand", "kostenstruktur", "kosten", "aufwand"],
-                    topicSentence: "material cost expense cost structure spending Materialaufwand Kostenstruktur Kosten Aufwand ausgeben Struktur",
-                    answer: "Der Materialaufwand ist mit 58,5 Millionen Euro unser größter Kostenblock und macht fast 58 Prozent der Gesamtleistung aus. Davon entfallen allein rund 48 Millionen auf den Kupfereinkauf. Der Rest sind Kunststoffgranulate, Isoliermaterialien und Verpackung. Im Bereich der sonstigen betrieblichen Aufwendungen stecken unter anderem die Energiekosten für unser Blockheizkraftwerk, die Kraftstoffkosten für die LKW-Flotte, und die Aufwendungen für CO₂-Zertifikate – zusammen rund 13 Millionen Euro. Das sind alles marktpreisabhängige Positionen."
-                },
+                // Keller & Weber - CO2 und Energie (PDF Background)
                 {
                     keywords: ["co2", "emission", "zertifikat", "eua", "emissionshandel", "ets"],
                     topicSentence: "CO2 carbon emission certificate EUA allowance trading Emission Zertifikat Emissionshandel Klimaschutz Umwelt",
-                    answer: "Unser Blockheizkraftwerk fällt mit seiner Feuerungswärmeleistung unter den EU-Emissionshandel. Wir stoßen jährlich rund 26.300 Tonnen CO₂ aus. Davon erhalten wir noch etwa 8.000 Tonnen als kostenlose Zuteilung – die sinkt aber Jahr für Jahr. Den Rest, also gut 18.000 Tonnen, müssen wir am Markt als EU Allowances zukaufen. Bei aktuellen Preisen um die 68 Euro pro Tonne sind das knapp 1,3 Millionen Euro nur für den Zukauf. Tendenz steigend."
+                    answer: "Keller: Die CO2-Situation ist komplex. Unser Blockheizkraftwerk (Gas) faellt unter das EU-ETS 1, also freie Marktpreise ohne Maximalgrenze. Wir brauchen ca. 18.000 Tonnen (EUAs) vom Markt, und laut aktuellen Terminkurven koennten die Preise von aktuell 68 EUR auf 80 EUR pro Tonne bis 2030 steigen! Zusaetzlich faellt der Diesel unserer LKW-Flotte aktuell unter das nationale Emissionshandelsgesetz (nEHS) mit festgelegtem Preiskorridor von 55 bis 65 Euro je Tonne fuer 2026. Ab 2027 wird der Verkehrssektor dann aber dem EU-ETS 2 unterworfen, ebenfalls ohne Preisobergrenze. Die Kosten werden also massiv steigen."
                 },
                 {
-                    keywords: ["kraftwerk", "bhkw", "energie", "gas", "erdgas", "wärme", "strom"],
-                    topicSentence: "power plant energy gas electricity heat CHP BHKW Kraftwerk Energie Gas Erdgas Wärme Strom Blockheizkraftwerk",
-                    answer: "Unser Blockheizkraftwerk hat eine elektrische Leistung von 22 Megawatt und versorgt uns mit Strom und Prozesswärme für die Schmelz- und Ziehprozesse. Wir verbrauchen jährlich rund 45 Gigawattstunden Erdgas. Die Gaskosten belaufen sich auf etwa 5,4 Millionen Euro pro Jahr. Aber wie gesagt – das Thema Erdgaspreisabsicherung steht bei uns gerade nicht ganz oben auf der Agenda, obwohl man darüber nachdenken sollte."
+                    keywords: ["nehs", "eu-ets", "eu-ets 2", "compliance", "markt"],
+                    topicSentence: "EU-ETS nEHS national emissions trading compliance voluntary market BEHG Gesetz",
+                    answer: "Keller: Wichtig zu unterscheiden: Wir sind im 'Compliance Markt', d.h. wir sind gesetzlich verpflichtet Zertifikate zu erwerben. Bis 2027 ist unsere Flotte noch im nEHS (Nationaler Emissionshandel) geschuetzt durch Preisobergrenzen (bis 65 EUR), aber danach gilt EU-ETS 2."
                 },
                 {
-                    keywords: ["eigenkapital", "quote", "verschuldung", "fremdkapital"],
-                    topicSentence: "equity ratio debt leverage capital structure Eigenkapital Quote Verschuldung Fremdkapital Finanzierung Bank",
-                    answer: "Die Eigenkapitalquote liegt bei 24,1 Prozent. Das ist für unsere Branche nicht unüblich, aber auch kein Polster für große Überraschungen. Von unseren 38 Millionen Bankverbindlichkeiten sind etwa 12 Millionen kurzfristig – die hängen teils an variablen Zinssätzen. Was mir mehr Sorgen macht, ist die hohe Kapitalbindung in unseren Vorräten. Wenn da Wertberichtigungen nötig werden, schlägt das direkt auf die Eigenkapitalquote durch."
+                    keywords: ["kraftwerk", "iaok", "enrgie", "gas", "erdgas", "strom"],
+                    topicSentence: "power plant energy gas electricity heat CHP BHKW Kraftwerk Energie Gas Erdgas Waerme",
+                    answer: "Keller: Unser Blockheizkraftwerk versorgt uns mit Strom und Prozesswaerme. Es verbraucht sehr viel Gas. Aber im Emissionshandel ist es besonders teuer. Gas selbst haben wir bisher nicht gehedeget."
                 },
                 {
-                    keywords: ["absicherung", "hedging", "sicherung", "strategie", "risikomanagement"],
-                    topicSentence: "hedging strategy risk management protection insurance Absicherung Hedging Strategie Risikomanagement Konzept Plan",
-                    answer: "Ich sage es ganz offen: Wir haben aktuell kein systematisches Absicherungskonzept für unsere Rohstoffpreisrisiken. Weder für Kupfer, noch für Diesel, noch für die CO₂-Zertifikate. Die Geschäftsführung hat das Thema jetzt auf die Agenda gesetzt – deshalb sind Sie ja hier. Meine Einschätzung: Die drei größten Risikopositionen sind erstens der Kupfereinkauf mit 48 Millionen Jahresvolumen, zweitens der Lagerbestand mit dem Abwertungsrisiko, und drittens die Diesel- und CO₂-Kosten in Kombination."
-                },
-                {
-                    keywords: ["risiko", "problem", "gefahr", "schwach"],
-                    topicSentence: "risk danger problem weakness threat concern Risiko Gefahr Problem Schwäche Bedrohung Sorge was macht Ihnen Sorgen",
-                    answer: "Aus Sicht des Controllings sehe ich mehrere Risiken: Erstens die direkte Abhängigkeit unserer Einkaufskosten von internationalen Rohstoffpreisen. Zweitens das Bestandsbewertungsrisiko – bei fallenden Preisen drohen Wertminderungen auf unser Fertiglager. Drittens die regulatorischen Kosten aus dem EU-Emissionshandel, die jedes Jahr steigen. Und viertens die Kraftstoffkosten für unsere Flotte, die wir aktuell gar nicht absichern."
-                },
-                {
-                    keywords: ["guv", "gewinn", "verlust", "ergebnis", "ebit", "marge"],
-                    topicSentence: "profit loss income statement EBIT margin result GuV Gewinn Verlust Ergebnis Marge Rentabilität profitabel",
-                    answer: "Unser EBIT liegt bei 4 Millionen Euro – das entspricht einer EBIT-Marge von gerade mal 4 Prozent. Bei einem Materialaufwand von 58,5 Millionen braucht es nur eine vergleichsweise geringe Schwankung der Einkaufspreise, um unser gesamtes Betriebsergebnis aufzuzehren. Anders gesagt: Wenn der Kupferpreis nur um 8-9 Prozent steigt und we das nicht weitergeben können, wäre unser Gewinn praktisch null."
-                },
-                {
-                    keywords: ["rückstellung", "sonstige"],
-                    topicSentence: "provisions reserves accruals Rückstellung Rückstellungen sonstige Reserve Vorsorge",
-                    answer: "In den sonstigen Rückstellungen von 2,3 Millionen stecken unter anderem Rückstellungen für ausstehende CO₂-Zertifikate des laufenden Jahres, Garantierückstellungen und Rechtskosten. Der CO₂-Anteil macht davon den größten einzelnen Posten aus."
+                    keywords: ["risiko", "problem", "gefahr", "schwach", "absicherung", "hedging"],
+                    topicSentence: "risk problem challenge concern worry hedging Risiko Problem Gefahr Absicherung Strategie Hedging",
+                    answer: "Keller & Weber: Unsere groessten wirtschaftlichen Risiken sind: 1. Beschaffungspreis-Anstieg bei Kupfer (Kostenfalle). 2. Preisverfall bei Kupfer (Abwertungsrisiko auf unser gigantisches Lager gem. HGB). 3. Massive Mehrkosten durch LKW-Diesel. 4. Die steigenden und teils schwankenden CO2-Zertifikatspreise im EU-ETS und nEHS. Aktuell ist davon leider nichts strategisch abgesichert."
                 }
             ],
-            fallback: "Das liegt eher im Bereich von Herrn Weber aus dem Einkauf. Ich kann Ihnen vor allem zu unserer Bilanz, GuV, Kostenstruktur, Bewertungsfragen und dem finanziellen Risikomanagement Auskunft geben."
+            fallback: "KabelWerke (Team): Diese Frage koennen wir Ihnen so direkt nicht beantworten. Fragen Sie uns gerne zu Lieferketten, Kupfer, LKW, Diesel, oder aber Finanz-Themen wie HGB Bilanzierung, Niederstwertprinzip oder das Emmissionshandelssystem."
+        },
+        bank: {
+            name: "Trading Desk",
+            role: "Financial Markets & Commodities Bank",
+            avatar: "GlobalBank",
+            greeting: "Guten Tag, hier spricht der Derivate-Handel. Wir koennen Ihnen Absicherungsinstrumente (Forwards, Swaps, Optionen) fuer Kupfer (LME-Quotierung), ICE Gasoil oder EUA-Zertifikate stellen. Welche Sicherungsgeschaefte moechten Sie abfragen?",
+            responses: [
+                {
+                    keywords: ["asian", "swap", "average", "durchschnitt", "termingeschaeft"],
+                    topicSentence: "asian swap commodity average price termingeschaeft derivat asian style",
+                    answer: "Trader: Ein Asian Style Swap auf Rohwaren macht absolut Sinn, wenn Sie fortlaufend ueber den Monat Energie oder Rohstoffe (z.B. LME Cash Settlement oder ICE Gasoil) verbrauchen und gegen den Monatsdurchschnitt hedgen wollen. Um Ihnen einen Preis zu nennen: Welches Underlying? Welche Laufzeit? Und wie hoch ist die Gesamt-Tonnage?"
+                },
+                {
+                    keywords: ["laufzeit", "tonnage", "volumen", "menge"],
+                    topicSentence: "tonnage volume tenor maturity laufzeit groesse",
+                    answer: "Trader: Gut. Fuer die Preisfindung beim Hedging berechnen wir meist einen kleinen Risikoabschlag oder Aufschlag auf die Forward-Preise aus dem Markt, abhaengig von Volumen und Bonitaet. Wenn Sie laut Marktdaten einkaufen, koennen Sie davon ausgehen, dass wir die Forward-Kurve ansetzen."
+                },
+                {
+                    keywords: ["future", "forward", "termingeschaeft", "kaufen"],
+                    topicSentence: "future forward terminkontrakt kaufen absichern fix",
+                    answer: "Trader: Ein klassischer Forward oder Future zielt auf einen genauen Stichtag in der Zukunft ab. Fuer Gasoil, Kupfer oder EUAs koennen wir fuer Sie an der ICE oder EEX Termin-Kontrakte (Forwards) erwerben. Schauen Sie sich einfach die Forward-Preise in Ihren Marktdaten an, um unseren Angebotspreis fuer diese Laufzeiten abzuschaetzen."
+                },
+                {
+                    keywords: ["kupfer", "copper", "lme"],
+                    topicSentence: "copper lme hedge kupfer absicherung",
+                    answer: "Trader: Bei Kupfer-Termingeschaeften notieren wir ueblicherweise USD/t basierend auf LME. Denken Sie daran, dass Sie zusaetzlich das EUR/USD Waehrungsrisiko hedgen muessen, da Ihr Unternehmen in Euro bilanziert!"
+                },
+                {
+                    keywords: ["eua", "co2", "zertifikat", "eex"],
+                    topicSentence: "eua co2 eex certificate zertifikat emissionsrechte",
+                    answer: "Trader: Zur CO2-Absicherung (EUA) koennen wir Forwards an der EEX oder ICE handeln. Beachten Sie, dass Sie mit EUAs nicht den Nationalen Emissionshandel (nEHS) fuer Diesel hedgen koennen, da nEHS-Zertifikate bis 2026 staatlich preisgebunden sind. Fuer den EU-ETS 1 Kraftwerks-Bedarf koennen wir aber heute schon die Preise im Forward einkaufen (ca. 72 EUR fuer naechstes Jahr)."
+                },
+                {
+                    keywords: ["diesel", "gasoil", "ice"],
+                    topicSentence: "diesel gasoil ice hedge diesel absicherung swap",
+                    answer: "Trader: Einen direkten Diesel-Forward gibt es fuer den Mittelstand so nicht transparent; wir nutzen hierfuer in der Regel 'ICE Low Sulphur Gasoil Futures' als Underlying fuer OTC-Swaps. Das passt durch hohe Korrelation perfekt zur Diesel-Absicherung Ihrer Flotte."
+                }
+            ],
+            fallback: "Trader: Bitte spezifizieren Sie Ihr Derivat. Nennen Sie Instrument (Future, Asian Swap), das Underlying (Kupfer, Gasoil, EUA) oder Parameter, damit ich Ihnen den Handelsablauf erklaeren kann."
         }
     },
 
-    // ---- AUFGABENSTELLUNG (offen, ohne vorweggenommene Antworten) ----
+    // ---- AUFGABENSTELLUNG ----
     questions: [
         {
             id: "q1",
             title: "Aufgabe 1: Identifikation der Preisänderungsrisiken",
-            prompt: "Analysieren Sie anhand der verfügbaren Informationen (Unternehmenswebsite, Bilanz, GuV, Lagebericht, Marktdaten und Gespräche mit den Ansprechpartnern) alle wesentlichen Preisänderungsrisiken der KabelWerke Deutschland GmbH. Unterscheiden Sie dabei zwischen Risiken aus steigenden und Risiken aus fallenden Preisen."
+            prompt: "Analysieren Sie alle wesentlichen Preisänderungsrisiken der Fallstudie. Unterscheiden Sie Risiken aus steigenden Preisen (Beschaffung) und Risiken aus fallenden Preisen (Bestandsbewertung HGB). Vergessen Sie nicht CO2!"
         },
         {
             id: "q2",
             title: "Aufgabe 2: Quantifizierung der Risiken",
-            prompt: "Quantifizieren Sie die identifizierten Preisänderungsrisiken so weit wie möglich. Nutzen Sie die verfügbaren Kennzahlen aus Bilanz und GuV sowie die aktuellen Marktdaten, um die potenzielle Ergebnisauswirkung bei einer Preisveränderung von +/- 10% zu berechnen."
+            prompt: "Nutzen Sie Bilanz/GuV und Marktdaten, um die potenzielle Ergebnisauswirkung bei einer Preisveränderung von +/- 10% zu berechnen (z.B. auf den Wert des Kupferlagers oder auf den Gasoil-Verbrauch)."
         },
         {
             id: "q3",
-            title: "Aufgabe 3: Absicherungsstrategie",
-            prompt: "Entwickeln Sie eine ganzheitliche Absicherungsstrategie für die identifizierten Risiken. Berücksichtigen Sie dabei die am Markt verfügbaren Instrumente und begründen Sie Ihre Empfehlung. Priorisieren Sie die Maßnahmen nach Wesentlichkeit."
+            title: "Aufgabe 3: Absicherungsstrategie (Hedging)",
+            prompt: "Entwickeln Sie nach Gesprächen mit dem Handelsraum eine Absicherungsstrategie. Welche Produkte nutzen Sie für Kupfer, Diesel und EUAs? Warum eventuell Asian Swaps oder Forwards?"
         },
         {
             id: "q4",
             title: "Aufgabe 4: Handlungsempfehlung an die Geschäftsführung",
-            prompt: "Verfassen Sie eine strukturierte Handlungsempfehlung an die Geschäftsführung der KabelWerke Deutschland GmbH. Fassen Sie die Risikosituation zusammen, priorisieren Sie die dringendsten Maßnahmen und skizzieren Sie einen Umsetzungsplan."
+            prompt: "Verfassen Sie eine strukturierte Handlungsempfehlung. Welches Risiko muss zuerst gesichert werden? Skizzieren Sie den Umsetzungsplan."
         }
     ]
 };
