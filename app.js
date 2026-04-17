@@ -45,7 +45,7 @@ function saveGroupConfig() {
     const count = parseInt(document.getElementById("group-count-input").value) || 4;
     
     // Save to Firebase
-    if (window.db) {
+    if (typeof db !== 'undefined' && db !== null) {
         db.collection("fallstudie_config").doc("settings").set({ group_count: count })
         .then(() => {
             renderDynamicButtons(count);
@@ -628,7 +628,7 @@ function showToast() {
 
 // Check for Global Config on load
 setTimeout(() => {
-    if (window.db) {
+    if (typeof db !== 'undefined' && db !== null) {
         db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
             if (doc.exists && doc.data().group_count) {
                 renderDynamicButtons(doc.data().group_count);
