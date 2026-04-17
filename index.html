@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fallstudie: Rohstoffmanagement – KabelWerke GmbH</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260417_1">
 </head>
-<body class="">
+<body>
     <div id="toast" class="toast">Gespeichert ✓</div>
 
     <!-- ===================== LOGIN ===================== -->
@@ -77,15 +77,15 @@
                     </div>
                     <div class="company-grid">
                         <div class="section-container">
-                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text">Die KabelWerke Deutschland GmbH ist seit ueber 35 Jahren ein verlaesslicher Partner fuer hochwertige Kabel- und Leitungstechnik. Am Standort Wuppertal fertigen wir mit rund 420 Mitarbeitern ein breites Sortiment an Kupferkabeln fuer Energieversorgung, Bauwesen und Industrie. Qualitaet und Liefertreue sind die Grundpfeiler unseres Erfolgs.</p></div>
-                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text">Als mittelstaendisches Familienunternehmen stehen wir fuer nachhaltige Wertschoepfung am Standort Deutschland. Unsere Kunden schaetzen unsere hohe Produktqualitaet, individuelle Beratung und die Faehigkeit, auch kurzfristige Grossauftraege zuverlaessig zu bedienen.</p></div>
+                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text"></p></div>
                         </div>
                         <div class="section-container">
-                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text">In unserer modernen Fertigungsanlage verarbeiten wir Kupfer in mehrstufigen Prozessen zu hochwertigen Kabelprodukten. Am Standort betreiben wir ein eigenes Blockheizkraftwerk zur Versorgung mit Strom und Prozesswaerme, um unsere Unabhaengigkeit von externen Energielieferanten zu sichern.</p></div>
+                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text"></p></div>
                         </div>
                         <div class="section-container">
-                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text">Um unsere versprochenen Lieferzeiten europaweit einzuhalten, setzen wir neben Speditionspartnern verstaerkt auf unseren eigenen, unternehmenseigenen Fuhrpark. Dies gewaehrleistet maximale Flexibilitaet und Kontrolle ueber die Lieferketten.</p></div>
-                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text">Unser großraeumiges Zentrallager am Standort Wuppertal ermoeglicht es uns, eine hohe Verfuegbarkeit unserer Standardprodukte sicherzustellen und als Puffer zwischen Produktion und Kundenauslieferung zu dienen.</p></div>
+                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text"></p></div>
                         </div>
                     </div>
                 </div>
@@ -151,12 +151,7 @@
                         <h2>Aktuelle Marktdaten</h2>
                         <p>Quelle: Handelsdaten | Stand: <span id="market-date"></span></p>
                     </div>
-                    <div class="market-grid" id="market-grid">
-        <!-- Copper Card -->
-        <!-- Diesel Card -->
-        <!-- EU-ETS Card -->
-        <!-- FX Card -->
-    </div>
+                    <div class="market-grid" id="market-grid"></div>
                 </div>
 
                 <!-- TAB: CHAT UNTERNEHMEN -->
@@ -164,8 +159,8 @@
                     <div class="chat-container">
                         <div class="chat-header">
                             <div style="flex-grow: 1;">
-                                <strong id="chat-unternehmen-name">Team KabelWerke</strong><br>
-                                <span class="chat-role" id="chat-unternehmen-role">Thomas Weber (Einkauf) & Sandra Keller (Finanzen)</span>
+                                <strong id="chat-unternehmen-name"></strong><br>
+                                <span class="chat-role" id="chat-unternehmen-role"></span>
                             </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
@@ -182,8 +177,8 @@
                     <div class="chat-container">
                         <div class="chat-header">
                             <div style="flex-grow: 1;">
-                                <strong id="chat-bank-name">Trading Desk</strong><br>
-                                <span class="chat-role" id="chat-bank-role">Financial Markets & Commodities Bank</span>
+                                <strong id="chat-bank-name"></strong><br>
+                                <span class="chat-role" id="chat-bank-role"></span>
                             </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
@@ -234,7 +229,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <script src="data.js?v=20260417_1"></script>
+    <script src="app.js?v=20260417_1"></script>
 </body>
 </html>
