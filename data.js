@@ -193,62 +193,42 @@ const companyData = {
             avatar: "KabelWerke",
             greeting: "Willkommen! Thomas Weber (Beschaffung & Logistik) und Sandra Keller (Finanzen & Controlling) sind fuer Sie da. Stellen Sie Fragen zum Materialeinkauf, zur Logistik, zur Bilanz oder zum Risikomanagement.",
             responses: [
-                // Weber - Kupfer
+                // Weber - Kupfer (Vonovia)
                 {
-                    keywords: ["kupfer", "rohstoff", "material", "vormaterial", "metall", "einkauf"],
-                    topicSentence: "copper procurement purchasing raw material metal supply Kupfer Beschaffung Einkauf Rohstoff Metall Vormaterial woher beziehen kaufen",
-                    answer: "Weber: Kupfer ist unser wichtigstes Vormaterial. Wir verarbeiten jaehrlich rund 6.500 Tonnen. Der Einkauf erfolgt am Kurs der London Metal Exchange (LME). Wir kaufen in der Regel monatlich zu den Tagespreisen ein. Eine echte Preisabsicherung betreiben wir im Moment noch nicht."
+                    keywords: ["kupfer", "rohstoff", "material", "vormaterial", "angebot", "svm", "vonovia"],
+                    topicSentence: "copper procurement raw material Vonovia SVM pricing Kupfer Beschaffung Angebot großprojekt",
+                    answer: "Weber: Für unseren klassischen Kupferhandel können wir bei Gelegenheit mal über Absicherungen sprechen, aber aktuell fokussieren wir uns auf ein Großprojekt: Unser Stammkunde SVM GmbH nimmt an einer gigantischen Ausschreibung von Vonovia für Ladepunkte teil. Projektstart ist in 9 Monaten, danach liefern wir für 6 Monate monatlich 200mt Kupferkabel. Wir fakturieren strikt in EUR."
                 },
                 {
-                    keywords: ["lme", "boerse", "preis", "preisbildung", "marktpreis", "kurs"],
-                    topicSentence: "LME London Metal Exchange price pricing stock exchange Boerse Preis Preisbildung Marktpreis Kurs Dollar Notierung Schwankung",
-                    answer: "Weber: Die Preise richten sich nach der LME. Unsere Einkaufspreise bewegen sich entsprechend mit dem LME-Kupferpreis in US-Dollar pro Tonne. In den letzten Monaten lag der Kupferpreis oft ueber 10.000 USD/Tonne, was erhebliche Volatilitaet mit sich bringt."
+                    keywords: ["risiko", "gleitklausel", "option", "optionsgeschäft", "preisgleitklausel", "absichern"],
+                    topicSentence: "option risk hedging Preisgleitklausel Angebot Option Sicherung Hedging",
+                    answer: "Weber: Optionsgeschäfte auf Kupfer brauchen wir hierfür nicht! Wir haben mit der SVM GmbH vereinbart, dass unser Angebotspreis nur 30 Minuten gehalten werden kann. Danach greift eine Preisgleitklausel für den Kupferpreis bis zur finalen Auftragszusage. Sobald die Zusage da ist, müssen wir aber die Kupfermenge (6 x 200mt) im Terminmarkt sofort festzurren, damit unsere Marge gesichert ist."
                 },
-                // Weber - Logistik 
+                // Weber - Gas (Neu: Gedeckt)
                 {
-                    keywords: ["lkw", "flotte", "fahrzeug", "transport", "logistik", "lieferung", "spedition"],
-                    topicSentence: "truck fleet vehicle transport delivery logistics LKW Flotte Fahrzeug Transport Lieferung Spedition Sattelzug",
-                    answer: "Weber: Wir unterhalten eine eigene Flotte von 50 Sattelzuegen, allesamt 40-Tonner mit Dieselantrieb. Pro Tag legt ein LKW im Schnitt 450 Kilometer zurueck. Da fallen enorme Kraftstoffkosten an."
+                    keywords: ["gas", "erdgas", "energie", "bhkw", "kraftwerk", "strom"],
+                    topicSentence: "gas energy power Erdgas Strom BHKW Kraftwerk",
+                    answer: "Weber: Erdgas für unser Blockheizkraftwerk ist zum Glück unkritisch geworden. Die Gaspreise haben wir mittlerweile direkt über Festpreisverträge mit unserem physischen Lieferanten abgesichert. Hier ist kein derivatives Finanzgeschäft mehr nötig."
                 },
+                // Weber - Diesel (LKW Flotte)
                 {
-                    keywords: ["diesel", "kraftstoff", "tanken", "sprit", "benzin", "treibstoff"],
-                    topicSentence: "diesel fuel gasoline petrol cost consumption Diesel Kraftstoff Sprit Benzin Treibstoff tanken Verbrauch Kosten",
-                    answer: "Weber: Ja, Diesel ist ein Riesenthema. 50 LKW bei ca. 32 Litern auf 100km – wir verbrauchen jaehrlich gut zwei Millionen Liter! Das sind ungesichert ueber 6 Millionen Euro pro Jahr."
+                    keywords: ["lkw", "flotte", "diesel", "transport", "logistik", "tank", "sprit", "kraftstoff"],
+                    topicSentence: "truck fleet diesel transport Flotte LKW Diesel Transport Kraftstoff",
+                    answer: "Weber: Bei der Logistik sieht es anders aus. Wir haben 50 LKWs, die im Schnitt 450 km am Tag fahren. Rechnen Sie mit rund 30 Liter Diesel pro 100km und 20 Arbeitstagen pro Monat. Im Sommer fahren wir allerdings deutlich mehr als im Winter: Von März bis November 100% Auslastung, Dezemezber bis Februar nur 50%. Unsere Fahrer tanken ganz normal an Tankstellen, aber ich brauche von der Finanzen/Bank dringend einen echten Festpreis für das zweite Halbjahr 2026!"
                 },
-                // Keller - Bilanz & Vorraete
+                // Keller - EUAs
                 {
-                    keywords: ["lager", "bestand", "vorraete", "vorrat", "fertig", "trommel", "lagerbestand"],
-                    topicSentence: "warehouse inventory stock storage finished goods Lager Bestand Vorraete Fertigerzeugnisse Trommel Lagerbestand lagern",
-                    answer: "Keller: Aktuell lagern wir Fertigware im Bilanzwert von knapp 26 Mio. Euro (Herstellungskosten). Der Kupferanteil am Materialwert liegt meist bei uener 70 Prozent. Wir muessen viel auf Lager halten, um schnell lieferfaehig zu sein."
-                },
-                {
-                    keywords: ["bewertung", "niederstwert", "abschreibung", "wertminderung", "hgb", "abwertung"],
-                    topicSentence: "inventory valuation write-down impairment lower of cost principle Vorraete Bewertung Niederstwertprinzip Abschreibung Wertminderung HGB",
-                    answer: "Keller: Genau das ist mein groesster Sorgenpunkt. Nach dem strengen Niederstwertprinzip (§ 253 Abs. 4 HGB) drohen bei stark fallenden Kupferpreisen massive Abschreibungen auf unsere 26 Mio. Euro Vorraete, da der reale Marktwert unter die Urspruenglichen Herstellungskosten fallen koennte."
-                },
-                // Keller & Weber - CO2 und Energie (PDF Background)
-                {
-                    keywords: ["co2", "emission", "zertifikat", "eua", "emissionshandel", "ets"],
-                    topicSentence: "CO2 carbon emission certificate EUA allowance trading Emission Zertifikat Emissionshandel Klimaschutz Umwelt",
-                    answer: "Keller: Die CO2-Situation ist komplex. Unser Blockheizkraftwerk (Gas) faellt unter das EU-ETS 1, also freie Marktpreise ohne Maximalgrenze. Wir brauchen ca. 18.000 Tonnen (EUAs) vom Markt, und laut aktuellen Terminkurven koennten die Preise von aktuell 68 EUR auf 80 EUR pro Tonne bis 2030 steigen! Zusaetzlich faellt der Diesel unserer LKW-Flotte aktuell unter das nationale Emissionshandelsgesetz (nEHS) mit festgelegtem Preiskorridor von 55 bis 65 Euro je Tonne fuer 2026. Ab 2027 wird der Verkehrssektor dann aber dem EU-ETS 2 unterworfen, ebenfalls ohne Preisobergrenze. Die Kosten werden also massiv steigen."
+                    keywords: ["co2", "eua", "emission", "zertifikat", "ets", "zuteilung"],
+                    topicSentence: "CO2 rights EUA allowance certificates Zuteilung Emission ETS",
+                    answer: "Keller: Unser Blockheizkraftwerk fällt unter das EU-ETS. Wir benötigen ca. 30.000 Tonnen CO2-Äquivalent p.a. an EUAs. Vom Staat erhalten wir aber nur eine Freizuteilung von 10.000 EUAs. Die verbleibende Lücke müssen wir am Markt beschaffen und ich fürchte, die Zertifikate werden massiv teurer."
                 },
                 {
-                    keywords: ["nehs", "eu-ets", "eu-ets 2", "compliance", "markt"],
+                    keywords: ["nehs", "eu-ets 2", "compliance", "markt"],
                     topicSentence: "EU-ETS nEHS national emissions trading compliance volunatry market BEHG Gesetz",
-                    answer: "Keller: Wichtig zu unterscheiden: Wir sind im 'Compliance Markt', d.h. wir sind gesetzlich verpflichtet Zertifikate zu erwerben. Bis 2027 ist unsere Flotte noch im nEHS (Nationaler Emissionshandel) geschuetzt durch Preisobergrenzen (bis 65 EUR), aber danach gilt EU-ETS 2."
-                },
-                {
-                    keywords: ["kraftwerk", "bhkw", "energie", "gas", "erdgas", "strom"],
-                    topicSentence: "power plant energy gas electricity heat CHP BHKW Kraftwerk Energie Gas Erdgas Waerme",
-                    answer: "Keller: Unser Blockheizkraftwerk versorgt uns mit Strom und Prozesswaerme. Es verbraucht sehr viel Gas. Aber im Emissionshandel ist es besonders teuer. Gas selbst haben wir bisher nicht gehedget."
-                },
-                {
-                    keywords: ["risiko", "problem", "gefahr", "schwach", "absicherung", "hedging"],
-                    topicSentence: "risk problem challenge concern worry hedging Risiko Problem Gefahr Absicherung Strategie Hedging",
-                    answer: "Keller & Weber: Unsere groessten wirtschaftlichen Risiken sind: 1. Beschaffungspreis-Anstieg bei Kupfer (Kostenfalle). 2. Preisverfall bei Kupfer (Abwertungsrisiko auf unser gigantisches Lager gem. HGB). 3. Massive Mehrkosten durch LKW-Diesel. 4. Die steigenden und teils schwankenden CO2-Zertifikatspreise im EU-ETS und nEHS. Aktuell ist davon leider nichts strategisch abgesichert."
+                    answer: "Keller: Bis 2026 ist unsere Logistik durch das nEHS mit festen CO2-Kosten gedeckt. Ab 2027 fallen die LKW aber in den EU-ETS 2. Das wird die Kostenkalkulation auf den Kopf stellen!"
                 }
             ],
-            fallback: "KabelWerke (Team): Diese Frage koennen wir Ihnen so direkt nicht beantworten. Fragen Sie uns gerne zu Lieferketten, Kupfer, LKW, Diesel, oder aber Finanz-Themen wie HGB Bilanzierung, Niederstwertprinzip oder das Emmissionshandelssystem."
+            fallback: "Weber & Keller: Diese Frage ist zu allgemein. Wollen Sie mit uns über das SVM/Vonovia Großprojekt (Kupfer), den CO2-Zertifikate-Bedarf für unser Kraftwerk oder unsere 50 LKW große Diesel-Flotte sprechen?"
         },
         bank: {
             name: "Trading Desk",
@@ -257,61 +237,56 @@ const companyData = {
             greeting: "Guten Tag, hier spricht der Derivate-Handel. Wir koennen Ihnen Absicherungsinstrumente (Forwards, Swaps, Optionen) fuer Kupfer (LME-Quotierung), ICE Gasoil oder EUA-Zertifikate stellen. Welche Sicherungsgeschaefte moechten Sie abfragen?",
             responses: [
                 {
-                    keywords: ["asian", "swap", "average", "durchschnitt", "termingeschaeft"],
-                    topicSentence: "asian swap commodity average price termingeschaeft derivat asian style",
-                    answer: "Trader: Ein Asian Style Swap auf Rohwaren macht absolut Sinn, wenn Sie fortlaufend ueber den Monat Energie oder Rohstoffe (z.B. LME Cash Settlement oder ICE Gasoil) verbrauchen und gegen den Monatsdurchschnitt hedgen wollen. Um Ihnen einen Preis zu nennen: Welches Underlying? Welche Laufzeit? Und wie hoch ist die Gesamt-Tonnage?"
+                    keywords: ["kupfer", "copper", "vonovia", "svm", "angebot"],
+                    topicSentence: "kupfer copper LME absicherung Angebot Projekt",
+                    answer: "Trader: Für das Kupfer-Großprojekt mit der SVM GmbH benötigen wir zur Bepreisung genaue Parameter. Welches Volumen benötigen Sie und über welchen Zeitraum? Handelt es sich um ein einmaliges Geschäft oder um mehrere Fixings?"
                 },
                 {
-                    keywords: ["laufzeit", "tonnage", "volumen", "menge"],
-                    topicSentence: "tonnage volume tenor maturity laufzeit groesse",
-                    answer: "Trader: Gut. Fuer die Preisfindung beim Hedging berechnen wir meist einen kleinen Risikoabschlag oder Aufschlag auf die Forward-Preise aus dem Markt, abhaengig von Volumen und Bonitaet. Wenn Sie laut Marktdaten einkaufen, koennen Sie davon ausgehen, dass wir die Forward-Kurve ansetzen."
+                    keywords: ["200", "200mt", "monat", "6 monat", "sechs monat", "februar"],
+                    topicSentence: "200mt 6 monate laufzeit asian style kupfer rtg monatlich",
+                    answer: "Trader: Alles klar. Für 200mt monatlich über 6 Monate ab Februar 2027 ist ein Optionsgeschäft nicht notwendig, da Sie ohnehin eine Preisgleitklausel bis zur Zusage haben. Die perfekte Lösung ist ein Sammel-Rohwarentermingeschäft auf Kupfer, Asian Style mit monatlichem Settlement. (Start Februar 2027 – einschließlich Juli 2027, 200 mt pro Monat). Die Risikolinie hierfür beträgt 20% bis 1 Jahr und danach 25% (in Summe ca. 3.105.000 EUR). Die Ziel-Marge für das Geschäft berechnen wir mit 4% auf das Aval (ca. 103,5 EUR/mt Marge auf den Terminpreis)."
                 },
                 {
-                    keywords: ["future", "forward", "termingeschaeft", "kaufen"],
-                    topicSentence: "future forward terminkontrakt kaufen absichern fix",
-                    answer: "Trader: Ein klassischer Forward oder Future zielt auf einen genauen Stichtag in der Zukunft ab. Fuer Gasoil, Kupfer oder EUAs koennen wir fuer Sie an der ICE oder EEX Termin-Kontrakte (Forwards) erwerben. Schauen Sie sich einfach die Forward-Preise in Ihren Marktdaten an, um unseren Angebotspreis fuer diese Laufzeiten abzuschaetzen."
+                    keywords: ["eua", "co2", "zertifikat"],
+                    topicSentence: "eua emission zertifikate absicherung co2 eex",
+                    answer: "Trader: Zur CO2-Absicherung (EUA) müssen wir wissen: Wie hoch ist der Gesamtbedarf und wie hoch ist die freie Zuteilung, die der Kunde erhält?"
                 },
                 {
-                    keywords: ["kupfer", "copper", "lme"],
-                    topicSentence: "copper lme hedge kupfer absicherung",
-                    answer: "Trader: Bei Kupfer-Termingeschaeften notieren wir ueblicherweise USD/t basierend auf LME. Denken Sie daran, dass Sie zusaetzlich das EUR/USD Waehrungsrisiko hedgen muessen, da Ihr Unternehmen in Euro bilanziert!"
+                    keywords: ["30000", "30.000", "10000", "10.000", "20000", "20.000", "zuteilung"],
+                    topicSentence: "30000 bedarf 10000 zuteilung 20000 eua absicherung dezember 2026",
+                    answer: "Trader: Verstanden. Bei 30.000t Bedarf und 10.000t Freizuteilung müssen Sie 20.000 EUAs sichern. Wir offerieren ein Rohwarentermingeschäft auf EUAs, European Style. Lieferung Mitte Dezember 2026 für 20.000 Stück. Die Risikolinie kalkulieren wir mit 20% vom Volumen (ca. 296.000 EUR Risikolimitauslastung bei 1.48 Mio EUR Gesamtvolumen). Unsere Marge liegt zielgerichtet bei 4% auf das Aval (ca. 2,96 EUR/EUA auf den Terminpreis)."
                 },
                 {
-                    keywords: ["eua", "co2", "zertifikat", "eex"],
-                    topicSentence: "eua co2 eex certificate zertifikate emissionsrechte",
-                    answer: "Trader: Zur CO2-Absicherung (EUA) koennen wir Forwards an der EEX oder ICE handeln. Beachten Sie, dass Sie mit EUAs nicht den Nationalen Emissionshandel (nEHS) fuer Diesel hedgen koennen, da nEHS-Zertifikate bis 2026 staatlich preisgebunden sind. Fuer den EU-ETS 1 Kraftwerks-Bedarf koennen wir aber heute schon die Preise im Forward einkaufen (ca 72 EUR fuer naechstes Jahr)."
+                    keywords: ["diesel", "gasoil", "lkw", "flotte"],
+                    topicSentence: "diesel gasoil ice abstimmung logistik",
+                    answer: "Trader: Zur Absicherung der Dieselflotte (ICE Gasoil) im zweiten Halbjahr benötigen wir zuerst das genaue Volumen. Wie viel Tonnen verbraucht die Flotte im Monat?"
                 },
                 {
-                    keywords: ["diesel", "gasoil", "ice"],
-                    topicSentence: "diesel gasoil ice hedge diesel absicherung swap",
-                    answer: "Trader: Einen direkten Diesel-Forward gibt es fuer den Mittelstand so nicht transparent; wir nutzen hierfuer in der Regel 'ICE Low Sulphur Gasoil Futures' als Underlying fuer OTC-Swaps. Das passt durch hohe Korrelation perfekt zur Diesel-Absicherung Ihrer Flotte."
+                    keywords: ["135000", "135.000", "liter", "114", "tonnen"],
+                    topicSentence: "114 tonnen 135000 liter asian style gasoil absicherung",
+                    answer: "Trader: Richtig kalkuliert (135.000 Liter / 1.183 = ca. 114 Tonnen p.m.). Wir offerieren ein Sammel-Rohwarentermingeschäft auf Gasoil, Asian Style mit monatlichem Settlement. Start Juli 2026 – einschließlich Dez 2026 mit 114 mt pro Monat. Unser Terminkurs ist 757 EUR/mt. Die Risikolinie beträgt 20% (ca. 103.500 EUR aus 517.788 EUR Nominal). Unsere Marge liegt bei 8% auf das Aval (ca. 12 EUR/mt auf den Terminpreis)."
                 }
             ],
-            fallback: "Trader: Bitte spezifizieren Sie Ihr Derivat. Nennen Sie Instrument (Future, Asian Swap), das Underlying (Kupfer, Gasoil, EUA) oder Parameter, damit ich Ihnen den Handelsablauf erklaeren kann."
+            fallback: "Trader: Bitte spezifizieren Sie Ihre Parameter. Wenn Sie Kupfer-Sicherungen für das Vonovia Projekt, EUAs für das Kraftwerk oder Gasoil für die Dieselflotte anfragen, benötige ich Laufzeiten, Tonnagen oder Angaben zur Zuteilung."
         }
     },
 
     // ---- AUFGABENSTELLUNG ----
     questions: [
         {
-            id: "q1",
-            title: "Aufgabe 1: Identifikation der Preisänderungsrisiken",
-            prompt: "Analysieren Sie alle wesentlichen Preisänderungsrisiken der Fallstudie. Unterscheiden Sie Risiken aus steigenden Preisen (Beschaffung) und Risiken aus fallenden Preisen (Bestandsbewertung HGB). Vergessen Sie nicht CO2!"
+            id: "q_copper",
+            title: "Fall 1: Kupfer (Großprojekt Vonovia)",
+            prompt: "Analysieren Sie das Großprojekt mit der SVM GmbH. Welches Produkt bietet die Bank an und wie hoch ist der Terminkurs/Aufbau? (Tipp: Fragen Sie die Bank nach Kupfer und geben Sie die Laufzeiten und Tonnage an)."
         },
         {
-            id: "q2",
-            title: "Aufgabe 2: Quantifizierung der Risiken",
-            prompt: "Nutzen Sie Bilanz/GuV und Marktdaten, um die potenzielle Ergebnisauswirkung bei einer Preisveränderung von +/- 10% zu berechnen (z.B. auf den Wert des Kupferlagers oder auf den Gasoil-Verbrauch)."
+            id: "q_eua",
+            title: "Fall 2: Emissionszertifikate (EUA)",
+            prompt: "Das Blockheizkraftwerk benötigt EUAs. Ermitteln Sie die nötige Sicherungsmenge nach Abzug der Zuteilung. Welches Produkt offeriert der Handel, wie hoch ist die Risikolinie und die Marge?"
         },
         {
-            id: "q3",
-            title: "Aufgabe 3: Absicherungsstrategie (Hedging)",
-            prompt: "Entwickeln Sie nach Gesprächen mit dem Handelsraum eine Absicherungsstrategie. Welche Produkte nutzen Sie für Kupfer, Diesel und EUAs? Warum eventuell Asian Swaps oder Forwards?"
-        },
-        {
-            id: "q4",
-            title: "Aufgabe 4: Handlungsempfehlung an die Geschäftsführung",
-            prompt: "Verfassen Sie eine strukturierte Handlungsempfehlung. Welches Risiko muss zuerst gesichert werden? Skizzieren Sie den Umsetzungsplan."
+            id: "q_diesel",
+            title: "Fall 3: Dieselflotte (Gasoil)",
+            prompt: "Berechnen Sie zuerst die monatliche Tonnage für die 50 LKWs im 2. Halbjahr 2026. Fragen Sie anschließend den Handel nach Diesel/Gasoil und nennen Sie die Tonnage. Notieren Sie sich das finale Produkt, den Terminkurs, die Risikolinie und die Marge."
         }
     ]
 };
