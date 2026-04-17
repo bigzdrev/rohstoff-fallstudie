@@ -23,38 +23,6 @@
                 </div>
             </div>
 
-            <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border);">
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase;">Dozenten & Admin Bereich</p>
-                <div style="display: flex; gap: 8px; justify-content: center;">
-                    <input type="password" id="admin-password" placeholder="Passwort" class="sidebar-input" style="width: 150px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);" onkeydown="if(event.key==='Enter') tryAdminLogin()">
-                    <button class="btn btn-secondary" onclick="tryAdminLogin()">Login</button>
-                </div>
-                <p id="admin-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 8px; display: none;">Passwort falsch.</p>
-            </div>
-            
-            <div id="admin-config-area" style="display: none; margin-top: 24px; background: #FFF5F5; padding: 16px; border-radius: var(--radius-md); border: 1px solid #FED7D7; text-align: left;">
-                <h3 style="color: var(--brand-red); font-size: 1rem; margin-bottom: 12px;">Gruppenkonfiguration</h3>
-                <label style="font-size: 0.85rem; color: var(--text-primary); display: block; margin-bottom: 8px;">Wie viele Gruppen nehmen teil (1-12)?</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 80px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);">
-                    <button class="btn btn-primary" onclick="saveGroupConfig()">Übernehmen & Speichern</button>
-                </div>
-                
-                <hr style="border: none; border-top: 1px solid #FED7D7; margin: 16px 0;">
-                <h3 style="color: var(--brand-red); font-size: 1rem; margin-bottom: 12px;">Regiepult (Live-Freischaltung)</h3>
-                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
-                    <label><input type="checkbox" id="check-produkte" onchange="saveRegieConfig()"> Reiter "Produkte" freischalten</label>
-                    <label><input type="checkbox" id="check-bilanz" onchange="saveRegieConfig()"> Reiter "Jahresabschluss" freischalten</label>
-                    <label><input type="checkbox" id="check-lagebericht" onchange="saveRegieConfig()"> Reiter "Lagebericht" freischalten</label>
-                    <label><input type="checkbox" id="check-marktdaten" onchange="saveRegieConfig()"> Reiter "Marktdaten" freischalten</label>
-                    <label><input type="checkbox" id="check-chat" onchange="saveRegieConfig()"> Reiter "Chat (Kundenunternehmen)" freischalten</label>
-                    <label><input type="checkbox" id="check-aufgaben" onchange="saveRegieConfig()"> Reiter "Aufgaben" freischalten</label>
-                </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Studierende können sich anschließend zuordnen.</p>
-                
-                <hr style="border: none; border-top: 1px solid #FED7D7; margin: 16px 0;">
-                <button class="btn btn-secondary" style="width: 100%;" onclick="loginAs('Dozent')">Zur Dozentenansicht (Lösungen)</button>
-            </div>
         </div>
     </div>
 
@@ -78,6 +46,7 @@
 
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Interviews</div>
                 <button id="nav-chat-unternehmen" class="nav-btn" style="display: none;" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
+                <button id="nav-chat-bank" class="nav-btn" style="display: none;" onclick="switchTab('tab-chat-bank')">Chat: Handel (Bank)</button>
                 
 
                 <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>

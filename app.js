@@ -96,9 +96,20 @@ function renderDynamicButtons(count) {
 
 function loginAs(role) {
     currentRole = role;
+    window.currentGroup = role; // global identifier for Firebase
     document.getElementById("user-role-badge").innerText = role;
     document.getElementById("login-view").classList.remove("active");
     document.getElementById("dashboard-view").classList.add("active");
+    
+    // Bind Firebase chat if not Dozent
+    if(role !== "Dozent" && typeof db !== 'undefined' && db !== null) {
+        db.collection("chat_rooms").doc(role).onSnapshot(doc => {
+            if(doc.exists) {
+                renderBankChat(doc.data().messages || []);
+            }
+        });
+    }
+    
     if (role === "Dozent") {
         document.querySelectorAll(".student-only").forEach(el => el.classList.add("hidden"));
         document.querySelectorAll(".lecturer-only").forEach(el => el.classList.remove("hidden"));
