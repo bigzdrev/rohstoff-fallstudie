@@ -39,6 +39,17 @@
                     <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 80px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);">
                     <button class="btn btn-primary" onclick="saveGroupConfig()">Übernehmen & Speichern</button>
                 </div>
+                
+                <hr style="border: none; border-top: 1px solid #FED7D7; margin: 16px 0;">
+                <h3 style="color: var(--brand-red); font-size: 1rem; margin-bottom: 12px;">Regiepult (Live-Freischaltung)</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+                    <label><input type="checkbox" id="check-produkte" onchange="saveRegieConfig()"> Reiter "Produkte" freischalten</label>
+                    <label><input type="checkbox" id="check-bilanz" onchange="saveRegieConfig()"> Reiter "Jahresabschluss" freischalten</label>
+                    <label><input type="checkbox" id="check-lagebericht" onchange="saveRegieConfig()"> Reiter "Lagebericht" freischalten</label>
+                    <label><input type="checkbox" id="check-marktdaten" onchange="saveRegieConfig()"> Reiter "Marktdaten" freischalten</label>
+                    <label><input type="checkbox" id="check-chat" onchange="saveRegieConfig()"> Reiter "Chat (Kundenunternehmen)" freischalten</label>
+                    <label><input type="checkbox" id="check-aufgaben" onchange="saveRegieConfig()"> Reiter "Aufgaben" freischalten</label>
+                </div>
                 <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Studierende können sich anschließend zuordnen.</p>
                 
                 <hr style="border: none; border-top: 1px solid #FED7D7; margin: 16px 0;">
@@ -60,17 +71,17 @@
             <div class="nav-menu">
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 12px 16px 4px;">Recherche</div>
                 <button class="nav-btn active" onclick="switchTab('tab-company')">Profil</button>
-                <button class="nav-btn" onclick="switchTab('tab-products')">Produkte</button>
-                <button class="nav-btn" onclick="switchTab('tab-bilanz')">Jahresabschluss</button>
-                <button class="nav-btn" onclick="switchTab('tab-lagebericht')">Lagebericht</button>
-                <button class="nav-btn" onclick="switchTab('tab-market')">Marktdaten</button>
+                <button id="nav-produkte" class="nav-btn" style="display: none;" onclick="switchTab('tab-products')">Produkte</button>
+                <button id="nav-bilanz" class="nav-btn" style="display: none;" onclick="switchTab('tab-bilanz')">Jahresabschluss</button>
+                <button id="nav-lagebericht" class="nav-btn" style="display: none;" onclick="switchTab('tab-lagebericht')">Lagebericht</button>
+                <button id="nav-marktdaten" class="nav-btn" style="display: none;" onclick="switchTab('tab-market')">Marktdaten</button>
 
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Interviews</div>
-                <button class="nav-btn" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
-                <button class="nav-btn" onclick="switchTab('tab-chat-bank')">Chat: Handel (Bank)</button>
+                <button id="nav-chat-unternehmen" class="nav-btn" style="display: none;" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
+                
 
                 <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>
-                <button class="nav-btn student-only" onclick="switchTab('tab-task')">Risikoanalyse</button>
+                <button id="nav-aufgaben" class="nav-btn student-only" style="display: none;" onclick="switchTab('tab-task')">Risikoanalyse</button>
 
                 <div class="lecturer-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Seminarleitung</div>
                 <button class="nav-btn lecturer-only" onclick="switchTab('tab-lecturer')">Ergebnisse</button>

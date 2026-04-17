@@ -41,6 +41,23 @@ function tryAdminLogin() {
     }
 }
 
+
+function saveRegieConfig() {
+    if (typeof db !== 'undefined' && db !== null) {
+        const payload = {
+            show_produkte: document.getElementById('check-produkte').checked,
+            show_bilanz: document.getElementById('check-bilanz').checked,
+            show_lagebericht: document.getElementById('check-lagebericht').checked,
+            show_marktdaten: document.getElementById('check-marktdaten').checked,
+            show_chat: document.getElementById('check-chat').checked,
+            show_aufgaben: document.getElementById('check-aufgaben').checked
+        };
+        db.collection("fallstudie_config").doc("settings").set(payload, { merge: true })
+        .then(() => console.log("Regiepult gespeichert"))
+        .catch(err => console.error(err));
+    }
+}
+
 function saveGroupConfig() {
     const count = parseInt(document.getElementById("group-count-input").value) || 4;
     
