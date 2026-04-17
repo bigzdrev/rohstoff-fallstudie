@@ -29,8 +29,10 @@ function initAdminData() {
             totalGroups = doc.data().group_count || 4;
             document.getElementById("group-count-input").value = totalGroups;
             renderGroupTabs();
+            if(!unsubChat) switchGroupContext(currentAdminGroup);
         } else {
             renderGroupTabs();
+            if(!unsubChat) switchGroupContext(currentAdminGroup);
         }
     });
 }
@@ -55,8 +57,7 @@ function renderGroupTabs() {
         container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.8rem; padding: 6px 12px; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
     }
 
-    // Auto-Bind context if nothing binds yet
-    if(!unsubChat) { switchGroupContext(currentAdminGroup); }
+
 }
 
 function switchGroupContext(groupName) {
