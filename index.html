@@ -9,9 +9,11 @@
 </head>
 <body class="">
     <div id="toast" class="toast">Gespeichert ✓</div>
-    <div id="login-view" class="view active">
+
+    <!-- ===================== LOGIN ===================== -->
+    <div id="login-view" class="view login-view active">
         <div class="login-card">
-            <h1><span style="color: var(--brand-red); font-weight: 800; margin-right: 8px;">S</span> Fallstudie</h1>
+            <h1>Fallstudie</h1>
             <h2 style="font-size: 1.2rem; color: var(--text-primary); margin-bottom: 8px;">Seminarmodul Rohstoffmanagement</h2>
             <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.9rem;">Interaktive Fallstudie: Preisänderungsrisiken erkennen und managen</p>
             <div class="login-buttons">
@@ -23,12 +25,17 @@
             </div>
         </div>
     </div>
+
+    <!-- ===================== DASHBOARD ===================== -->
     <div id="dashboard-view" class="view dashboard-view">
+        
+        <!-- SIDEBAR -->
         <nav class="sidebar">
             <div class="brand">
-                <h2><span class="brand-s">S</span> Fallstudie</h2>
+                <h2>Fallstudie</h2>
                 <div class="user-info">Angemeldet: <span id="user-role-badge"></span></div>
             </div>
+            
             <div class="nav-menu">
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 12px 16px 4px;">Recherche</div>
                 <button class="nav-btn active" onclick="switchTab('tab-company')">Profil</button>
@@ -36,24 +43,33 @@
                 <button class="nav-btn" onclick="switchTab('tab-bilanz')">Jahresabschluss</button>
                 <button class="nav-btn" onclick="switchTab('tab-lagebericht')">Lagebericht</button>
                 <button class="nav-btn" onclick="switchTab('tab-market')">Marktdaten</button>
+
                 <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Interviews</div>
                 <button class="nav-btn" onclick="switchTab('tab-chat-unternehmen')">Chat: Kundenunternehmen</button>
                 <button class="nav-btn" onclick="switchTab('tab-chat-bank')">Chat: Handel (Bank)</button>
+
                 <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>
                 <button class="nav-btn student-only" onclick="switchTab('tab-task')">Risikoanalyse</button>
+
                 <div class="lecturer-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Seminarleitung</div>
                 <button class="nav-btn lecturer-only" onclick="switchTab('tab-lecturer')">Ergebnisse</button>
             </div>
+
             <div class="sidebar-footer">
                 <button class="btn btn-secondary" onclick="logout()">Abmelden</button>
             </div>
         </nav>
+
+        <!-- MAIN CONTENT -->
         <main class="main-content">
             <header class="topbar">
                 <h1 id="current-tab-title">Profil</h1>
                 <span class="badge badge-red">STAND: Q1 2026</span>
             </header>
+
             <div class="content-wrapper">
+                
+                <!-- TAB: COMPANY -->
                 <div id="tab-company" class="tab-content active">
                     <div class="company-header">
                         <h2>KabelWerke Deutschland GmbH</h2>
@@ -61,18 +77,20 @@
                     </div>
                     <div class="company-grid">
                         <div class="section-container">
-                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text"></p></div>
-                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Über uns</h3><p id="about-text">Die KabelWerke Deutschland GmbH ist seit ueber 35 Jahren ein verlaesslicher Partner fuer hochwertige Kabel- und Leitungstechnik. Am Standort Wuppertal fertigen wir mit rund 420 Mitarbeitern ein breites Sortiment an Kupferkabeln fuer Energieversorgung, Bauwesen und Industrie. Qualitaet und Liefertreue sind die Grundpfeiler unseres Erfolgs.</p></div>
+                            <div class="info-card glass-panel"><h3>Unsere Mission</h3><p id="mission-text">Als mittelstaendisches Familienunternehmen stehen wir fuer nachhaltige Wertschoepfung am Standort Deutschland. Unsere Kunden schaetzen unsere hohe Produktqualitaet, individuelle Beratung und die Faehigkeit, auch kurzfristige Grossauftraege zuverlaessig zu bedienen.</p></div>
                         </div>
                         <div class="section-container">
-                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text"></p></div>
+                            <div class="info-card glass-panel" style="width: 100%;"><h3>Fertigung</h3><p id="production-text">In unserer modernen Fertigungsanlage verarbeiten wir Kupfer in mehrstufigen Prozessen zu hochwertigen Kabelprodukten. Am Standort betreiben wir ein eigenes Blockheizkraftwerk zur Versorgung mit Strom und Prozesswaerme, um unsere Unabhaengigkeit von externen Energielieferanten zu sichern.</p></div>
                         </div>
                         <div class="section-container">
-                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text"></p></div>
-                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text"></p></div>
+                            <div class="info-card glass-panel"><h3>Logistik</h3><p id="logistics-text">Um unsere versprochenen Lieferzeiten europaweit einzuhalten, setzen wir neben Speditionspartnern verstaerkt auf unseren eigenen, unternehmenseigenen Fuhrpark. Dies gewaehrleistet maximale Flexibilitaet und Kontrolle ueber die Lieferketten.</p></div>
+                            <div class="info-card glass-panel"><h3>Lagerhaltung</h3><p id="warehouse-text">Unser großraeumiges Zentrallager am Standort Wuppertal ermoeglicht es uns, eine hohe Verfuegbarkeit unserer Standardprodukte sicherzustellen und als Puffer zwischen Produktion und Kundenauslieferung zu dienen.</p></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- TAB: PRODUCTS -->
                 <div id="tab-products" class="tab-content">
                     <div class="company-header" style="text-align: left;">
                         <h2>Unser Produktportfolio</h2>
@@ -80,6 +98,8 @@
                     </div>
                     <div class="products-grid" id="products-grid"></div>
                 </div>
+
+                <!-- TAB: BILANZ + GuV -->
                 <div id="tab-bilanz" class="tab-content">
                     <div class="finance-header glass-panel">
                         <div>
@@ -88,23 +108,32 @@
                         </div>
                         <span class="badge badge-red">VERTRAULICH</span>
                     </div>
+
                     <div class="sub-tabs">
                         <button class="sub-tab active" onclick="switchSubTab('sub-bilanz-view', this)">Bilanz</button>
                         <button class="sub-tab" onclick="switchSubTab('sub-guv-view', this)">Gewinn- und Verlustrechnung</button>
                     </div>
+
+                    <!-- Sub-Content: Bilanz -->
                     <div id="sub-bilanz-view" class="sub-content active">
                         <div class="finance-container">
                             <div class="finance-side" id="bilanz-aktiva"></div>
                             <div class="finance-side" id="bilanz-passiva"></div>
                         </div>
                     </div>
+
+                    <!-- Sub-Content: GuV -->
                     <div id="sub-guv-view" class="sub-content">
                         <div class="finance-side">
                             <div class="bilanz-title">Gewinn- und Verlustrechnung (Gesamtkostenverfahren)</div>
-                            <table class="finance-table" id="guv-table"><tbody></tbody></table>
+                            <table class="finance-table" id="guv-table">
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+
+                <!-- TAB: LAGEBERICHT -->
                 <div id="tab-lagebericht" class="tab-content">
                     <div class="finance-header glass-panel">
                         <div>
@@ -115,19 +144,28 @@
                     </div>
                     <div class="lagebericht-container" id="lagebericht-container"></div>
                 </div>
+
+                <!-- TAB: MARKET DATA -->
                 <div id="tab-market" class="tab-content">
                     <div class="company-header" style="text-align: left;">
                         <h2>Aktuelle Marktdaten</h2>
                         <p>Quelle: Handelsdaten | Stand: <span id="market-date"></span></p>
                     </div>
-                    <div class="market-grid" id="market-grid"></div>
+                    <div class="market-grid" id="market-grid">
+        <!-- Copper Card -->
+        <!-- Diesel Card -->
+        <!-- EU-ETS Card -->
+        <!-- FX Card -->
+    </div>
                 </div>
+
+                <!-- TAB: CHAT UNTERNEHMEN -->
                 <div id="tab-chat-unternehmen" class="tab-content">
                     <div class="chat-container">
                         <div class="chat-header">
                             <div style="flex-grow: 1;">
-                                <strong id="chat-unternehmen-name"></strong><br>
-                                <span class="chat-role" id="chat-unternehmen-role"></span>
+                                <strong id="chat-unternehmen-name">Team KabelWerke</strong><br>
+                                <span class="chat-role" id="chat-unternehmen-role">Thomas Weber (Einkauf) & Sandra Keller (Finanzen)</span>
                             </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
@@ -138,12 +176,14 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- TAB: CHAT BANK -->
                 <div id="tab-chat-bank" class="tab-content">
                     <div class="chat-container">
                         <div class="chat-header">
                             <div style="flex-grow: 1;">
-                                <strong id="chat-bank-name"></strong><br>
-                                <span class="chat-role" id="chat-bank-role"></span>
+                                <strong id="chat-bank-name">Trading Desk</strong><br>
+                                <span class="chat-role" id="chat-bank-role">Financial Markets & Commodities Bank</span>
                             </div>
                             <div class="ai-status-badge ai-idle">⏳ KI bereit</div>
                         </div>
@@ -154,6 +194,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- TAB: TASK (STUDENT) -->
                 <div id="tab-task" class="tab-content">
                     <div class="company-header" style="text-align: left;">
                         <h2 style="color: var(--brand-red);">Aufgabe: Risikoanalyse & Hedging</h2>
@@ -165,6 +207,8 @@
                         <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">Tipp: Ihre Eingaben werden beim Tippen automatisch gespeichert.</p>
                     </form>
                 </div>
+
+                <!-- TAB: LECTURER (DOZENT) -->
                 <div id="tab-lecturer" class="tab-content">
                     <div class="company-header" style="text-align: left;">
                         <h2>Ergebnisse einsehen</h2>
@@ -181,9 +225,12 @@
                         <div id="presentation-answers"></div>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
+
+    <!-- Firebase + Fallback logic (App) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
