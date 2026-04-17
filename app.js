@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try { injectLagebericht(); } catch(e) { console.error("lagebericht:", e); }
     try { injectMarketData(); } catch(e) { console.error("market:", e); }
     try { injectTaskQuestions(); } catch(e) { console.error("tasks:", e); }
-    
+    try { initChats(); } catch(e) { console.error("chat:", e); }
     try { updateConnectionStatus(); } catch(e) { console.error("firebase:", e); }
     
     // Fallback falls db noch nicht bereit ist
@@ -38,22 +38,6 @@ function tryAdminLogin() {
         document.getElementById("admin-error").style.display = "none";
     } else {
         document.getElementById("admin-error").style.display = "block";
-    }
-}
-
-
-function saveRegieConfig() {
-    if (typeof db !== 'undefined' && db !== null) {
-        const payload = {
-            show_produkte: document.getElementById('check-produkte').checked,
-            show_bilanz: document.getElementById('check-bilanz').checked,
-            show_lagebericht: document.getElementById('check-lagebericht').checked,
-            show_marktdaten: document.getElementById('check-marktdaten').checked,
-            show_aufgaben: document.getElementById('check-aufgaben').checked
-        };
-        db.collection("fallstudie_config").doc("settings").set(payload, { merge: true })
-        .then(() => console.log("Regiepult gespeichert"))
-        .catch(err => console.error(err));
     }
 }
 
@@ -281,7 +265,7 @@ async function initAI() {
         const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
         
         // Modelle aus HuggingFace CDN laden, kein lokaler Server nötig
-        
+        env.allowLocalModels = false;
 
         // Kleines, effizientes Embedding-Modell laden (~23 MB, wird im Browser gecacht)
         aiExtractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", {
