@@ -1,9 +1,14 @@
 // ============================================================
-// APP.JS – KabelWerke Fallstudie v3 (mit Chat-System)
+// APP.JS – KabelWerke Fallstudie v4 (KI-Chat mit Transformers.js)
 // ============================================================
 
 let currentRole = "";
 let saveTimeout = null;
+
+// ---- KI-MODUL ----
+let aiStatus = "idle"; // idle | loading | ready | error
+let aiExtractor = null;
+let aiEmbeddingsCache = {};
 
 document.addEventListener("DOMContentLoaded", () => {
     try { injectCompanyWebsite(); } catch(e) { console.error("company:", e); }
@@ -48,12 +53,17 @@ function switchTab(tabId) {
         btn.classList.remove("active");
         if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(tabId)) {
             btn.classList.add("active");
-            const title = btn.innerText.replace(/^[^\wäöüÄÖÜ\s]*/i, '').trim();
+            const title = btn.innerText.replace(/^[^wäöüÄÖÜs]*/i, '').trim();
             document.getElementById("current-tab-title").innerText = title;
         }
     });
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
     document.getElementById(tabId).classList.add("active");
+
+    // Lazy-load KI wenn ein Chat-Tab geöffnet wird
+    if (tabId.startsWith("tab-chat-") && aiStatus === "idle") {
+        initAI();
+    }
 }
 
 function switchSubTab(subId, btn) {
@@ -140,7 +150,6 @@ function injectMarketData() {
     const mp = companyData.marketPrices;
     document.getElementById("market-date").innerText = mp.date;
     const grid = document.getElementById("market-grid");
-
     grid.innerHTML = `
         <div class="market-card">
             <div class="market-card-header"><h3>Kupfer (LME)</h3><span class="market-card-icon">🔶</span></div>
@@ -193,7 +202,204 @@ function injectTaskQuestions() {
 }
 
 // ============================================================
-// CHAT SYSTEM
+// KI-MODUL: Transformers.js (Open-Source, läuft im Browser)
+// ============================================================
+async function initAI() {
+    aiStatus = "loading";
+    updateAIBadges();
+
+    try {
+        // Dynamischer Import von Transformers.js (Hugging Face, Open Source)
+        const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
+        
+        // Modelle aus HuggingFace CDN laden, kein lokaler Server nötig
+        env.allowLocalModels = false;
+
+        // Kleines, effizientes Embedding-Modell laden (~23 MB, wird im Browser gecacht)
+        aiExtractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", {
+            progress_callback: (progress) => {
+                if (progress.status === "progress" && progress.progress) {
+                    const pct = Math.round(progress.progress);
+                    document.querySelectorAll(".ai-progress-text").forEach(el => {
+                        el.innerText = `KI lädt: ${pct}%`;
+                    });
+                }
+            }
+        });
+
+        // Embeddings für alle Themen-Sätze vorberechnen
+        for (const contactId of ["einkauf", "finanzen"]) {
+            const contact = companyData.chatContacts[contactId];
+            aiEmbeddingsCache[contactId] = [];
+            for (const r of contact.responses) {
+                if (r.topicSentence) {
+                    const output = await aiExtractor(r.topicSentence, { pooling: "mean", normalize: true });
+                    aiEmbeddingsCache[contactId].push({
+                        response: r,
+                        embedding: Array.from(output.data)
+                    });
+                }
+            }
+        }
+
+        aiStatus = "ready";
+        console.log("✅ KI-Modell geladen und Embeddings berechnet!");
+    } catch (e) {
+        console.warn("⚠️ KI konnte nicht geladen werden, verwende intelligentes Keyword-Matching:", e);
+        aiStatus = "error";
+    }
+    updateAIBadges();
+}
+
+function updateAIBadges() {
+    document.querySelectorAll(".ai-status-badge").forEach(badge => {
+        badge.className = "ai-status-badge";
+        if (aiStatus === "loading") {
+            badge.classList.add("ai-loading");
+            badge.innerHTML = `<span class="ai-spinner"></span><span class="ai-progress-text">KI lädt...</span>`;
+        } else if (aiStatus === "ready") {
+            badge.classList.add("ai-ready");
+            badge.innerHTML = `🧠 KI aktiv`;
+        } else if (aiStatus === "error") {
+            badge.classList.add("ai-fallback");
+            badge.innerHTML = `⚡ Smart-Matching`;
+        } else {
+            badge.classList.add("ai-idle");
+            badge.innerHTML = `⏳ KI bereit`;
+        }
+    });
+}
+
+// Kosinus-Ähnlichkeit für Embedding-Vektoren
+function cosineSimilarity(a, b) {
+    let dot = 0, normA = 0, normB = 0;
+    for (let i = 0; i < a.length; i++) {
+        dot += a[i] * b[i];
+        normA += a[i] * a[i];
+        normB += b[i] * b[i];
+    }
+    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// ============================================================
+// DEUTSCHES NLP: Erweitertes Keyword-Matching als Fallback
+// ============================================================
+
+// Deutsche Synonyme und verwandte Begriffe
+const germanSynonyms = {
+    "metall": ["kupfer", "rohstoff", "material"],
+    "rohstoff": ["kupfer", "material", "metall", "vormaterial"],
+    "beschaffung": ["einkauf", "kupfer", "kaufen", "beziehen"],
+    "einkaufen": ["kupfer", "beschaffung", "kaufen"],
+    "beziehen": ["kupfer", "beschaffung", "einkauf"],
+    "truck": ["lkw", "fahrzeug", "flotte"],
+    "lastwagen": ["lkw", "fahrzeug", "flotte"],
+    "sattelzug": ["lkw", "fahrzeug", "flotte"],
+    "treibstoff": ["diesel", "kraftstoff", "sprit"],
+    "sprit": ["diesel", "kraftstoff", "treibstoff"],
+    "tanken": ["diesel", "kraftstoff"],
+    "kraftstoffverbrauch": ["diesel", "verbrauch"],
+    "inventur": ["lager", "bestand", "vorräte"],
+    "bestandsbewertung": ["vorräte", "bewertung", "niederstwert"],
+    "wertberichtigung": ["abschreibung", "wertminderung", "niederstwert"],
+    "versand": ["transport", "lieferung", "lkw"],
+    "liefern": ["transport", "lieferung", "lkw"],
+    "auslieferung": ["transport", "lieferung", "lkw"],
+    "finanzen": ["bilanz", "guv", "ergebnis"],
+    "buchführung": ["bilanz", "guv"],
+    "kennzahlen": ["bilanz", "eigenkapital", "ebit", "marge"],
+    "rendite": ["marge", "ebit", "ergebnis", "gewinn"],
+    "profitabilität": ["marge", "ebit", "gewinn"],
+    "umwelt": ["co2", "emission", "zertifikat"],
+    "klima": ["co2", "emission", "zertifikat"],
+    "emissionsrechte": ["co2", "eua", "zertifikat", "emissionshandel"],
+    "strom": ["energie", "kraftwerk", "bhkw"],
+    "heizung": ["wärme", "energie", "kraftwerk", "bhkw"],
+    "erdgas": ["gas", "bhkw", "kraftwerk"],
+    "schulden": ["verbindlichkeiten", "fremdkapital", "verschuldung"],
+    "kredit": ["verbindlichkeiten", "fremdkapital", "bank"],
+    "bank": ["verbindlichkeiten", "fremdkapital", "eigenkapital"],
+    "schutz": ["absicherung", "hedging", "sicherung"],
+    "absichern": ["absicherung", "hedging", "sicherung"],
+    "option": ["absicherung", "hedging", "derivat", "future"],
+    "swap": ["absicherung", "hedging", "derivat"],
+    "preisrisiko": ["risiko", "absicherung", "preis"],
+    "volatilität": ["risiko", "schwankung", "preis"],
+    "kabel": ["kupfer", "material", "fertig"],
+    "produktion": ["material", "kupfer", "kosten"]
+};
+
+// Deutsche Kompositum-Zerlegung (vereinfacht)
+function decomposeGermanCompound(word) {
+    const parts = [];
+    const prefixes = ["kupfer", "diesel", "energie", "kraft", "stoff", "markt", "preis", "lager", "bestands", 
+                       "eigen", "kapital", "material", "risiko", "absicherungs", "emissions", "handels", 
+                       "wert", "gas", "erdgas", "fahrzeug", "transport", "kosten"];
+    
+    const lw = word.toLowerCase();
+    for (const prefix of prefixes) {
+        if (lw.startsWith(prefix) && lw.length > prefix.length + 2) {
+            parts.push(prefix.replace(/s$/, ''));  // Remove Fugen-s
+            const rest = lw.substring(prefix.length).replace(/^s/, ''); // Remove Fugen-s
+            parts.push(rest);
+        }
+    }
+    return parts.length > 0 ? parts : [lw];
+}
+
+// Erweitertes deutsches Keyword-Matching
+function findChatResponseSmart(contactId, question) {
+    const contact = companyData.chatContacts[contactId];
+    const q = question.toLowerCase();
+    const qWords = q.split(/[\s,;.!?]+/).filter(w => w.length > 2);
+    
+    // Alle Wörter aus der Frage + Compound-Zerlegung + Synonyme sammeln
+    const expandedTerms = new Set();
+    qWords.forEach(word => {
+        expandedTerms.add(word);
+        // Compound-Zerlegung
+        decomposeGermanCompound(word).forEach(part => expandedTerms.add(part));
+        // Synonyme nachschlagen
+        if (germanSynonyms[word]) {
+            germanSynonyms[word].forEach(syn => expandedTerms.add(syn));
+        }
+    });
+
+    let bestMatch = null;
+    let bestScore = 0;
+
+    contact.responses.forEach(r => {
+        let score = 0;
+        r.keywords.forEach(kw => {
+            // Exakte Treffer (doppelt gewichtet)
+            if (q.includes(kw.toLowerCase())) {
+                score += 2;
+            }
+            // Treffer über expandierte Terme
+            else if (expandedTerms.has(kw.toLowerCase())) {
+                score += 1.5;
+            }
+            // Fuzzy-Match (Teilstring)
+            else {
+                for (const term of expandedTerms) {
+                    if (term.length > 3 && kw.includes(term)) {
+                        score += 0.5;
+                        break;
+                    }
+                }
+            }
+        });
+        if (score > bestScore) {
+            bestScore = score;
+            bestMatch = r;
+        }
+    });
+
+    return { match: bestMatch, score: bestScore };
+}
+
+// ============================================================
+// CHAT SYSTEM (KI + Smart-Matching Hybrid)
 // ============================================================
 function initChats() {
     ["einkauf", "finanzen"].forEach(contactId => {
@@ -212,48 +418,99 @@ function sendChatMessage(contactId) {
 
     addChatBubble(contactId, message, "user");
 
-    // Simulate typing delay
-    setTimeout(() => {
-        const response = findChatResponse(contactId, message);
-        addChatBubble(contactId, response, "contact");
-    }, 600 + Math.random() * 800);
-}
+    // Tipp-Animation
+    const typingId = addTypingIndicator(contactId);
 
-function findChatResponse(contactId, question) {
-    const contact = companyData.chatContacts[contactId];
-    const q = question.toLowerCase();
+    // Asynchron antworten (KI oder Fallback)
+    (async () => {
+        const delay = 800 + Math.random() * 1200;
+        await new Promise(resolve => setTimeout(resolve, delay));
 
-    // Suche nach passenden Keywords
-    let bestMatch = null;
-    let bestScore = 0;
+        let response;
+        let method = "keyword";
 
-    contact.responses.forEach(r => {
-        let score = 0;
-        r.keywords.forEach(kw => {
-            if (q.includes(kw.toLowerCase())) score++;
-        });
-        if (score > bestScore) {
-            bestScore = score;
-            bestMatch = r;
+        if (aiStatus === "ready" && aiEmbeddingsCache[contactId]) {
+            try {
+                // KI-basierte semantische Suche
+                const questionOutput = await aiExtractor(message, { pooling: "mean", normalize: true });
+                const qVec = Array.from(questionOutput.data);
+
+                let bestAIMatch = null;
+                let bestAIScore = -1;
+
+                aiEmbeddingsCache[contactId].forEach(item => {
+                    const sim = cosineSimilarity(qVec, item.embedding);
+                    if (sim > bestAIScore) {
+                        bestAIScore = sim;
+                        bestAIMatch = item.response;
+                    }
+                });
+
+                // Auch Smart-Matching parallel ausführen
+                const smartResult = findChatResponseSmart(contactId, message);
+
+                // Hybrid-Entscheidung: KI UND Keyword-Scores kombinieren
+                if (bestAIScore > 0.45) {
+                    // KI ist sich sicher → KI-Ergebnis nehmen
+                    response = bestAIMatch.answer;
+                    method = "ki";
+                } else if (bestAIScore > 0.30 && smartResult.score > 0) {
+                    // KI hat eine Tendenz UND Keywords passen → KI gewinnt
+                    response = bestAIMatch.answer;
+                    method = "ki+keyword";
+                } else if (smartResult.score > 0 && smartResult.match) {
+                    // Nur Keywords matchen
+                    response = smartResult.match.answer;
+                    method = "keyword";
+                } else {
+                    response = companyData.chatContacts[contactId].fallback;
+                    method = "fallback";
+                }
+
+                console.log(`[Chat ${contactId}] Methode: ${method} | KI-Score: ${bestAIScore.toFixed(3)} | Keyword-Score: ${smartResult.score}`);
+            } catch (e) {
+                console.warn("KI-Fehler, Fallback auf Smart-Matching:", e);
+                const smartResult = findChatResponseSmart(contactId, message);
+                response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
+            }
+        } else {
+            // Kein KI-Modell → Smart-Matching
+            const smartResult = findChatResponseSmart(contactId, message);
+            response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
+            method = smartResult.score > 0 ? "smart" : "fallback";
         }
-    });
 
-    if (bestMatch && bestScore > 0) {
-        return bestMatch.answer;
-    }
-    return contact.fallback;
+        removeTypingIndicator(typingId);
+        addChatBubble(contactId, response, "contact");
+    })();
 }
 
 function addChatBubble(contactId, text, sender) {
     const container = document.getElementById(`chat-${contactId}-messages`);
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble chat-${sender}`;
-
     const avatar = sender === "contact" ? companyData.chatContacts[contactId].avatar : "👤";
     bubble.innerHTML = `<span class="bubble-avatar">${avatar}</span><div class="bubble-text">${text}</div>`;
-
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
+}
+
+function addTypingIndicator(contactId) {
+    const container = document.getElementById(`chat-${contactId}-messages`);
+    const id = "typing-" + Date.now();
+    const contact = companyData.chatContacts[contactId];
+    const el = document.createElement("div");
+    el.className = "chat-bubble chat-contact typing-indicator";
+    el.id = id;
+    el.innerHTML = `<span class="bubble-avatar">${contact.avatar}</span><div class="bubble-text"><span class="dot-pulse"><span></span><span></span><span></span></span> <em>${contact.name} tippt...</em></div>`;
+    container.appendChild(el);
+    container.scrollTop = container.scrollHeight;
+    return id;
+}
+
+function removeTypingIndicator(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
 // ============================================================
@@ -262,7 +519,6 @@ function addChatBubble(contactId, text, sender) {
 function saveFormData() {
     const dataObj = { gruppe: currentRole, timestamp: new Date().getTime() };
     companyData.questions.forEach(q => { dataObj[q.id] = document.getElementById("ans-" + q.id).value; });
-
     if (typeof useFirebase !== 'undefined' && useFirebase && db) {
         db.collection("fallstudie_ergebnisse").doc(currentRole).set(dataObj).then(() => showToast()).catch(err => alert("Fehler: " + err));
     } else {
@@ -309,7 +565,7 @@ function loadGroupAnswers(groupName) {
 // ============================================================
 function formatEur(val) {
     if (!val) return "";
-    const str = val.toString().replace(/[+\-]/g, '').trim();
+    const str = val.toString().replace(/[+-]/g, '').trim();
     const prefix = val.toString().startsWith("-") ? "- " : (val.toString().startsWith("+") ? "+ " : "");
     return prefix + str + " €";
 }

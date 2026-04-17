@@ -175,34 +175,42 @@ const companyData = {
             responses: [
                 {
                     keywords: ["kupfer", "rohstoff", "material", "vormaterial", "metall"],
+                    topicSentence: "copper procurement purchasing raw material metal supply Kupfer Beschaffung Einkauf Rohstoff Metall Vormaterial woher beziehen kaufen",
                     answer: "Kupfer ist unser mit Abstand wichtigstes Vormaterial. Wir verarbeiten jährlich rund 6.500 Tonnen Kupferkathoden der Güteklasse Cu-ETP. Der Einkauf erfolgt über unsere Handelspartner zu Preisen, die sich am Kurs der London Metal Exchange – der LME – orientieren. Wir kaufen in der Regel monatlich zu den jeweils gültigen Tagespreisen ein. Eine langfristige Preisfixierung betreiben wir derzeit nicht."
                 },
                 {
                     keywords: ["lme", "börse", "preis", "preisbildung", "marktpreis", "kurs"],
+                    topicSentence: "LME London Metal Exchange price pricing stock exchange Börse Preis Preisbildung Marktpreis Kurs Dollar Notierung Schwankung",
                     answer: "Die Preise richten sich nach der LME, der Londoner Metallbörse. Das ist der internationale Referenzmarkt für Industriemetalle. Unsere Einkaufspreise bewegen sich entsprechend mit dem LME-Kupferpreis, der in US-Dollar pro Tonne notiert wird. Dazu kommt natürlich das Währungsrisiko EUR/USD. In den letzten Monaten lag der LME-Kupferpreis zwischen 10.000 und 14.000 USD pro Tonne – das sind schon erhebliche Schwankungen."
                 },
                 {
                     keywords: ["lkw", "flotte", "fahrzeug", "transport", "lieferung", "spedition"],
+                    topicSentence: "truck fleet vehicle transport delivery logistics LKW Flotte Fahrzeug Transport Lieferung Spedition Sattelzug",
                     answer: "Wir unterhalten eine eigene Flotte von 50 Sattelzügen, allesamt 40-Tonner mit Dieselantrieb. Die Fahrzeuge sind im Durchschnitt 280 Tage im Jahr auf der Straße und legen pro Tag etwa 450 Kilometer zurück. Das sind natürlich erhebliche Fahrleistungen, die sich auch in den Kraftstoffkosten niederschlagen."
                 },
                 {
                     keywords: ["diesel", "kraftstoff", "tankst", "sprit", "benzin", "treibstoff"],
+                    topicSentence: "diesel fuel gasoline petrol cost consumption Diesel Kraftstoff Sprit Benzin Treibstoff tanken Verbrauch Kosten",
                     answer: "Ja, die Dieselkosten sind ein großes Thema bei uns. Bei 50 LKW mit durchschnittlich 32 Litern auf 100 Kilometer kommen Sie auf einen jährlichen Verbrauch von gut zwei Millionen Litern. Das summiert sich auf über sechs Millionen Euro pro Jahr. Wir tanken über Rahmenverträge mit großen Mineralölkonzernen, aber der Preis orientiert sich letztlich am Markt."
                 },
                 {
                     keywords: ["lager", "bestand", "vorräte", "vorrat", "fertig", "trommel", "lagerbestand"],
+                    topicSentence: "warehouse inventory stock storage finished goods Lager Bestand Vorräte Fertigerzeugnisse Trommel Lagerbestand lagern",
                     answer: "Unser Zentrallager umfasst über 12.000 Quadratmeter. Aktuell lagern dort fertige Kabeltrommeln im Wert von etwa 22 Millionen Euro – Bilanzwert zu Herstellungskosten. Der Kupferanteil am Materialwert liegt je nach Kabeltyp zwischen 48 und 72 Prozent. Das ist schon eine erhebliche Kapitalbindung. Wir brauchen diese Bestände aber, um unsere 48-Stunden-Liefergarantie halten zu können."
                 },
                 {
                     keywords: ["absicherung", "hedging", "sicherung", "forward", "future", "termin", "derivat"],
+                    topicSentence: "hedging risk management forward future derivative protection Absicherung Sicherung Termin Derivat absichern schützen",
                     answer: "Ehrlich gesagt: Wir haben derzeit keine systematische Rohstoffpreisabsicherung. Wir kaufen zu Tagespreisen und versuchen, Preisänderungen über Anpassungen unserer Verkaufspreise weiterzugeben. Das gelingt aber nicht immer zeitnah – unsere Kundenverträge haben oft Laufzeiten von drei bis sechs Monaten mit festen Preisen. Die Geschäftsführung hat uns beauftragt, das Thema Hedging zu prüfen."
                 },
                 {
                     keywords: ["kunde", "vertrag", "verkaufspreis", "preisanpassung", "weitergabe"],
+                    topicSentence: "customer contract sales price adjustment passing on Kunde Vertrag Verkaufspreis Preisanpassung Weitergabe Konditionen",
                     answer: "Unsere Kundenverträge laufen meist über drei bis sechs Monate mit fixen Preisen. Preisanpassungen können wir daher nicht sofort weitergeben. Bei starken Kupferpreisschwankungen entsteht dadurch ein zeitlicher Versatz – wenn die Rohstoffpreise steigen, tragen wir das Risiko bis zur nächsten Preisanpassung. Das kann bei 6.500 Tonnen im Jahr schon ins Geld gehen."
                 },
                 {
                     keywords: ["risiko", "problem", "schwierig", "herausforderung", "sorge"],
+                    topicSentence: "risk problem challenge concern worry Risiko Problem Herausforderung Sorge schwierig Volatilität Schwankung",
                     answer: "Unsere größten Herausforderungen? Ganz klar die Volatilität auf der Beschaffungsseite. Wenn der Kupferpreis innerhalb eines Quartals um 10 Prozent steigt, reden wir schnell über mehrere Millionen Mehrkosten. Und auf der Lagerseite ist es genau umgekehrt: Fällt der Kupferpreis, dann steht unser gesamter Lagerbestand mit zu hohen Herstellungskosten in den Büchern. Frau Keller aus dem Controlling kann Ihnen da mehr zu den bilanziellen Auswirkungen sagen."
                 }
             ],
@@ -216,42 +224,52 @@ const companyData = {
             responses: [
                 {
                     keywords: ["bilanz", "bilanzsumme", "vermögen", "aktiva", "passiva"],
+                    topicSentence: "balance sheet total assets liabilities equity Bilanz Bilanzsumme Vermögen Aktiva Passiva Zahlen",
                     answer: "Unsere Bilanzsumme liegt bei 94 Millionen Euro. Was mich als Controllerin beschäftigt: Die Vorräte an fertigen und unfertigen Erzeugnissen machen mit knapp 26 Millionen Euro den größten Einzelposten im Umlaufvermögen aus. Das ist eine enorme Kapitalbindung, deren Wert unmittelbar von der Rohstoffpreisentwicklung abhängt."
                 },
                 {
                     keywords: ["vorräte", "bestand", "bewertung", "niederstwert", "abschreibung", "wertminderung"],
+                    topicSentence: "inventory valuation write-down impairment lower of cost principle Vorräte Bewertung Niederstwertprinzip Abschreibung Wertminderung HGB",
                     answer: "Die Vorräte bewerten wir zu Herstellungskosten – das schreibt das HGB vor. Aber nach dem strengen Niederstwertprinzip gemäß § 253 Abs. 4 HGB müssen wir zum Bilanzstichtag prüfen, ob der Marktpreis unter die Herstellungskosten gefallen ist. Wenn ja, müssen wir auf den niedrigeren Wert abschreiben. Bei unserem Lagerbestand von 22 Millionen Euro Fertigerzeugnissen, wovon gut 70 Prozent des Materialwerts auf Kupfer entfallen – das sind rund 17 bis 18 Millionen Euro reiner Kupferwert – wäre ein Kupferpreisverfall von 10 Prozent potenziell ein Abwertungsbedarf von fast 2 Millionen Euro. Das geht direkt ins Ergebnis."
                 },
                 {
                     keywords: ["materialaufwand", "kostenstruktur", "kosten", "aufwand"],
+                    topicSentence: "material cost expense cost structure spending Materialaufwand Kostenstruktur Kosten Aufwand ausgeben Struktur",
                     answer: "Der Materialaufwand ist mit 58,5 Millionen Euro unser größter Kostenblock und macht fast 58 Prozent der Gesamtleistung aus. Davon entfallen allein rund 48 Millionen auf den Kupfereinkauf. Der Rest sind Kunststoffgranulate, Isoliermaterialien und Verpackung. Im Bereich der sonstigen betrieblichen Aufwendungen stecken unter anderem die Energiekosten für unser Blockheizkraftwerk, die Kraftstoffkosten für die LKW-Flotte, und die Aufwendungen für CO₂-Zertifikate – zusammen rund 13 Millionen Euro. Das sind alles marktpreisabhängige Positionen."
                 },
                 {
                     keywords: ["co2", "emission", "zertifikat", "eua", "emissionshandel", "ets"],
+                    topicSentence: "CO2 carbon emission certificate EUA allowance trading Emission Zertifikat Emissionshandel Klimaschutz Umwelt",
                     answer: "Unser Blockheizkraftwerk fällt mit seiner Feuerungswärmeleistung unter den EU-Emissionshandel. Wir stoßen jährlich rund 26.300 Tonnen CO₂ aus. Davon erhalten wir noch etwa 8.000 Tonnen als kostenlose Zuteilung – die sinkt aber Jahr für Jahr. Den Rest, also gut 18.000 Tonnen, müssen wir am Markt als EU Allowances zukaufen. Bei aktuellen Preisen um die 68 Euro pro Tonne sind das knapp 1,3 Millionen Euro nur für den Zukauf. Tendenz steigend."
                 },
                 {
                     keywords: ["kraftwerk", "bhkw", "energie", "gas", "erdgas", "wärme", "strom"],
+                    topicSentence: "power plant energy gas electricity heat CHP BHKW Kraftwerk Energie Gas Erdgas Wärme Strom Blockheizkraftwerk",
                     answer: "Unser Blockheizkraftwerk hat eine elektrische Leistung von 22 Megawatt und versorgt uns mit Strom und Prozesswärme für die Schmelz- und Ziehprozesse. Wir verbrauchen jährlich rund 45 Gigawattstunden Erdgas. Die Gaskosten belaufen sich auf etwa 5,4 Millionen Euro pro Jahr. Aber wie gesagt – das Thema Erdgaspreisabsicherung steht bei uns gerade nicht ganz oben auf der Agenda, obwohl man darüber nachdenken sollte."
                 },
                 {
                     keywords: ["eigenkapital", "quote", "verschuldung", "fremdkapital"],
+                    topicSentence: "equity ratio debt leverage capital structure Eigenkapital Quote Verschuldung Fremdkapital Finanzierung Bank",
                     answer: "Die Eigenkapitalquote liegt bei 24,1 Prozent. Das ist für unsere Branche nicht unüblich, aber auch kein Polster für große Überraschungen. Von unseren 38 Millionen Bankverbindlichkeiten sind etwa 12 Millionen kurzfristig – die hängen teils an variablen Zinssätzen. Was mir mehr Sorgen macht, ist die hohe Kapitalbindung in unseren Vorräten. Wenn da Wertberichtigungen nötig werden, schlägt das direkt auf die Eigenkapitalquote durch."
                 },
                 {
                     keywords: ["absicherung", "hedging", "sicherung", "strategie", "risikomanagement"],
+                    topicSentence: "hedging strategy risk management protection insurance Absicherung Hedging Strategie Risikomanagement Konzept Plan",
                     answer: "Ich sage es ganz offen: Wir haben aktuell kein systematisches Absicherungskonzept für unsere Rohstoffpreisrisiken. Weder für Kupfer, noch für Diesel, noch für die CO₂-Zertifikate. Die Geschäftsführung hat das Thema jetzt auf die Agenda gesetzt – deshalb sind Sie ja hier. Meine Einschätzung: Die drei größten Risikopositionen sind erstens der Kupfereinkauf mit 48 Millionen Jahresvolumen, zweitens der Lagerbestand mit dem Abwertungsrisiko, und drittens die Diesel- und CO₂-Kosten in Kombination."
                 },
                 {
                     keywords: ["risiko", "problem", "gefahr", "schwach"],
+                    topicSentence: "risk danger problem weakness threat concern Risiko Gefahr Problem Schwäche Bedrohung Sorge was macht Ihnen Sorgen",
                     answer: "Aus Sicht des Controllings sehe ich mehrere Risiken: Erstens die direkte Abhängigkeit unserer Einkaufskosten von internationalen Rohstoffpreisen. Zweitens das Bestandsbewertungsrisiko – bei fallenden Preisen drohen Wertminderungen auf unser Fertiglager. Drittens die regulatorischen Kosten aus dem EU-Emissionshandel, die jedes Jahr steigen. Und viertens die Kraftstoffkosten für unsere Flotte, die wir aktuell gar nicht absichern."
                 },
                 {
                     keywords: ["guv", "gewinn", "verlust", "ergebnis", "ebit", "marge"],
+                    topicSentence: "profit loss income statement EBIT margin result GuV Gewinn Verlust Ergebnis Marge Rentabilität profitabel",
                     answer: "Unser EBIT liegt bei 4 Millionen Euro – das entspricht einer EBIT-Marge von gerade mal 4 Prozent. Bei einem Materialaufwand von 58,5 Millionen braucht es nur eine vergleichsweise geringe Schwankung der Einkaufspreise, um unser gesamtes Betriebsergebnis aufzuzehren. Anders gesagt: Wenn der Kupferpreis nur um 8-9 Prozent steigt und wir das nicht weitergeben können, wäre unser Gewinn praktisch null."
                 },
                 {
                     keywords: ["rückstellung", "sonstige"],
+                    topicSentence: "provisions reserves accruals Rückstellung Rückstellungen sonstige Reserve Vorsorge",
                     answer: "In den sonstigen Rückstellungen von 2,3 Millionen stecken unter anderem Rückstellungen für ausstehende CO₂-Zertifikate des laufenden Jahres, Garantierückstellungen und Rechtskosten. Der CO₂-Anteil macht davon den größten einzelnen Posten aus."
                 }
             ],
