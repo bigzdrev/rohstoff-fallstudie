@@ -616,10 +616,14 @@ function loadGroupAnswers(groupName) {
 // UTILITIES
 // ============================================================
 function formatEur(val) {
-    if (!val) return "";
-    const str = val.toString().replace(/[+\-]/g, '').trim();
-    const prefix = val.toString().startsWith("-") ? "- " : (val.toString().startsWith("+") ? "+ " : "");
-    return prefix + str + " €";
+    if (val === undefined || val === null || val === "") return "";
+    const isNegative = val.toString().startsWith("-");
+    const num = parseFloat(val.toString().replace(/[^\d.-]/g, ''));
+    if (isNaN(num)) return val + " €";
+    
+    // Format using German locale which uses '.' for thousands and ',' for decimal
+    const formatted = num.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return formatted + " €";
 }
 function showToast() {
     const t = document.getElementById("toast"); t.classList.add("show");
