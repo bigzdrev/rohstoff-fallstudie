@@ -119,11 +119,7 @@ function loginAs(role) {
                 if(document.getElementById('nav-chat-bank')) document.getElementById('nav-chat-bank').style.display = data.show_bank_chat ? 'block' : 'none';
                 if(document.getElementById('nav-aufgaben')) document.getElementById('nav-aufgaben').style.display = data.show_aufgaben ? 'block' : 'none';
                 
-                // Force Navigation
-                if (data.force_tab && data.force_time && data.force_time > (window.lastForceTime || 0)) {
-                    window.lastForceTime = data.force_time;
-                    switchTab(data.force_tab);
-                }
+                // Zwanghafte Navigation auf Kundenwunsch deaktiviert.
             }
         });
     }
@@ -688,3 +684,31 @@ setTimeout(() => {
         });
     }
 }, 1000);
+
+
+// ===================================
+// BANK CHAT (FIREBASE)
+// ===================================
+function renderBankChat(msgs) {
+    const cont = document.getElementById("bank-chat-messages");
+    if(!cont) return;
+    cont.innerHTML = "";
+    msgs.forEach(m => {
+        const isBot = m.sender === 'bank';
+        cont.innerHTML += `<div class="msg-bubble ${isBot ? 'bot-msg' : 'user-msg'}">${m.text}</div>`;
+    });
+    cont.scrollTo(0, cont.scrollHeight);
+}
+
+function sendBankMessage() {
+    const inp = document.getElementById("bank-chat-input");
+    const val = inp.value.trim();
+    if(!val || typeof db === 'undefined' || !db || !window.currentGroup) return;
+    inp.value = "";
+    
+    db.collection("chat_rooms").doc(window.currentGroup).get().then(doc => {
+        let msgs = doc.exists ? doc.data().messages || [] : [];
+        msgs.push({ sender: 'student', text: val, time: Date.now() });
+        db.collection("chat_rooms").doc(window.currentGroup).set({ messages: msgs });
+    });
+}
