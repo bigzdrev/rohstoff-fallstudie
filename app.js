@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try { injectMarketData(); } catch(e) { console.error("market:", e); }
     try { injectTaskQuestions(); } catch(e) { console.error("tasks:", e); }
     try { initChats(); } catch(e) { console.error("chat:", e); }
-    try { updateConnectionStatus(); } catch(e) { console.error("firebase:", e); }
+    // Firebase connection check removed (handled by listeners)
     
     // Fallback falls db noch nicht bereit ist
     setTimeout(() => { if (!window.configLoaded) renderDynamicButtons(4); }, 2000);
@@ -503,12 +503,18 @@ function findChatResponseSmart(contactId, question) {
 // CHAT SYSTEM (KI + Smart-Matching Hybrid)
 // ============================================================
 function initChats() {
-    ["unternehmen", "bank"].forEach(contactId => {
-        const contact = companyData.chatContacts[contactId];
-        document.getElementById(`chat-${contactId}-name`).innerText = contact.name;
-        document.getElementById(`chat-${contactId}-role`).innerText = contact.role;
-        addChatBubble(contactId, contact.greeting, "contact");
-    });
+    // Only init the Unternehmen chat header (bank chat is fully Firebase-driven)
+    const contact = companyData.chatContacts["unternehmen"];
+    const nameEl = document.getElementById("chat-unternehmen-name");
+    const roleEl = document.getElementById("chat-unternehmen-role");
+    if (nameEl) nameEl.innerText = contact.name;
+    if (roleEl) roleEl.innerText = contact.role;
+    // Bank chat header
+    const bankContact = companyData.chatContacts["bank"];
+    const bankNameEl = document.getElementById("chat-bank-name");
+    const bankRoleEl = document.getElementById("chat-bank-role");
+    if (bankNameEl) bankNameEl.innerText = bankContact.name;
+    if (bankRoleEl) bankRoleEl.innerText = bankContact.role;
 }
 
 function sendChatMessage(contactId) {
@@ -572,6 +578,7 @@ function triggerAIResponse(contactId, message) {
 
 function addChatBubble(contactId, text, sender) {
     const container = document.getElementById(`chat-${contactId}-messages`);
+    if (!container) return;
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble chat-${sender}`;
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
