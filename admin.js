@@ -1,5 +1,5 @@
 // ============================================================
-// ADMIN.JS – Dozenten-Cockpit (v5 Clean)
+// ADMIN.JS – Dozenten-Cockpit (v5.2 Clean)
 // ============================================================
 let currentAdminGroup = "Gruppe 1";
 let activeAdminChatType = "bank";
@@ -54,6 +54,17 @@ function updateTotalGroups() {
     if(!db) return;
     const count = parseInt(document.getElementById("group-count-input").value) || 4;
     db.collection("fallstudie_config").doc("settings").set({ group_count: count }, { merge: true });
+}
+
+// ============================================================
+// DASHBOARD NAVIGATION (TABS)
+// ============================================================
+function switchMainTab(tab) {
+    document.querySelectorAll(".dashboard-nav-item").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".main-tab-content").forEach(el => el.classList.remove("active"));
+    
+    document.getElementById(`nav-item-${tab}`).classList.add("active");
+    document.getElementById(`tab-${tab}-view`).classList.add("active");
 }
 
 // ============================================================
@@ -239,15 +250,28 @@ function loadTemplates() {
         const cont = document.getElementById("admin-templates-container");
         if(!cont) return;
         cont.innerHTML = "";
-        if(doc.exists && doc.data().items) {
-            doc.data().items.forEach((t, index) => {
-                const div = document.createElement("div");
-                div.className = "tpl-btn";
-                div.innerHTML = `${escapeHtml(t.title)}<span class="tpl-tooltip">${escapeHtml(t.text)}</span><span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${index})">✕</span>`;
-                div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
-                cont.appendChild(div);
-            });
+        
+        let items = [];
+        if(doc.exists && doc.data().items && doc.data().items.length > 0) {
+            items = doc.data().items;
+        } else {
+            // Fallback: Default templates from data.js
+            if(typeof companyData !== 'undefined') {
+                const unternehmen = companyData.chatContacts.unternehmen.responses.map(r => ({ title: "Kunde: " + r.keywords[0], text: r.answer }));
+                const bank = companyData.chatContacts.bank.responses.map(r => ({ title: "Handel: " + r.keywords[0], text: r.answer }));
+                items = [...unternehmen, ...bank];
+                // Save these as initial defaults
+                db.collection("admin_settings").doc("templates").set({ items });
+            }
         }
+
+        items.forEach((t, index) => {
+            const div = document.createElement("div");
+            div.className = "tpl-btn";
+            div.innerHTML = `${escapeHtml(t.title)}<span class="tpl-tooltip">${escapeHtml(t.text)}</span><span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${index})">✕</span>`;
+            div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
+            cont.appendChild(div);
+        });
     });
 }
 

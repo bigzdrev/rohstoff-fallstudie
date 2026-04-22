@@ -527,53 +527,11 @@ function sendChatMessage(contactId) {
     db.collection("chat_rooms_unternehmen").doc(window.currentGroup).get().then(doc => {
         let msgs = doc.exists ? doc.data().messages || [] : [];
         msgs.push({ sender: 'student', text: message, time: Date.now() });
-        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs }).then(() => {
-            // Trigger AI response after saving
-            triggerAIResponse(contactId, message);
-        });
+        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs });
     });
 }
 
-function triggerAIResponse(contactId, message) {
-    const typingId = addTypingIndicator(contactId);
 
-    // Asynchron antworten (KI oder Fallback)
-    setTimeout(async () => {
-        let response;
-        if (aiStatus === "ready" && aiEmbeddingsCache[contactId]) {
-            try {
-                const questionOutput = await aiExtractor(message, { pooling: "mean", normalize: true });
-                const qVec = Array.from(questionOutput.data);
-                let bestAIMatch = null;
-                let bestAIScore = -1;
-                aiEmbeddingsCache[contactId].forEach(item => {
-                    const sim = cosineSimilarity(qVec, item.embedding);
-                    if (sim > bestAIScore) { bestAIScore = sim; bestAIMatch = item.response; }
-                });
-                const smartResult = findChatResponseSmart(contactId, message);
-                if (bestAIScore > 0.45) response = bestAIMatch.answer;
-                else if (bestAIScore > 0.30 && smartResult.score > 0) response = bestAIMatch.answer;
-                else if (smartResult.score > 0 && smartResult.match) response = smartResult.match.answer;
-                else response = companyData.chatContacts[contactId].fallback;
-            } catch (e) {
-                const smartResult = findChatResponseSmart(contactId, message);
-                response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
-            }
-        } else {
-            const smartResult = findChatResponseSmart(contactId, message);
-            response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
-        }
-
-        removeTypingIndicator(typingId);
-        
-        // Push AI response to Firebase
-        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).get().then(doc => {
-            let msgs = doc.exists ? doc.data().messages || [] : [];
-            msgs.push({ sender: 'unternehmen', text: response, time: Date.now() });
-            db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs });
-        });
-    }, 1500);
-}
 
 
 function addChatBubble(contactId, text, sender) {

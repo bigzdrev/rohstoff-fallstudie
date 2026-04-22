@@ -12,11 +12,11 @@
         .chat-toggle-bar .btn { padding: 5px 14px; font-size: 0.8rem; border-radius: 6px; }
         .chat-toggle-bar .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
 
-        .templates-sidebar { width: 220px; display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; }
+        .templates-sidebar { width: 350px; display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; }
         .templates-sidebar h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin: 0 0 4px 0; }
-        .tpl-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; font-size: 0.8rem; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.15s; position: relative; }
+        .tpl-btn { display: block; width: 100%; text-align: left; padding: 10px 12px; font-size: 0.85rem; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.15s; position: relative; margin-bottom: 4px; }
         .tpl-btn:hover { background: rgba(255,255,255,0.18); }
-        .tpl-tooltip { display: none; position: absolute; left: -10px; top: 100%; transform: translateX(-100%); min-width: 250px; max-width: 350px; padding: 12px; background: #1a1a2e; color: #eee; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.8rem; white-space: normal; line-height: 1.5; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; }
+        .tpl-tooltip { display: none; position: absolute; right: 10px; top: 0; transform: translateX(-100%); min-width: 250px; max-width: 400px; padding: 12px; background: #1a1a2e; color: #eee; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.85rem; white-space: normal; line-height: 1.5; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; }
         .tpl-btn:hover .tpl-tooltip { display: block; }
         .tpl-del { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.7rem; padding: 2px 4px; opacity: 0; transition: opacity 0.15s; }
         .tpl-btn:hover .tpl-del { opacity: 1; }
@@ -39,6 +39,14 @@
         .cms-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
         .cms-tabs .btn { padding: 6px 16px; font-size: 0.85rem; border-radius: 6px; }
         .cms-tabs .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
+
+        .dashboard-nav { display: flex; gap: 12px; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.1); }
+        .dashboard-nav-item { padding: 12px 20px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .dashboard-nav-item:hover { color: var(--text-primary); }
+        .dashboard-nav-item.active { color: var(--brand-red); border-bottom-color: var(--brand-red); background: rgba(255,255,255,0.03); }
+        
+        .main-tab-content { display: none; flex: 1; overflow: hidden; }
+        .main-tab-content.active { display: flex; }
     </style>
 </head>
 <body class="dark-mode">
@@ -59,7 +67,7 @@
     <!-- ADMIN DASHBOARD -->
     <div id="dashboard-view" class="view" style="display: none; height: 100vh; display: flex; flex-direction: column;">
         
-        <header class="topbar">
+        <header class="topbar" style="border-bottom: none;">
             <h1 style="margin-right: 20px; flex-shrink:0;">Dozenten-Cockpit</h1>
             <div id="admin-group-tabs" style="display: flex; gap: 4px; overflow-x: auto; flex: 1; padding: 0 10px;">
                 <!-- Group tabs injected here -->
@@ -73,10 +81,15 @@
             </div>
         </header>
 
+        <div class="dashboard-nav">
+            <div id="nav-item-chat" class="dashboard-nav-item active" onclick="switchMainTab('chat')">Regie & Chat</div>
+            <div id="nav-item-aufgaben" class="dashboard-nav-item" onclick="switchMainTab('aufgaben')">Aufgaben-Erfassung</div>
+        </div>
+
         <div style="display: flex; flex: 1; overflow: hidden; padding: 24px; gap: 24px;">
             
-            <!-- LEFT: Settings -->
-            <div style="width: 300px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0;">
+            <!-- LEFT: Settings (Persistent) -->
+            <div style="width: 280px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0;">
                 <div class="glass-panel" style="padding: 24px;">
                     <h3>Globale Settings</h3>
                     <label style="font-size: 0.85rem; color: var(--text-primary); display: block; margin-top: 12px;">Anzahl der Gruppen (1-12)</label>
@@ -88,7 +101,7 @@
                 
                 <div class="glass-panel" style="padding: 24px; flex: 1; border-color: var(--brand-red);">
                     <h3 id="current-group-title" style="color: var(--brand-red);">Regiepult: Gruppe X</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Tabs für diese Gruppe freischalten:</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Tabs freischalten:</p>
                     <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
                         <label><input type="checkbox" id="check-produkte" onchange="saveGroupSettings('tab-products')"> Produkte</label>
                         <label><input type="checkbox" id="check-bilanz" onchange="saveGroupSettings('tab-bilanz')"> Jahresabschluss</label>
@@ -101,8 +114,8 @@
                 </div>
             </div>
             
-            <!-- MIDDLE: Chat + Templates sidebar -->
-            <div style="flex: 1.2; display: flex; flex-direction: column;" class="glass-panel">
+            <!-- MAIN TAB AREA -->
+            <div id="tab-chat-view" class="main-tab-content active glass-panel" style="display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px 0 24px;">
                     <div class="chat-toggle-bar">
                         <button id="btn-chat-bank" class="btn active-toggle" onclick="switchAdminChatType('bank')">Bank</button>
@@ -130,11 +143,10 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Monitoring Table -->
-            <div style="flex: 1.2; overflow-y: auto; display: flex; flex-direction: column;" class="glass-panel">
+            <div id="tab-aufgaben-view" class="main-tab-content glass-panel" style="flex-direction: column;">
                 <h3 style="padding: 16px 24px 0 24px; margin: 0;">Aufgaben-Erfassungen</h3>
                 <p style="padding: 0 24px 16px 24px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1);">Live-Mitschrift von <span class="active-group-name">Gruppe X</span></p>
-                <div id="monitoring-container" style="padding: 24px; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.5; flex: 1;">
+                <div id="monitoring-container" style="padding: 24px; overflow-y: auto; flex: 1;">
                     Wacht auf Eingaben der Gruppe...
                 </div>
             </div>
@@ -190,6 +202,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
     <script src="data.js"></script>
-    <script src="admin.js?v=17764406432"></script>
+    <script src="admin.js?v=17764406433"></script>
 </body>
 </html>
