@@ -104,10 +104,21 @@ function loginAs(role) {
     
     // Bind Firebase chat if not Dozent
     if(role !== "Dozent" && typeof db !== 'undefined' && db !== null) {
+        
         if (unsubBankChat) unsubBankChat();
         unsubBankChat = db.collection("chat_rooms").doc(role).onSnapshot(doc => {
             renderBankChat(doc.exists ? doc.data().messages || [] : []);
         });
+
+        if (window.unsubUnternehmenChat) window.unsubUnternehmenChat();
+        window.unsubUnternehmenChat = db.collection("chat_rooms_unternehmen").doc(role).onSnapshot(doc => {
+            if(doc.exists) {
+                renderUnternehmenChat(doc.data().messages || []);
+            } else {
+                renderUnternehmenChat([]);
+            }
+        });
+
         
         // Listen to per-group config
         db.collection("group_controls").doc(role).onSnapshot(doc => {
@@ -126,11 +137,7 @@ function loginAs(role) {
         });
     }
     
-    if (role === "Dozent") {
-        document.querySelectorAll(".student-only").forEach(el => el.classList.add("hidden"));
-        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.remove("hidden"));
-        switchTab("tab-lecturer");
-    } else {
+    if (true) {
         document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
         document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
         loadSavedAnswers();
@@ -511,83 +518,66 @@ function sendChatMessage(contactId) {
     const message = input.value.trim();
     if (!message) return;
     input.value = "";
+    
+    // Push to Firebase
+    db.collection("chat_rooms_unternehmen").doc(window.currentGroup).get().then(doc => {
+        let msgs = doc.exists ? doc.data().messages || [] : [];
+        msgs.push({ sender: 'student', text: message, time: Date.now() });
+        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs }).then(() => {
+            // Trigger AI response after saving
+            triggerAIResponse(contactId, message);
+        });
+    });
+}
 
-    addChatBubble(contactId, message, "user");
-
-    // Tipp-Animation
+function triggerAIResponse(contactId, message) {
     const typingId = addTypingIndicator(contactId);
 
     // Asynchron antworten (KI oder Fallback)
-    (async () => {
-        const delay = 800 + Math.random() * 1200;
-        await new Promise(resolve => setTimeout(resolve, delay));
-
+    setTimeout(async () => {
         let response;
-        let method = "keyword";
-
         if (aiStatus === "ready" && aiEmbeddingsCache[contactId]) {
             try {
-                // KI-basierte semantische Suche
                 const questionOutput = await aiExtractor(message, { pooling: "mean", normalize: true });
                 const qVec = Array.from(questionOutput.data);
-
                 let bestAIMatch = null;
                 let bestAIScore = -1;
-
                 aiEmbeddingsCache[contactId].forEach(item => {
                     const sim = cosineSimilarity(qVec, item.embedding);
-                    if (sim > bestAIScore) {
-                        bestAIScore = sim;
-                        bestAIMatch = item.response;
-                    }
+                    if (sim > bestAIScore) { bestAIScore = sim; bestAIMatch = item.response; }
                 });
-
-                // Auch Smart-Matching parallel ausführen
                 const smartResult = findChatResponseSmart(contactId, message);
-
-                // Hybrid-Entscheidung: KI UND Keyword-Scores kombinieren
-                if (bestAIScore > 0.45) {
-                    // KI ist sich sicher → KI-Ergebnis nehmen
-                    response = bestAIMatch.answer;
-                    method = "ki";
-                } else if (bestAIScore > 0.30 && smartResult.score > 0) {
-                    // KI hat eine Tendenz UND Keywords passen → KI gewinnt
-                    response = bestAIMatch.answer;
-                    method = "ki+keyword";
-                } else if (smartResult.score > 0 && smartResult.match) {
-                    // Nur Keywords matchen
-                    response = smartResult.match.answer;
-                    method = "keyword";
-                } else {
-                    response = companyData.chatContacts[contactId].fallback;
-                    method = "fallback";
-                }
-
-                console.log(`[Chat ${contactId}] Methode: ${method} | KI-Score: ${bestAIScore.toFixed(3)} | Keyword-Score: ${smartResult.score}`);
+                if (bestAIScore > 0.45) response = bestAIMatch.answer;
+                else if (bestAIScore > 0.30 && smartResult.score > 0) response = bestAIMatch.answer;
+                else if (smartResult.score > 0 && smartResult.match) response = smartResult.match.answer;
+                else response = companyData.chatContacts[contactId].fallback;
             } catch (e) {
-                console.warn("KI-Fehler, Fallback auf Smart-Matching:", e);
                 const smartResult = findChatResponseSmart(contactId, message);
                 response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
             }
         } else {
-            // Kein KI-Modell → Smart-Matching
             const smartResult = findChatResponseSmart(contactId, message);
             response = (smartResult.score > 0 && smartResult.match) ? smartResult.match.answer : companyData.chatContacts[contactId].fallback;
-            method = smartResult.score > 0 ? "smart" : "fallback";
         }
 
         removeTypingIndicator(typingId);
-        addChatBubble(contactId, response, "contact");
-    })();
+        
+        // Push AI response to Firebase
+        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).get().then(doc => {
+            let msgs = doc.exists ? doc.data().messages || [] : [];
+            msgs.push({ sender: 'unternehmen', text: response, time: Date.now() });
+            db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs });
+        });
+    }, 1500);
 }
+
 
 function addChatBubble(contactId, text, sender) {
     const container = document.getElementById(`chat-${contactId}-messages`);
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble chat-${sender}`;
-    const avatar = sender === "contact" ? companyData.chatContacts[contactId].avatar : "";
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    bubble.innerHTML = `<span class="bubble-avatar">${avatar}</span><div class="bubble-text">${text}<span class="chat-time">${timeStr}</span></div>`;
+    bubble.innerHTML = `<div class="bubble-text">${text}<span class="chat-time">${timeStr}</span></div>`;
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
 }
@@ -638,23 +628,6 @@ function loadSavedAnswers() {
 // ============================================================
 // LECTURER
 // ============================================================
-function loadGroupAnswers(groupName) {
-    document.getElementById("presentation-group-name").innerText = groupName;
-    document.getElementById("presentation-board").classList.remove("hidden");
-    const container = document.getElementById("presentation-answers");
-    const render = (data) => {
-        container.innerHTML = "";
-        companyData.questions.forEach(q => {
-            const answer = data ? (data[q.id] || "Noch nicht bearbeitet.") : "Noch nicht bearbeitet.";
-            container.innerHTML += `<div class="pres-item"><h4>${q.title}</h4><div class="pres-item-text">${answer}</div></div>`;
-        });
-    };
-    if (typeof useFirebase !== 'undefined' && useFirebase && db) {
-        db.collection("fallstudie_ergebnisse").doc(groupName).get().then(doc => { render(doc.exists ? doc.data() : null); });
-    } else {
-        const local = localStorage.getItem("fallstudie_" + groupName);
-        render(local ? JSON.parse(local) : null);
-    }
 }
 
 // ============================================================
@@ -674,6 +647,24 @@ function showToast() {
     const t = document.getElementById("toast"); t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2500);
 }
+
+
+// Check for Global Content Config
+setTimeout(() => {
+    if (typeof db !== 'undefined' && db !== null) {
+        db.collection("fallstudie_config").doc("content").onSnapshot(doc => {
+            if (doc.exists && doc.data().questions) {
+                companyData.questions = doc.data().questions;
+                const container = document.getElementById("task-questions-container");
+                if (container) {
+                    container.innerHTML = "";
+                    injectTaskQuestions();
+                    loadSavedAnswers(); // reload user's saved text into the new textareas
+                }
+            }
+        });
+    }
+}, 1000);
 
 // Check for Global Config on load
 setTimeout(() => {
@@ -699,12 +690,11 @@ function renderBankChat(msgs) {
     msgs.forEach(m => {
         const isBot = m.sender === 'bank';
         const senderCls = isBot ? 'chat-contact' : 'chat-user';
-        const avatar = isBot ? '🏦' : '';
         let timeStr = "";
         if (m.time) {
             timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-        cont.innerHTML += `<div class="chat-bubble ${senderCls}"><span class="bubble-avatar">${avatar}</span><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
+        cont.innerHTML += `<div class="chat-bubble ${senderCls}"><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
     });
     cont.scrollTo(0, cont.scrollHeight);
 }
@@ -720,4 +710,29 @@ function sendBankMessage() {
         msgs.push({ sender: 'student', text: val, time: Date.now() });
         db.collection("chat_rooms").doc(window.currentGroup).set({ messages: msgs });
     });
+}
+
+function renderUnternehmenChat(msgs) {
+    const cont = document.getElementById("chat-unternehmen-messages");
+    if(!cont) return;
+    cont.innerHTML = "";
+    
+    // Add greeting if empty
+    if(msgs.length === 0) {
+        addChatBubble("unternehmen", companyData.chatContacts["unternehmen"].greeting, "contact");
+        return;
+    }
+
+    msgs.forEach(m => {
+        const isBot = m.sender !== 'student';
+        const senderCls = isBot ? 'chat-contact' : 'chat-user';
+        let timeStr = "";
+        if (m.time) timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        const bubble = document.createElement("div");
+        bubble.className = `chat-bubble ${senderCls}`;
+        bubble.innerHTML = `<div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div>`;
+        cont.appendChild(bubble);
+    });
+    cont.scrollTo(0, cont.scrollHeight);
 }

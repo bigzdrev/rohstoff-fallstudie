@@ -235,13 +235,11 @@ textarea:focus { outline: none; border-color: var(--brand-red); box-shadow: 0 0 
    ============================================================ */
 .chat-container { display: flex; flex-direction: column; height: calc(100vh - 160px); max-height: 700px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 .chat-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; background: #F7FAFC; border-bottom: 1px solid var(--border); }
-.chat-avatar { font-size: 2.5rem; }
 .chat-header strong { font-size: 1.1rem; color: var(--text-primary); }
 .chat-role { color: var(--text-secondary); font-size: 0.85rem; }
 .chat-messages { flex-grow: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; background: var(--surface); }
 .chat-bubble { display: flex; gap: 16px; max-width: 85%; }
 .chat-bubble.chat-user { align-self: flex-end; flex-direction: row-reverse; max-width: 75%; }
-.bubble-avatar { font-size: 1.8rem; flex-shrink: 0; }
 .bubble-text { background: #EDF2F7; padding: 16px 20px; border-radius: 12px; border-top-left-radius: 2px; font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .chat-user .bubble-text { background: var(--brand-red); color: white; border-radius: 12px; border-top-right-radius: 2px; }
 .chat-time { display: block; font-size: 0.7rem; color: rgba(0,0,0,0.4); text-align: right; margin-top: 4px; }

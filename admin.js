@@ -1,4 +1,5 @@
 let currentAdminGroup = "Gruppe 1";
+let activeAdminChatType = "bank";
 let totalGroups = 4;
 let unsubSettings = null;
 let unsubGlobal = null;
@@ -22,6 +23,8 @@ function loginAdmin() {
 }
 
 function initAdminData() {
+    loadTemplates();
+
     if (!db) return alert("Firebase ist nicht geladen/konfiguriert!");
 
     unsubGlobal = db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
@@ -141,12 +144,11 @@ function bindChat() {
             msgs.forEach(m => {
                 const isBot = m.sender === 'bank';
                 const senderCls = isBot ? 'chat-user' : 'chat-contact'; // From admin's perspective, they are the 'user' (bank), student is 'contact'
-                const avatar = isBot ? '🏦' : '🧑‍💻';
                 let timeStr = "";
                 if (m.time) {
                     timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
-                cont.innerHTML += `<div class="chat-bubble ${senderCls}"><span class="bubble-avatar">${avatar}</span><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
+                cont.innerHTML += `<div class="chat-bubble ${senderCls}"><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
             });
             cont.scrollTo(0, cont.scrollHeight);
         } else {
@@ -155,23 +157,34 @@ function bindChat() {
     });
 }
 
-function sendAdminMessage() {
+function sendAdminMessage(templateText = null) {
     const inp = document.getElementById("admin-chat-input");
-    const text = inp.value.trim();
+    const text = templateText || inp.value.trim();
     if(!text || !db) return;
-    inp.value = "";
+    if(!templateText) inp.value = "";
 
-    db.collection("chat_rooms").doc(currentAdminGroup).get().then(doc => {
+    const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
+    const senderName = activeAdminChatType === "bank" ? "bank" : "unternehmen";
+
+    db.collection(collectionName).doc(currentAdminGroup).get().then(doc => {
         let msgs = doc.exists ? doc.data().messages || [] : [];
-        msgs.push({ sender: 'bank', text: text, time: Date.now() });
-        db.collection("chat_rooms").doc(currentAdminGroup).set({ messages: msgs });
+        msgs.push({ sender: senderName, text: text, time: Date.now() });
+        db.collection(collectionName).doc(currentAdminGroup).set({ messages: msgs });
     });
+}
+
+function switchAdminChatType(type) {
+    activeAdminChatType = type;
+    document.getElementById("btn-chat-bank").className = type === "bank" ? "btn btn-primary" : "btn btn-secondary";
+    document.getElementById("btn-chat-unternehmen").className = type === "unternehmen" ? "btn btn-primary" : "btn btn-secondary";
+    bindChat();
 }
 
 function clearAdminChat() {
     if(!db) return;
-    if(confirm(`Möchtest du den gesamten Bank-Chat für ${currentAdminGroup} wirklich löschen?`)) {
-        db.collection("chat_rooms").doc(currentAdminGroup).set({ messages: [] }, { merge: true });
+    const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
+    if(confirm(`Möchtest du den Chat für ${currentAdminGroup} wirklich löschen?`)) {
+        db.collection(collectionName).doc(currentAdminGroup).set({ messages: [] }, { merge: true });
     }
 }
 
@@ -180,7 +193,7 @@ function bindTasks() {
     const mon = document.getElementById("monitoring-container");
     mon.innerHTML = "Wacht auf Eingaben der Gruppe...";
 
-    unsubTasks = db.collection("student_tasks").doc(currentAdminGroup).onSnapshot(doc => {
+    unsubTasks = db.collection("fallstudie_ergebnisse").doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
             const d = doc.data();
             let html = "";
@@ -193,5 +206,140 @@ function bindTasks() {
             });
             mon.innerHTML = html || "Die Gruppe hat noch nichts in den Risiko-Formularen abgespeichert.";
         }
+    });
+}
+
+function archiveSession() {
+    if(!db) return;
+    const sessionName = prompt("Name für diese Session (z.B. Kurs vom 22.04.):", "Session " + new Date().toLocaleDateString());
+    if(!sessionName) return;
+
+    db.collection("archived_sessions").add({
+        name: sessionName,
+        date: Date.now(),
+        data: "Session data placeholder"
+    }).then(() => {
+        alert("Session wurde archiviert!");
+    });
+}
+
+// ===================================
+// TEMPLATES
+// ===================================
+function loadTemplates() {
+    if(!db) return;
+    db.collection("admin_settings").doc("templates").onSnapshot(doc => {
+        const cont = document.getElementById("admin-templates-container");
+        if(!cont) return;
+        cont.innerHTML = `<button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px; flex-shrink:0;" onclick="addTemplate()">+ Neue Vorlage</button>`;
+        if(doc.exists && doc.data().items) {
+            doc.data().items.forEach((t, index) => {
+                const btn = document.createElement("button");
+                btn.className = "btn btn-secondary";
+                btn.style.cssText = "font-size:0.75rem; padding:4px 8px; flex-shrink:0; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+                btn.innerText = t.title;
+                btn.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
+                btn.oncontextmenu = (e) => { e.preventDefault(); deleteTemplate(index); };
+                cont.appendChild(btn);
+            });
+        }
+    });
+}
+
+function addTemplate() {
+    const title = prompt("Titel der Vorlage (kurz):");
+    if(!title) return;
+    const text = prompt("Text der Vorlage (wird in den Chat eingefügt):");
+    if(!text) return;
+
+    db.collection("admin_settings").doc("templates").get().then(doc => {
+        let items = doc.exists ? doc.data().items || [] : [];
+        items.push({ title, text });
+        db.collection("admin_settings").doc("templates").set({ items });
+    });
+}
+
+function deleteTemplate(index) {
+    if(!confirm("Vorlage löschen?")) return;
+    db.collection("admin_settings").doc("templates").get().then(doc => {
+        if(doc.exists) {
+            let items = doc.data().items || [];
+            items.splice(index, 1);
+            db.collection("admin_settings").doc("templates").set({ items });
+        }
+    });
+}
+
+// Call loadTemplates in initAdminData
+
+// ===================================
+// CMS
+// ===================================
+let cmsQuestions = [];
+
+function openCMS() {
+    document.getElementById("cms-modal").style.display = "flex";
+    if (!db) return;
+    db.collection("fallstudie_config").doc("content").get().then(doc => {
+        if (doc.exists && doc.data().questions) {
+            cmsQuestions = doc.data().questions;
+        } else {
+            // Load defaults from data.js if no firebase config yet (assuming companyData is available)
+            if (typeof companyData !== 'undefined') {
+                cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
+            } else {
+                cmsQuestions = [];
+            }
+        }
+        renderCMS();
+    });
+}
+
+function renderCMS() {
+    const list = document.getElementById("cms-questions-list");
+    list.innerHTML = "";
+    cmsQuestions.forEach((q, i) => {
+        const div = document.createElement("div");
+        div.style.cssText = "padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #F7FAFC; position:relative;";
+        div.innerHTML = `
+            <button class="btn btn-secondary" style="position:absolute; top:16px; right:16px; padding:4px 8px; font-size:0.7rem; color:var(--danger);" onclick="cmsDelete(${i})">Löschen</button>
+            <label style="font-size:0.8rem; font-weight:bold;">ID (intern, darf keine Leerzeichen haben):</label>
+            <input type="text" class="sidebar-input" value="${q.id}" onchange="cmsUpdate(${i}, 'id', this.value)" style="width:100%; margin-bottom:8px;">
+            <label style="font-size:0.8rem; font-weight:bold;">Titel:</label>
+            <input type="text" class="sidebar-input" value="${q.title}" onchange="cmsUpdate(${i}, 'title', this.value)" style="width:100%; margin-bottom:8px;">
+            <label style="font-size:0.8rem; font-weight:bold;">Fragestellung / Prompt:</label>
+            <textarea class="sidebar-input" onchange="cmsUpdate(${i}, 'prompt', this.value)" style="width:100%; min-height:80px;">${q.prompt}</textarea>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function cmsUpdate(index, field, value) {
+    cmsQuestions[index][field] = value;
+}
+
+function cmsAddQuestion() {
+    cmsQuestions.push({
+        id: "q_neu_" + Date.now(),
+        title: "Neue Aufgabe",
+        prompt: "Beschreiben Sie die Aufgabe hier..."
+    });
+    renderCMS();
+}
+
+function cmsDelete(index) {
+    if(confirm("Aufgabe entfernen?")) {
+        cmsQuestions.splice(index, 1);
+        renderCMS();
+    }
+}
+
+function cmsSave() {
+    if(!db) return;
+    db.collection("fallstudie_config").doc("content").set({
+        questions: cmsQuestions
+    }, { merge: true }).then(() => {
+        alert("Inhalte gespeichert!");
+        document.getElementById("cms-modal").style.display = "none";
     });
 }
