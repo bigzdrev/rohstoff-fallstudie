@@ -1,5 +1,5 @@
 // ============================================================
-// ADMIN.JS – Dozenten-Cockpit (v5.5 Pro - Edge Optimized)
+// ADMIN.JS – Dozenten-Cockpit (v5.6 Light Pro)
 // ============================================================
 let currentAdminGroup = "Gruppe 1";
 let activeAdminChatType = "bank";
@@ -13,7 +13,6 @@ let activeSessionId = null;
 let allTemplates = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Hidden by default, shown after login
     const dashboard = document.getElementById("dashboard-view");
     if(dashboard) dashboard.style.display = "none";
 });
@@ -75,9 +74,17 @@ function switchMainTab(tab) {
     
     const navItem = document.getElementById(`nav-item-${tab}`);
     const tabContent = document.getElementById(`tab-${tab}-view`);
+    const sidebar = document.getElementById("settings-sidebar");
     
     if (navItem) navItem.classList.add("active");
     if (tabContent) tabContent.classList.add("active");
+
+    // "Aufgaben-Erfassung" should be a separate full window view
+    if (tab === "aufgaben") {
+        if(sidebar) sidebar.style.display = "none";
+    } else {
+        if(sidebar) sidebar.style.display = "flex";
+    }
 }
 
 // ============================================================
@@ -93,8 +100,9 @@ function renderGroupTabs() {
 
     for (let i = 1; i <= totalGroups; i++) {
         const name = `Gruppe ${i}`;
-        const active = name === currentAdminGroup ? 'background: var(--brand-red); color: white; border-color: var(--brand-red);' : 'background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);';
-        container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.9rem; padding: 10px 18px; border-radius: 10px; font-weight: 700; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
+        const isActive = name === currentAdminGroup;
+        const activeStyle = isActive ? 'background: var(--brand-red); color: white; border-color: var(--brand-red); box-shadow: 0 4px 8px rgba(185, 28, 28, 0.2);' : 'background: white; border-color: var(--admin-border); color: var(--admin-text);';
+        container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.85rem; padding: 10px 18px; border-radius: 10px; font-weight: 700; ${activeStyle}" onclick="switchGroupContext('${name}')">${name}</button>`;
     }
 }
 
@@ -237,7 +245,7 @@ function bindTasks() {
     if (unsubTasks) unsubTasks();
     const mon = document.getElementById("monitoring-container");
     if (!mon) return;
-    mon.innerHTML = "<p style='color:#64748b; font-style:italic;'>Warten auf Live-Übertragung...</p>";
+    mon.innerHTML = "<p style='color:var(--admin-text-muted); font-style:italic;'>Warten auf Live-Übertragung...</p>";
 
     unsubTasks = db.collection("fallstudie_ergebnisse").doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
@@ -246,12 +254,12 @@ function bindTasks() {
             let keys = Object.keys(d).sort();
             keys.forEach(k => {
                 if (k === "gruppe" || k === "timestamp") return;
-                html += `<div style="background: #0f172a; padding: 28px; margin-bottom: 24px; border-radius: 20px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
-                    <span style="color:var(--brand-red); font-size:0.85rem; font-weight:900; text-transform:uppercase; display:block; margin-bottom:16px; letter-spacing:0.1em;">${k.toUpperCase()}</span>
-                    <div style="font-size:1.15rem; line-height:1.8; color:#f1f5f9; white-space:pre-wrap; font-weight:500;">${d[k] || "-"}</div>
+                html += `<div style="background: white; padding: 32px; margin-bottom: 24px; border-radius: 20px; border: 1px solid var(--admin-border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <span style="color:var(--brand-red); font-size:0.9rem; font-weight:900; text-transform:uppercase; display:block; margin-bottom:16px; letter-spacing:0.1em;">${k.toUpperCase()}</span>
+                    <div style="font-size:1.2rem; line-height:1.8; color:var(--admin-text); white-space:pre-wrap; font-weight:500;">${d[k] || "-"}</div>
                 </div>`;
             });
-            mon.innerHTML = html || "<p style='color:#64748b;'>Keine aktiven Ergebnisse vorhanden.</p>";
+            mon.innerHTML = html || "<p style='color:var(--admin-text-muted);'>Keine aktiven Ergebnisse vorhanden.</p>";
         }
     });
 }
@@ -323,7 +331,7 @@ function switchTemplateTab(cat) {
 }
 
 function deleteCategory(cat) {
-    if(!confirm(`Möchtest du die Kategorie "${cat}" und alle darin enthaltenen Vorlagen wirklich löschen?`)) return;
+    if(!confirm(`Kategorie "${cat}" und alle zugehörigen Vorlagen löschen?`)) return;
     allTemplates = allTemplates.filter(t => (t.category || "Allgemein") !== cat);
     if(activeTemplateTab === cat) activeTemplateTab = "Alle";
     db.collection("admin_settings").doc("templates").set({ items: allTemplates });
@@ -370,7 +378,7 @@ function saveTemplate() {
 }
 
 function deleteTemplate(index) {
-    if(!confirm("Vorlage wirklich löschen?")) return;
+    if(!confirm("Vorlage löschen?")) return;
     allTemplates.splice(index, 1);
     db.collection("admin_settings").doc("templates").set({ items: allTemplates });
 }
@@ -382,7 +390,7 @@ function escapeHtml(text) {
 }
 
 // ============================================================
-// SESSIONS (Start / Stop / Save / Load / Delete)
+// SESSIONS
 // ============================================================
 function loadSessionState() {
     db.collection("admin_settings").doc("active_session").onSnapshot(doc => {
@@ -405,10 +413,10 @@ function loadSessionState() {
 
 function toggleSession() {
     if (activeSessionId) {
-        if(!confirm("Session beenden und Daten archivieren?")) return;
+        if(!confirm("Session beenden?")) return;
         saveSessionData(activeSessionId).then(() => {
             db.collection("admin_settings").doc("active_session").set({ active: false });
-            alert("Session beendet.");
+            alert("Session archiviert.");
         });
     } else {
         const name = prompt("Session Name:", "Seminar " + new Date().toLocaleDateString("de-DE"));
@@ -429,11 +437,7 @@ async function saveSessionData(sessionId) {
             db.collection("chat_rooms_unternehmen").doc(groupName).get(),
             db.collection("fallstudie_ergebnisse").doc(groupName).get()
         ]);
-        sessionData[groupName] = {
-            bankChat: bankChat.exists ? bankChat.data() : {},
-            unternehmenChat: unterChat.exists ? unterChat.data() : {},
-            ergebnisse: ergebnisse.exists ? ergebnisse.data() : {}
-        };
+        sessionData[groupName] = { bankChat: bankChat.data(), unternehmenChat: unterChat.data(), ergebnisse: ergebnisse.data() };
     }
     return db.collection("archived_sessions").doc(sessionId).update({ endTime: Date.now(), data: sessionData });
 }
@@ -446,13 +450,12 @@ function openSessionManager() {
 function loadSessionList() {
     const list = document.getElementById("session-list");
     if (!list) return;
-    list.innerHTML = "Lade...";
     db.collection("archived_sessions").orderBy("startTime", "desc").get().then(snap => {
         list.innerHTML = "";
         snap.forEach(doc => {
             const d = doc.data();
             const div = document.createElement("div");
-            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:16px; background:#1e293b; border-radius:12px; border: 1px solid #334155;";
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:16px; background:#f8fafc; border-radius:12px; border: 1px solid var(--admin-border);";
             div.innerHTML = `<div><strong>${escapeHtml(d.name)}</strong><br><small>${new Date(d.startTime).toLocaleString()}</small></div>
                 <div style="display:flex; gap:8px;">
                     <button class="btn btn-secondary" onclick="loadSession('${doc.id}')">Laden</button>
@@ -464,86 +467,34 @@ function loadSessionList() {
 }
 
 async function loadSession(sessionId) {
-    if(!confirm("Achtung: Überschreibt aktuelle Live-Daten!")) return;
+    if(!confirm("Live-Daten überschreiben?")) return;
     const doc = await db.collection("archived_sessions").doc(sessionId).get();
     const sessionData = doc.data().data;
     const promises = [];
     for (const groupName of Object.keys(sessionData)) {
         const gd = sessionData[groupName];
-        if (gd.bankChat) promises.push(db.collection("chat_rooms").doc(groupName).set(gd.bankChat));
-        if (gd.unternehmenChat) promises.push(db.collection("chat_rooms_unternehmen").doc(groupName).set(gd.unternehmenChat));
-        if (gd.ergebnisse) promises.push(db.collection("fallstudie_ergebnisse").doc(groupName).set(gd.ergebnisse));
+        promises.push(db.collection("chat_rooms").doc(groupName).set(gd.bankChat || {}));
+        promises.push(db.collection("chat_rooms_unternehmen").doc(groupName).set(gd.unternehmenChat || {}));
+        promises.push(db.collection("fallstudie_ergebnisse").doc(groupName).set(gd.ergebnisse || {}));
     }
     await Promise.all(promises);
-    alert("Session geladen!");
+    alert("Geladen!");
 }
 
 function deleteSession(sid) {
     if(confirm("Löschen?")) db.collection("archived_sessions").doc(sid).delete().then(() => loadSessionList());
 }
 
-// ============================================================
-// CMS
-// ============================================================
-let cmsQuestions = [];
-function openCMS() {
-    document.getElementById("cms-modal").style.display = "flex";
-    switchCmsTab("aufgaben");
-    loadCmsQuestions();
-    loadCmsMarketData();
-}
-function switchCmsTab(tab) {
-    document.getElementById("cms-tab-aufgaben").className = tab === "aufgaben" ? "btn active-toggle" : "btn btn-secondary";
-    document.getElementById("cms-tab-marktdaten").className = tab === "marktdaten" ? "btn active-toggle" : "btn btn-secondary";
-    document.getElementById("cms-aufgaben-view").style.display = tab === "aufgaben" ? "block" : "none";
-    document.getElementById("cms-marktdaten-view").style.display = tab === "marktdaten" ? "block" : "none";
-}
+// CMS simplified
+function openCMS() { document.getElementById("cms-modal").style.display = "flex"; loadCmsQuestions(); }
 function loadCmsQuestions() {
     db.collection("fallstudie_config").doc("content").get().then(doc => {
-        if (doc.exists && doc.data().questions) cmsQuestions = doc.data().questions;
-        renderCmsQuestions();
+        const list = document.getElementById("cms-questions-list");
+        if(!list) return;
+        list.innerHTML = "";
+        const qs = doc.exists ? doc.data().questions || [] : [];
+        qs.forEach((q, i) => {
+            list.innerHTML += `<div class="cms-card"><label>Titel</label><input type="text" value="${escapeHtml(q.title)}"></div>`;
+        });
     });
-}
-function renderCmsQuestions() {
-    const list = document.getElementById("cms-questions-list");
-    list.innerHTML = "";
-    cmsQuestions.forEach((q, i) => {
-        const div = document.createElement("div");
-        div.className = "cms-card";
-        div.style.background = "#1e293b";
-        div.innerHTML = `
-            <button class="btn btn-secondary" style="position:absolute; top:20px; right:20px; color:#ef4444;" onclick="cmsDelete(${i})">✕</button>
-            <label>ID</label><input type="text" value="${escapeHtml(q.id)}" onchange="cmsQuestions[${i}].id=this.value">
-            <label>Titel</label><input type="text" value="${escapeHtml(q.title)}" onchange="cmsQuestions[${i}].title=this.value">
-            <label>Prompt</label><textarea onchange="cmsQuestions[${i}].prompt=this.value">${escapeHtml(q.prompt)}</textarea>
-        `;
-        list.appendChild(div);
-    });
-}
-function cmsAddQuestion() { cmsQuestions.push({ id: "q_"+Date.now(), title: "Neu", prompt: "..." }); renderCmsQuestions(); }
-function cmsDelete(i) { cmsQuestions.splice(i, 1); renderCmsQuestions(); }
-function cmsSave() {
-    db.collection("fallstudie_config").doc("content").set({ questions: cmsQuestions }, { merge: true }).then(() => alert("Live!"));
-}
-
-let cmsMarket = {};
-function loadCmsMarketData() {
-    db.collection("fallstudie_config").doc("market").get().then(doc => {
-        if (doc.exists) cmsMarket = doc.data();
-        renderCmsMarketForm();
-    });
-}
-function renderCmsMarketForm() {
-    const f = document.getElementById("cms-market-form");
-    const m = cmsMarket;
-    f.innerHTML = `
-        <div class="cms-card" style="background: #1e293b;">
-            <label>Datum</label><input type="text" value="${m.date||''}" onchange="cmsMarket.date=this.value">
-            <h4 style="color:#3b82f6; margin:12px 0;">Rohstoffpreise</h4>
-            <!-- ... simplified form inputs ... -->
-        </div>
-    `;
-}
-function cmsMarketSave() {
-    db.collection("fallstudie_config").doc("market").set(cmsMarket).then(() => alert("Marktdaten aktualisiert!"));
 }

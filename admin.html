@@ -7,120 +7,117 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css?v=1776440643">
     <style>
-        /* Admin-specific overrides */
+        /* Light Theme Admin Pro */
         :root {
-            --tpl-accent: #3b82f6;
-            --tpl-bg: rgba(59, 130, 246, 0.08);
-            --tpl-border: rgba(59, 130, 246, 0.2);
+            --admin-bg: #f8fafc;
+            --admin-surface: #ffffff;
+            --admin-border: #e2e8f0;
+            --admin-text: #1e293b;
+            --admin-text-muted: #64748b;
+            --brand-red: #b91c1c;
+            --tpl-accent: #2563eb;
+            --tpl-bg: #f1f5f9;
+            --tpl-border: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.8);
         }
 
-        .chat-toggle-bar { display: flex; gap: 4px; }
-        .chat-toggle-bar .btn { padding: 5px 14px; font-size: 0.8rem; border-radius: 6px; }
-        .chat-toggle-bar .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
+        body.admin-light {
+            background-color: var(--admin-bg);
+            color: var(--admin-text);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
 
-        .templates-sidebar { width: 50%; display: flex; flex-direction: column; gap: 8px; padding: 24px; background: #0f172a; border-left: 1px solid rgba(255,255,255,0.1); overflow-y: auto; flex-shrink: 0; }
-        .templates-sidebar h4 { font-size: 0.9rem; color: #94a3b8; text-transform: uppercase; margin: 0 0 12px 0; letter-spacing: 0.08em; font-weight: 700; }
+        .topbar { 
+            background: var(--admin-surface); 
+            border-bottom: 1px solid var(--admin-border); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            color: var(--admin-text);
+        }
+
+        .chat-toggle-bar .btn { padding: 5px 14px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--admin-border); background: var(--admin-bg); color: var(--admin-text); }
+        .chat-toggle-bar .btn.active-toggle { background: var(--tpl-accent); color: white; border-color: var(--tpl-accent); }
+
+        .templates-sidebar { width: 50%; display: flex; flex-direction: column; gap: 8px; padding: 24px; background: #f1f5f9; border-left: 1px solid var(--admin-border); overflow-y: auto; flex-shrink: 0; }
+        .templates-sidebar h4 { font-size: 0.9rem; color: var(--admin-text-muted); text-transform: uppercase; margin: 0 0 12px 0; letter-spacing: 0.08em; font-weight: 700; }
         
-        /* Dynamic Grid Layout */
         .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; align-content: start; }
-        
         .tpl-btn { 
-            display: flex; 
-            flex-direction: column;
-            gap: 8px;
-            width: 100%; 
-            text-align: left; 
-            padding: 16px; 
-            font-size: 0.9rem; 
-            border-radius: 12px; 
-            background: var(--tpl-bg); 
-            border: 1px solid var(--tpl-border); 
-            color: #f1f5f9; 
-            cursor: pointer; 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
-            position: relative; 
-            min-height: 100px;
+            display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; padding: 18px; font-size: 0.9rem; border-radius: 12px; 
+            background: var(--admin-surface); border: 1px solid var(--tpl-border); color: var(--admin-text); cursor: pointer; transition: all 0.2s; position: relative; min-height: 110px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .tpl-btn:hover { 
-            background: rgba(59, 130, 246, 0.15); 
-            border-color: var(--tpl-accent); 
-            transform: translateY(-3px); 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3); 
-        }
+        .tpl-btn:hover { border-color: var(--tpl-accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #f8fafc; }
         
-        .tpl-title-row { font-weight: 700; color: var(--tpl-accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.02em; display: block; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; margin-bottom: 4px; }
-        .tpl-snippet { font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .tpl-title-row { font-weight: 700; color: var(--tpl-accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.02em; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px; margin-bottom: 4px; }
+        .tpl-snippet { font-size: 0.85rem; line-height: 1.5; color: var(--admin-text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Full text Tooltip */
-        .tpl-tooltip { display: none; position: absolute; right: 20px; top: 0; transform: translateX(-100%); width: 500px; padding: 20px; background: #1e293b; color: #f8fafc; border: 1px solid #334155; border-radius: 16px; font-size: 0.95rem; white-space: normal; line-height: 1.6; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: none; backdrop-filter: blur(12px); }
+        .tpl-tooltip { display: none; position: absolute; right: 20px; top: 0; transform: translateX(-100%); width: 500px; padding: 24px; background: white; color: var(--admin-text); border: 1px solid var(--tpl-accent); border-radius: 16px; font-size: 1rem; white-space: normal; line-height: 1.6; z-index: 1000; box-shadow: 0 20px 40px rgba(0,0,0,0.15); pointer-events: none; }
         .tpl-btn:hover .tpl-tooltip { display: block; }
         
         .tpl-del { position: absolute; right: 10px; top: 12px; color: #ef4444; opacity: 0; transition: opacity 0.2s; font-size: 1.1rem; }
-        .tpl-edit { position: absolute; right: 38px; top: 12px; color: #94a3b8; opacity: 0; transition: opacity 0.2s; font-size: 1.1rem; }
-        .tpl-btn:hover .tpl-del, .tpl-btn:hover .tpl-edit { opacity: 0.6; }
-        .tpl-del:hover, .tpl-edit:hover { opacity: 1 !important; color: white; }
+        .tpl-edit { position: absolute; right: 38px; top: 12px; color: var(--admin-text-muted); opacity: 0; transition: opacity 0.2s; font-size: 1.1rem; }
+        .tpl-btn:hover .tpl-del, .tpl-btn:hover .tpl-edit { opacity: 0.5; }
+        .tpl-del:hover, .tpl-edit:hover { opacity: 1 !important; }
 
-        .tpl-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; flex-wrap: wrap; }
-        .tpl-tab { display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; cursor: pointer; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; background: rgba(255,255,255,0.03); font-weight: 600; }
-        .tpl-tab:hover { color: #f1f5f9; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-        .tpl-tab.active { background: var(--tpl-accent); color: white; border-color: var(--tpl-accent); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-        .tpl-tab-del { font-size: 0.8rem; opacity: 0.5; transition: opacity 0.2s; margin-left: 4px; }
-        .tpl-tab-del:hover { opacity: 1; color: #ef4444; }
+        .tpl-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--admin-border); padding-bottom: 12px; flex-wrap: wrap; }
+        .tpl-tab { display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; cursor: pointer; color: var(--admin-text-muted); border: 1px solid var(--admin-border); transition: all 0.2s; background: var(--admin-surface); font-weight: 600; }
+        .tpl-tab:hover { color: var(--tpl-accent); background: #f1f5f9; border-color: var(--tpl-accent); }
+        .tpl-tab.active { background: var(--tpl-accent); color: white; border-color: var(--tpl-accent); }
+        .tpl-tab-del { font-size: 0.8rem; opacity: 0.5; margin-left: 4px; }
+        .tpl-tab-del:hover { color: #ef4444; opacity: 1; }
 
-        .tpl-modal-body { display: grid; gap: 24px; }
-        .tpl-input-group { display: flex; flex-direction: column; gap: 8px; }
-        .tpl-input-group label { font-size: 0.75rem; font-weight: 800; color: var(--tpl-accent); text-transform: uppercase; letter-spacing: 0.08em; }
-        .tpl-input-group input, .tpl-input-group textarea, .tpl-input-group select { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px 16px; color: white; font-family: inherit; font-size: 1rem; transition: all 0.2s; }
-        .tpl-input-group input:focus, .tpl-input-group textarea:focus { outline: none; border-color: var(--tpl-accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-
-        .session-indicator { padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
-        .session-indicator.active { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
-        .session-indicator.inactive { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
-
-        .dashboard-nav { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); }
-        .dashboard-nav-item { padding: 18px 32px; font-size: 1rem; font-weight: 700; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .dashboard-nav-item:hover { color: #f1f5f9; background: rgba(255,255,255,0.02); }
-        .dashboard-nav-item.active { color: var(--brand-red); border-bottom-color: var(--brand-red); background: rgba(255,255,255,0.03); }
+        .dashboard-nav { display: flex; gap: 0; border-bottom: 1px solid var(--admin-border); background: var(--admin-surface); }
+        .dashboard-nav-item { padding: 18px 32px; font-size: 1rem; font-weight: 700; color: var(--admin-text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .dashboard-nav-item:hover { color: var(--admin-text); background: #f8fafc; }
+        .dashboard-nav-item.active { color: var(--brand-red); border-bottom-color: var(--brand-red); background: #fff1f2; }
         
         .main-tab-content { display: none; flex: 1; overflow: hidden; }
         .main-tab-content.active { display: flex; }
 
-        /* Browser compatibility fix for Edge/Modern browsers */
-        .cms-modal-overlay { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100vw; height: 100vh; 
-            background: rgba(0,0,0,0.85); 
-            z-index: 9999; 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            backdrop-filter: blur(8px);
-        }
+        /* Full Screen Task view */
+        #tab-aufgaben-view { position: absolute; top: 125px; left: 0; width: 100%; height: calc(100% - 125px); background: var(--admin-bg); z-index: 10; }
+
+        .glass-panel { background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        
+        .chat-container { background: white; border-right: 1px solid var(--admin-border); }
+        .chat-messages { background: #f8fafc; }
+        .chat-input-area { background: white; border-top: 1px solid var(--admin-border); }
+        .chat-input-area input { background: #f1f5f9; border: 1px solid var(--admin-border); color: var(--admin-text); }
+
+        .cms-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .cms-modal-content { background: white; color: var(--admin-text); border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.1); }
+        .cms-card { background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 12px; padding: 20px; }
+        .tpl-input-group input, .tpl-input-group textarea { background: #f8fafc; border: 1px solid var(--admin-border); color: var(--admin-text); }
+        .tpl-input-group input:focus, .tpl-input-group textarea:focus { border-color: var(--tpl-accent); background: white; }
+
+        .btn-secondary { background: #f1f5f9; color: var(--admin-text); border: 1px solid var(--admin-border); }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .session-indicator.inactive { background: #f1f5f9; color: var(--admin-text-muted); }
     </style>
 </head>
-<body class="dark-mode">
+<body class="admin-light">
     
     <!-- LOGIN VIEW -->
     <div id="login-view" class="view active login-view">
-        <div class="login-card" style="background: #0f172a; border: 1px solid #1e293b;">
-            <h1 style="font-size: 2.8rem; margin-bottom: 12px; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Admin-Konsole</h1>
-            <p style="color: #64748b; margin-bottom: 40px; font-size: 1.2rem;">Management Simulation Control Center</p>
+        <div class="login-card" style="background: white; border: 1px solid var(--admin-border); box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
+            <h1 style="font-size: 2.8rem; margin-bottom: 12px; font-weight: 900; color: var(--admin-text);">Admin-Konsole</h1>
+            <p style="color: var(--admin-text-muted); margin-bottom: 40px; font-size: 1.2rem;">Management Simulation Control Center</p>
             <div style="display: flex; gap: 12px; justify-content: center; width: 100%; max-width: 450px; margin: 0 auto;">
-                <input type="password" id="admin-password" placeholder="Passwort" class="sidebar-input" style="flex: 1; padding: 16px; background: #1e293b; border-color: #334155;" onkeydown="if(event.key==='Enter') loginAdmin()">
+                <input type="password" id="admin-password" placeholder="Passwort" class="sidebar-input" style="flex: 1; padding: 16px; background: #f1f5f9; border-color: var(--admin-border); color: var(--admin-text);" onkeydown="if(event.key==='Enter') loginAdmin()">
                 <button class="btn btn-primary" style="padding: 16px 32px; background: var(--tpl-accent); border: none;" onclick="loginAdmin()">Login</button>
             </div>
-            <p id="admin-error" style="color: #ef4444; font-size: 0.9rem; margin-top: 16px; display: none; font-weight: 700;">Passwort nicht korrekt.</p>
+            <p id="admin-error" style="color: var(--brand-red); font-size: 0.9rem; margin-top: 16px; display: none; font-weight: 700;">Passwort nicht korrekt.</p>
         </div>
     </div>
 
     <!-- ADMIN DASHBOARD -->
     <div id="dashboard-view" class="view" style="display: none; height: 100vh; display: flex; flex-direction: column;">
         
-        <header class="topbar" style="border-bottom: 1px solid #1e293b; height: 75px; background: #0f172a;">
+        <header class="topbar" style="height: 75px;">
             <div style="display: flex; align-items: center; gap: 14px; margin-right: 40px;">
                 <div style="width: 36px; height: 36px; background: var(--brand-red); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.3rem; color: white;">KW</div>
-                <h1 style="margin: 0; font-size: 1.4rem; letter-spacing: -0.02em; font-weight: 800; color: #f8fafc;">Dozenten-Cockpit</h1>
+                <h1 style="margin: 0; font-size: 1.4rem; letter-spacing: -0.02em; font-weight: 800; color: var(--admin-text);">Dozenten-Cockpit</h1>
             </div>
             <div id="admin-group-tabs" style="display: flex; gap: 8px; overflow-x: auto; flex: 1; padding: 0 10px;">
                 <!-- Group tabs injected here -->
@@ -139,81 +136,82 @@
             <div id="nav-item-aufgaben" class="dashboard-nav-item" onclick="switchMainTab('aufgaben')">Aufgaben-Erfassung</div>
         </nav>
 
-        <div style="display: flex; flex: 1; overflow: hidden; padding: 0;">
+        <!-- CONTENT AREA -->
+        <div style="position: relative; flex: 1; overflow: hidden; display: flex;">
             
-            <!-- LEFT: Settings (Permanent Sidebar) -->
-            <div style="width: 260px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; flex-shrink: 0; background: #0f172a; border-right: 1px solid #1e293b; padding: 24px;">
-                <div style="margin-bottom: 24px;">
-                    <h3 style="font-size: 0.95rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Globale Settings</h3>
-                    <label style="font-size: 0.8rem; color: #64748b; display: block; margin-top: 16px;">Gruppenanzahl</label>
-                    <div style="display: flex; gap: 8px; margin-top: 8px;">
-                        <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 65px; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: white;">
-                        <button class="btn btn-secondary" style="padding: 10px 14px; font-size:0.8rem;" onclick="updateTotalGroups()">SET</button>
+            <!-- VIEW: CHAT & REGIE -->
+            <div id="tab-chat-view" class="main-tab-content active" style="width: 100%;">
+                
+                <!-- LEFT: Settings -->
+                <div id="settings-sidebar" style="width: 260px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; flex-shrink: 0; border-right: 1px solid var(--admin-border); padding: 24px;">
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 0.95rem; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Globale Settings</h3>
+                        <label style="font-size: 0.8rem; color: var(--admin-text-muted); display: block; margin-top: 16px;">Gruppenanzahl</label>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 65px; padding: 10px; background: #f1f5f9; border: 1px solid var(--admin-border); border-radius: 8px; color: var(--admin-text);">
+                            <button class="btn btn-secondary" style="padding: 10px 14px; font-size:0.8rem;" onclick="updateTotalGroups()">SET</button>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1;">
+                        <h3 id="current-group-title" style="color: var(--brand-red); font-size: 1.1rem; font-weight: 800; margin-bottom: 16px;">Regie: Gruppe X</h3>
+                        <p style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 16px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Sichtbarkeit der Tabs:</p>
+                        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-produkte" onchange="saveGroupSettings('tab-products')"> Produkte</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-bilanz" onchange="saveGroupSettings('tab-bilanz')"> Jahresabschluss</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-lagebericht" onchange="saveGroupSettings('tab-lagebericht')"> Lagebericht</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-marktdaten" onchange="saveGroupSettings('tab-market')"> Marktdaten</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-chat" onchange="saveGroupSettings('tab-chat-unternehmen')"> Chat: Kunden</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-bank-chat" onchange="saveGroupSettings('tab-chat-bank')"> Chat: Handel (Bank)</label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-aufgaben" onchange="saveGroupSettings('tab-task')"> Aufgaben / Risiko</label>
+                        </div>
                     </div>
                 </div>
-                
-                <div style="flex: 1;">
-                    <h3 id="current-group-title" style="color: var(--brand-red); font-size: 1.1rem; font-weight: 800; margin-bottom: 16px;">Regie: Gruppe X</h3>
-                    <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 16px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Sichtbarkeit der Tabs:</p>
-                    <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-produkte" onchange="saveGroupSettings('tab-products')"> Produkte</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-bilanz" onchange="saveGroupSettings('tab-bilanz')"> Jahresabschluss</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-lagebericht" onchange="saveGroupSettings('tab-lagebericht')"> Lagebericht</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-marktdaten" onchange="saveGroupSettings('tab-market')"> Marktdaten</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-chat" onchange="saveGroupSettings('tab-chat-unternehmen')"> Chat: Kunden</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-bank-chat" onchange="saveGroupSettings('tab-chat-bank')"> Chat: Handel (Bank)</label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e2e8f0;"><input type="checkbox" id="check-aufgaben" onchange="saveGroupSettings('tab-task')"> Aufgaben / Risiko</label>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- MAIN TAB AREA: CHAT & REGIE -->
-            <div id="tab-chat-view" class="main-tab-content active" style="display: flex; flex-direction: row; padding: 0; background: #020617;">
-                
-                <!-- Chat Middle Column -->
-                <div style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid #1e293b; background: rgba(0,0,0,0.2);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+
+                <!-- MIDDLE: Chat -->
+                <div style="flex: 1; display: flex; flex-direction: column; background: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--admin-border);">
                         <div class="chat-toggle-bar">
                             <button id="btn-chat-bank" class="btn active-toggle" onclick="switchAdminChatType('bank')">Handel (Bank)</button>
                             <button id="btn-chat-unternehmen" class="btn btn-secondary" onclick="switchAdminChatType('unternehmen')">Kunden (Unternehmen)</button>
                         </div>
-                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.2);" onclick="clearAdminChat()">Chat leeren</button>
+                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; color: var(--brand-red); border-color: rgba(185, 28, 28, 0.2);" onclick="clearAdminChat()">Chat leeren</button>
                     </div>
                     
-                    <div class="chat-container" style="flex: 1; margin: 0; border: none; border-radius: 0; box-shadow: none; background: transparent;">
+                    <div class="chat-container" style="flex: 1; margin: 0; border: none; border-radius: 0; box-shadow: none;">
                         <div class="chat-messages" id="admin-chat-messages" style="padding: 24px;"></div>
-                        <div class="chat-input-area" style="padding: 24px; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05);">
-                            <input type="text" id="admin-chat-input" placeholder="Nachricht an die Gruppe..." style="height: 50px; font-size: 1rem; border-radius: 12px; background: #1e293b; border-color: #334155;" onkeydown="if(event.key==='Enter') sendAdminMessage()">
+                        <div class="chat-input-area" style="padding: 24px;">
+                            <input type="text" id="admin-chat-input" placeholder="Nachricht an die Gruppe..." style="height: 50px; font-size: 1rem; border-radius: 12px;" onkeydown="if(event.key==='Enter') sendAdminMessage()">
                             <button class="btn btn-primary" style="height: 50px; padding: 0 30px; border-radius: 12px; background: var(--tpl-accent);" onclick="sendAdminMessage()">SENDEN</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Templates Right Column (50%) -->
+                <!-- RIGHT: Templates (50%) -->
                 <div class="templates-sidebar">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h4 style="margin:0; color: #f8fafc;">Vorlagen-Bibliothek</h4>
-                        <button class="btn btn-primary" style="padding: 10px 20px; font-weight: 800; background: var(--tpl-accent); border: none; border-radius: 10px;" onclick="openTemplateEditor()">+ NEUE VORLAGE</button>
+                        <h4 style="margin:0; color: var(--admin-text);">Vorlagen-Bibliothek</h4>
+                        <button class="btn btn-primary" style="padding: 10px 20px; font-weight: 800; background: var(--tpl-accent); border: none; border-radius: 10px;" onclick="openTemplateEditor()">+ NEU</button>
                     </div>
                     <div class="tpl-tabs" id="admin-template-tabs">
                         <!-- Template tabs injected here -->
                     </div>
                     <div id="admin-templates-container" class="tpl-grid"></div>
                 </div>
-
             </div>
 
-            <!-- MAIN TAB AREA: AUFGABEN -->
-            <div id="tab-aufgaben-view" class="main-tab-content" style="flex-direction: column; padding: 40px; background: #020617; overflow-y: auto;">
-                <div style="max-width: 1200px; margin: 0 auto; width: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #1e293b; padding-bottom: 24px;">
+            <!-- VIEW: AUFGABEN (Full Screen) -->
+            <div id="tab-aufgaben-view" class="main-tab-content" style="flex-direction: column; padding: 40px; background: white; overflow-y: auto;">
+                <div style="max-width: 1100px; margin: 0 auto; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid var(--admin-border); padding-bottom: 24px;">
                         <div>
-                            <h2 style="margin: 0; font-size: 2rem; font-weight: 900; color: #f8fafc;">Aufgaben-Erfassung</h2>
-                            <p style="margin: 8px 0 0 0; font-size: 1rem; color: #64748b;">Live-Monitor für <span class="active-group-name" style="color: var(--brand-red); font-weight: 800;">Gruppe X</span></p>
+                            <h2 style="margin: 0; font-size: 2.2rem; font-weight: 900; color: var(--admin-text);">Aufgaben-Erfassung</h2>
+                            <p style="margin: 8px 0 0 0; font-size: 1.1rem; color: var(--admin-text-muted);">Echtzeit-Mitschrift der <span class="active-group-name" style="color: var(--brand-red); font-weight: 800;">Gruppe X</span></p>
                         </div>
+                        <button class="btn btn-secondary" onclick="switchMainTab('chat')">Zurück zur Regie</button>
                     </div>
                     <div id="monitoring-container">
-                        <p style="color: #64748b; font-style: italic;">Warten auf Live-Übertragung...</p>
+                        <p style="color: var(--admin-text-muted); font-style: italic;">Warten auf Live-Übertragung...</p>
                     </div>
                 </div>
             </div>
@@ -223,8 +221,8 @@
 
     <!-- CMS MODAL -->
     <div id="cms-modal" class="cms-modal-overlay">
-        <div class="cms-modal-content" style="background: #0f172a; border: 1px solid #1e293b;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:20px; margin-bottom:24px;">
+        <div class="cms-modal-content" style="max-width: 900px; width: 90%; padding: 40px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--admin-border); padding-bottom:20px; margin-bottom:24px;">
                 <h2 style="margin:0; font-weight: 800;">Inhalte konfigurieren</h2>
                 <button class="btn btn-secondary" onclick="document.getElementById('cms-modal').style.display='none'">Schließen</button>
             </div>
@@ -233,26 +231,26 @@
                 <button id="cms-tab-marktdaten" class="btn btn-secondary" onclick="switchCmsTab('marktdaten')">Marktdaten</button>
             </div>
             <div id="cms-aufgaben-view">
-                <div id="cms-questions-list" style="display:flex; flex-direction:column; gap:20px;"></div>
+                <div id="cms-questions-list" style="display:flex; flex-direction:column; gap:20px; max-height: 50vh; overflow-y: auto; padding: 10px;"></div>
                 <div style="display:flex; gap:12px; margin-top:24px;">
                     <button class="btn btn-secondary" onclick="cmsAddQuestion()">+ Neue Frage</button>
-                    <button class="btn btn-primary" onclick="cmsSave()" style="margin-left:auto; background: var(--tpl-accent);">SPEICHERN & LIVE SCHALTEN</button>
+                    <button class="btn btn-primary" onclick="cmsSave()" style="margin-left:auto; background: var(--tpl-accent);">SPEICHERN</button>
                 </div>
             </div>
             <div id="cms-marktdaten-view" style="display:none;">
                 <div id="cms-market-form" style="display:flex; flex-direction:column; gap:20px;"></div>
                 <div style="display:flex; gap:12px; margin-top:24px;">
-                    <button class="btn btn-primary" onclick="cmsMarketSave()" style="margin-left:auto; background: var(--tpl-accent);">MARKTDATEN AKTUALISIEREN</button>
+                    <button class="btn btn-primary" onclick="cmsMarketSave()" style="margin-left:auto; background: var(--tpl-accent);">SPEICHERN</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TEMPLATE EDITOR MODAL (Edge Compatibility Fix & Pro UI) -->
+    <!-- TEMPLATE EDITOR MODAL -->
     <div id="tpl-modal" class="cms-modal-overlay">
-        <div class="cms-modal-content" style="max-width:650px; padding: 48px; background: #0f172a; border: 1px solid #1e293b; border-radius: 24px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:24px; margin-bottom:32px;">
-                <h2 id="tpl-modal-title" style="margin:0; font-size: 2rem; font-weight: 900; color: #f8fafc;">Vorlage bearbeiten</h2>
+        <div class="cms-modal-content" style="max-width:650px; width: 90%; padding: 48px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--admin-border); padding-bottom:24px; margin-bottom:32px;">
+                <h2 id="tpl-modal-title" style="margin:0; font-size: 2rem; font-weight: 900; color: var(--admin-text);">Vorlage bearbeiten</h2>
                 <button class="btn btn-secondary" onclick="document.getElementById('tpl-modal').style.display='none'">Abbrechen</button>
             </div>
             <div class="tpl-modal-body">
@@ -269,10 +267,10 @@
                 </div>
                 <div class="tpl-input-group">
                     <label>Antwort-Volltext</label>
-                    <textarea id="tpl-text" style="min-height: 300px; line-height: 1.6; font-size: 1.1rem;" placeholder="Geben Sie hier die vollständige Antwort ein..."></textarea>
+                    <textarea id="tpl-text" style="min-height: 250px; line-height: 1.6; font-size: 1rem;" placeholder="Geben Sie hier die vollständige Antwort ein..."></textarea>
                 </div>
                 <div style="margin-top: 16px;">
-                    <button class="btn btn-primary" style="width: 100%; padding: 22px; font-size: 1.1rem; font-weight: 900; background: var(--tpl-accent); box-shadow: 0 15px 30px rgba(59, 130, 246, 0.25); border: none;" onclick="saveTemplate()">VORLAGE IN BIBLIOTHEK SPEICHERN</button>
+                    <button class="btn btn-primary" style="width: 100%; padding: 20px; font-size: 1.1rem; font-weight: 900; background: var(--tpl-accent); border: none;" onclick="saveTemplate()">VORLAGE SPEICHERN</button>
                 </div>
             </div>
         </div>
@@ -280,13 +278,13 @@
 
     <!-- SESSION MANAGER MODAL -->
     <div id="session-modal" class="cms-modal-overlay">
-        <div class="cms-modal-content" style="max-width:700px; background: #0f172a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:20px; margin-bottom:24px;">
+        <div class="cms-modal-content" style="max-width:700px; width: 90%; padding: 40px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--admin-border); padding-bottom:20px; margin-bottom:24px;">
                 <h2 style="margin:0; font-weight: 800;">Sessions & Archiv</h2>
                 <button class="btn btn-secondary" onclick="document.getElementById('session-modal').style.display='none'">Schließen</button>
             </div>
             <div id="session-list" style="display:flex; flex-direction:column; gap:16px;">
-                <p style="color: #64748b;">Lade Session-Daten...</p>
+                <p style="color: var(--admin-text-muted);">Lade Session-Daten...</p>
             </div>
         </div>
     </div>
@@ -295,6 +293,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="firebase-config.js"></script>
     <script src="data.js"></script>
-    <script src="admin.js?v=17764406435"></script>
+    <script src="admin.js?v=17764406436"></script>
 </body>
 </html>
