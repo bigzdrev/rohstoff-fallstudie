@@ -160,11 +160,6 @@ function switchTab(tabId) {
     });
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
     document.getElementById(tabId).classList.add("active");
-
-    // Lazy-load KI wenn ein Chat-Tab geöffnet wird
-    if (tabId.startsWith("tab-chat-") && aiStatus === "idle") {
-        initAI();
-    }
 }
 
 function switchSubTab(subId, btn) {
@@ -303,204 +298,9 @@ function injectTaskQuestions() {
 }
 
 // ============================================================
-// KI-MODUL: Transformers.js (Open-Source, läuft im Browser)
+// CHAT SYSTEM (Firebase-only, no AI)
 // ============================================================
-async function initAI() {
-    aiStatus = "loading";
-    updateAIBadges();
-
-    try {
-        // Dynamischer Import von Transformers.js (Hugging Face, Open Source)
-        const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
-        
-        // Modelle aus HuggingFace CDN laden, kein lokaler Server nötig
-        env.allowLocalModels = false;
-
-        // Kleines, effizientes Embedding-Modell laden (~23 MB, wird im Browser gecacht)
-        aiExtractor = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2", {
-            progress_callback: (progress) => {
-                if (progress.status === "progress" && progress.progress) {
-                    const pct = Math.round(progress.progress);
-                    document.querySelectorAll(".ai-progress-text").forEach(el => {
-                        el.innerText = `KI lädt: ${pct}%`;
-                    });
-                }
-            }
-        });
-
-        // Embeddings für alle Themen-Sätze vorberechnen
-        for (const contactId of ["unternehmen", "bank"]) {
-            const contact = companyData.chatContacts[contactId];
-            aiEmbeddingsCache[contactId] = [];
-            for (const r of contact.responses) {
-                if (r.topicSentence) {
-                    const output = await aiExtractor(r.topicSentence, { pooling: "mean", normalize: true });
-                    aiEmbeddingsCache[contactId].push({
-                        response: r,
-                        embedding: Array.from(output.data)
-                    });
-                }
-            }
-        }
-
-        aiStatus = "ready";
-        console.log("✅ KI-Modell geladen und Embeddings berechnet!");
-    } catch (e) {
-        console.warn("⚠️ KI konnte nicht geladen werden, verwende intelligentes Keyword-Matching:", e);
-        aiStatus = "error";
-    }
-    updateAIBadges();
-}
-
-function updateAIBadges() {
-    document.querySelectorAll(".ai-status-badge").forEach(badge => {
-        badge.className = "ai-status-badge";
-        if (aiStatus === "loading") {
-            badge.classList.add("ai-loading");
-            badge.innerHTML = `<span class="ai-spinner"></span><span class="ai-progress-text">KI lädt...</span>`;
-        } else if (aiStatus === "ready") {
-            badge.classList.add("ai-ready");
-            badge.innerHTML = ` KI aktiv`;
-        } else if (aiStatus === "error") {
-            badge.classList.add("ai-fallback");
-            badge.innerHTML = `⚡ Smart-Matching`;
-        } else {
-            badge.classList.add("ai-idle");
-            badge.innerHTML = `⏳ KI bereit`;
-        }
-    });
-}
-
-// Kosinus-Ähnlichkeit für Embedding-Vektoren
-function cosineSimilarity(a, b) {
-    let dot = 0, normA = 0, normB = 0;
-    for (let i = 0; i < a.length; i++) {
-        dot += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
-    }
-    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-// ============================================================
-// DEUTSCHES NLP: Erweitertes Keyword-Matching als Fallback
-// ============================================================
-
-// Deutsche Synonyme und verwandte Begriffe
-const germanSynonyms = {
-    "metall": ["kupfer", "rohstoff", "material"],
-    "rohstoff": ["kupfer", "material", "metall", "vormaterial"],
-    "beschaffung": ["unternehmen", "kupfer", "kaufen", "beziehen"],
-    "unternehmenen": ["kupfer", "beschaffung", "kaufen"],
-    "beziehen": ["kupfer", "beschaffung", "unternehmen"],
-    "truck": ["lkw", "fahrzeug", "flotte"],
-    "lastwagen": ["lkw", "fahrzeug", "flotte"],
-    "sattelzug": ["lkw", "fahrzeug", "flotte"],
-    "treibstoff": ["diesel", "kraftstoff", "sprit"],
-    "sprit": ["diesel", "kraftstoff", "treibstoff"],
-    "tanken": ["diesel", "kraftstoff"],
-    "kraftstoffverbrauch": ["diesel", "verbrauch"],
-    "inventur": ["lager", "bestand", "vorräte"],
-    "bestandsbewertung": ["vorräte", "bewertung", "niederstwert"],
-    "wertberichtigung": ["abschreibung", "wertminderung", "niederstwert"],
-    "versand": ["transport", "lieferung", "lkw"],
-    "liefern": ["transport", "lieferung", "lkw"],
-    "auslieferung": ["transport", "lieferung", "lkw"],
-    "bank": ["bilanz", "guv", "ergebnis"],
-    "buchführung": ["bilanz", "guv"],
-    "kennzahlen": ["bilanz", "eigenkapital", "ebit", "marge"],
-    "rendite": ["marge", "ebit", "ergebnis", "gewinn"],
-    "profitabilität": ["marge", "ebit", "gewinn"],
-    "umwelt": ["co2", "emission", "zertifikat"],
-    "klima": ["co2", "emission", "zertifikat"],
-    "emissionsrechte": ["co2", "eua", "zertifikat", "emissionshandel"],
-    "strom": ["energie", "kraftwerk", "bhkw"],
-    "heizung": ["wärme", "energie", "kraftwerk", "bhkw"],
-    "erdgas": ["gas", "bhkw", "kraftwerk"],
-    "schulden": ["verbindlichkeiten", "fremdkapital", "verschuldung"],
-    "kredit": ["verbindlichkeiten", "fremdkapital", "bank"],
-    "bank": ["verbindlichkeiten", "fremdkapital", "eigenkapital"],
-    "schutz": ["absicherung", "hedging", "sicherung"],
-    "absichern": ["absicherung", "hedging", "sicherung"],
-    "option": ["absicherung", "hedging", "derivat", "future"],
-    "swap": ["absicherung", "hedging", "derivat"],
-    "preisrisiko": ["risiko", "absicherung", "preis"],
-    "volatilität": ["risiko", "schwankung", "preis"],
-    "kabel": ["kupfer", "material", "fertig"],
-    "produktion": ["material", "kupfer", "kosten"]
-};
-
-// Deutsche Kompositum-Zerlegung (vereinfacht)
-function decomposeGermanCompound(word) {
-    const parts = [];
-    const prefixes = ["kupfer", "diesel", "energie", "kraft", "stoff", "markt", "preis", "lager", "bestands", 
-                       "eigen", "kapital", "material", "risiko", "absicherungs", "emissions", "handels", 
-                       "wert", "gas", "erdgas", "fahrzeug", "transport", "kosten"];
-    
-    const lw = word.toLowerCase();
-    for (const prefix of prefixes) {
-        if (lw.startsWith(prefix) && lw.length > prefix.length + 2) {
-            parts.push(prefix.replace(/s$/, ''));  // Remove Fugen-s
-            const rest = lw.substring(prefix.length).replace(/^s/, ''); // Remove Fugen-s
-            parts.push(rest);
-        }
-    }
-    return parts.length > 0 ? parts : [lw];
-}
-
-// Erweitertes deutsches Keyword-Matching
-function findChatResponseSmart(contactId, question) {
-    const contact = companyData.chatContacts[contactId];
-    const q = question.toLowerCase();
-    const qWords = q.split(/[\s,;.!?]+/).filter(w => w.length > 2);
-    
-    // Alle Wörter aus der Frage + Compound-Zerlegung + Synonyme sammeln
-    const expandedTerms = new Set();
-    qWords.forEach(word => {
-        expandedTerms.add(word);
-        // Compound-Zerlegung
-        decomposeGermanCompound(word).forEach(part => expandedTerms.add(part));
-        // Synonyme nachschlagen
-        if (germanSynonyms[word]) {
-            germanSynonyms[word].forEach(syn => expandedTerms.add(syn));
-        }
-    });
-
-    let bestMatch = null;
-    let bestScore = 0;
-
-    contact.responses.forEach(r => {
-        let score = 0;
-        r.keywords.forEach(kw => {
-            // Exakte Treffer (doppelt gewichtet)
-            if (q.includes(kw.toLowerCase())) {
-                score += 2;
-            }
-            // Treffer über expandierte Terme
-            else if (expandedTerms.has(kw.toLowerCase())) {
-                score += 1.5;
-            }
-            // Fuzzy-Match (Teilstring)
-            else {
-                for (const term of expandedTerms) {
-                    if (term.length > 3 && kw.includes(term)) {
-                        score += 0.5;
-                        break;
-                    }
-                }
-            }
-        });
-        if (score > bestScore) {
-            bestScore = score;
-            bestMatch = r;
-        }
-    });
-
-    return { match: bestMatch, score: bestScore };
-}
-
-// ============================================================
-// CHAT SYSTEM (KI + Smart-Matching Hybrid)
+// CHAT SYSTEM (Firebase-only, Admin responds manually)
 // ============================================================
 function initChats() {
     // Only init the Unternehmen chat header (bank chat is fully Firebase-driven)
@@ -519,15 +319,16 @@ function initChats() {
 
 function sendChatMessage(contactId) {
     const input = document.getElementById(`chat-${contactId}-input`);
-    const message = input.value.trim();
+    const message = input ? input.value.trim() : "";
     if (!message) return;
     input.value = "";
     
-    // Push to Firebase
-    db.collection("chat_rooms_unternehmen").doc(window.currentGroup).get().then(doc => {
+    // Push student message to Firebase (admin responds manually)
+    const collection = contactId === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
+    db.collection(collection).doc(window.currentGroup).get().then(doc => {
         let msgs = doc.exists ? doc.data().messages || [] : [];
         msgs.push({ sender: 'student', text: message, time: Date.now() });
-        db.collection("chat_rooms_unternehmen").doc(window.currentGroup).set({ messages: msgs });
+        db.collection(collection).doc(window.currentGroup).set({ messages: msgs });
     });
 }
 

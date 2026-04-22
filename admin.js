@@ -303,6 +303,15 @@ function renderTemplates() {
         ? allTemplates 
         : allTemplates.filter(t => (t.category || "Allgemein") === activeTemplateTab);
 
+    // Create a single shared tooltip element
+    let sharedTooltip = document.getElementById("tpl-shared-tooltip");
+    if (!sharedTooltip) {
+        sharedTooltip = document.createElement("div");
+        sharedTooltip.id = "tpl-shared-tooltip";
+        sharedTooltip.className = "tpl-tooltip";
+        document.body.appendChild(sharedTooltip);
+    }
+
     filtered.forEach((t) => {
         const actualIndex = allTemplates.indexOf(t);
         const div = document.createElement("div");
@@ -310,19 +319,40 @@ function renderTemplates() {
         div.innerHTML = `
             <span class="tpl-title-row">${escapeHtml(t.title)}</span>
             <div class="tpl-snippet">${escapeHtml(t.text)}</div>
-            <span class="tpl-tooltip">${escapeHtml(t.text)}</span>
             <span class="tpl-edit" title="Bearbeiten" onclick="event.stopPropagation(); openTemplateEditor(${actualIndex})">✎</span>
             <span class="tpl-del" title="Löschen" onclick="event.stopPropagation(); deleteTemplate(${actualIndex})">✕</span>
         `;
+        // Tooltip: follow mouse, always visible
+        div.addEventListener("mouseenter", (e) => {
+            sharedTooltip.innerText = t.text;
+            sharedTooltip.style.display = "block";
+            positionTooltip(e, sharedTooltip);
+        });
+        div.addEventListener("mousemove", (e) => {
+            positionTooltip(e, sharedTooltip);
+        });
+        div.addEventListener("mouseleave", () => {
+            sharedTooltip.style.display = "none";
+        });
         div.onclick = () => { 
             const inp = document.getElementById("admin-chat-input");
-            if (inp) {
-                inp.value = t.text; 
-                inp.focus();
-            }
+            if (inp) { inp.value = t.text; inp.focus(); }
         };
         cont.appendChild(div);
     });
+}
+
+function positionTooltip(e, tooltip) {
+    const margin = 16;
+    const tw = 460;
+    const th = tooltip.offsetHeight || 300;
+    let x = e.clientX + margin;
+    let y = e.clientY + margin;
+    if (x + tw > window.innerWidth) x = e.clientX - tw - margin;
+    if (y + th > window.innerHeight) y = window.innerHeight - th - margin;
+    if (y < 0) y = margin;
+    tooltip.style.left = x + "px";
+    tooltip.style.top = y + "px";
 }
 
 function switchTemplateTab(cat) {
@@ -486,15 +516,142 @@ function deleteSession(sid) {
 }
 
 // CMS simplified
-function openCMS() { document.getElementById("cms-modal").style.display = "flex"; loadCmsQuestions(); }
+function openCMS() { 
+    document.getElementById("cms-modal").style.display = "flex";
+    switchCmsTab("aufgaben");
+    loadCmsQuestions();
+    loadCmsMarketData();
+}
+
+function switchCmsTab(tab) {
+    document.getElementById("cms-tab-aufgaben").className = tab === "aufgaben" ? "btn btn-primary" : "btn btn-secondary";
+    document.getElementById("cms-tab-marktdaten").className = tab === "marktdaten" ? "btn btn-primary" : "btn btn-secondary";
+    document.getElementById("cms-aufgaben-view").style.display = tab === "aufgaben" ? "block" : "none";
+    document.getElementById("cms-marktdaten-view").style.display = tab === "marktdaten" ? "block" : "none";
+}
+
+let cmsQuestions = [];
+
 function loadCmsQuestions() {
     db.collection("fallstudie_config").doc("content").get().then(doc => {
-        const list = document.getElementById("cms-questions-list");
-        if(!list) return;
-        list.innerHTML = "";
-        const qs = doc.exists ? doc.data().questions || [] : [];
-        qs.forEach((q, i) => {
-            list.innerHTML += `<div class="cms-card"><label>Titel</label><input type="text" value="${escapeHtml(q.title)}"></div>`;
-        });
+        if (doc.exists && doc.data().questions) {
+            cmsQuestions = doc.data().questions;
+        } else if (typeof companyData !== 'undefined' && companyData.questions) {
+            cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
+        } else {
+            cmsQuestions = [];
+        }
+        renderCmsQuestions();
+    }).catch(err => console.error("CMS load error:", err));
+}
+
+function renderCmsQuestions() {
+    const list = document.getElementById("cms-questions-list");
+    if (!list) return;
+    list.innerHTML = "";
+    cmsQuestions.forEach((q, i) => {
+        const div = document.createElement("div");
+        div.className = "cms-card";
+        div.style.marginBottom = "16px";
+        div.innerHTML = `
+            <button onclick="cmsDelete(${i})" style="position:absolute; top:12px; right:12px; background: none; border: 1px solid #fecaca; color: #dc2626; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem;">Löschen</button>
+            <label>ID (intern)</label>
+            <input type="text" value="${escapeHtml(q.id)}" onchange="cmsQuestions[${i}].id=this.value" style="width:100%; padding:10px; background:white; border:1px solid #e2e8f0; border-radius:8px; color:#2D3748; font-family:inherit; font-size:0.9rem; margin-bottom:8px;">
+            <label>Titel</label>
+            <input type="text" value="${escapeHtml(q.title)}" onchange="cmsQuestions[${i}].title=this.value" style="width:100%; padding:10px; background:white; border:1px solid #e2e8f0; border-radius:8px; color:#2D3748; font-family:inherit; font-size:0.9rem; margin-bottom:8px;">
+            <label>Aufgaben-Text / Prompt</label>
+            <textarea onchange="cmsQuestions[${i}].prompt=this.value" style="width:100%; padding:10px; background:white; border:1px solid #e2e8f0; border-radius:8px; color:#2D3748; font-family:inherit; font-size:0.9rem; min-height:80px; resize:vertical;">${escapeHtml(q.prompt)}</textarea>
+        `;
+        list.appendChild(div);
     });
+    if (cmsQuestions.length === 0) {
+        list.innerHTML = "<p style='color:var(--admin-text-muted); font-style:italic;'>Noch keine Aufgaben konfiguriert.</p>";
+    }
+}
+
+function cmsAddQuestion() { 
+    cmsQuestions.push({ id: "q_" + Date.now(), title: "Neue Aufgabe", prompt: "Beschreibung..." }); 
+    renderCmsQuestions(); 
+}
+
+function cmsDelete(i) { 
+    if(confirm("Aufgabe entfernen?")) {
+        cmsQuestions.splice(i, 1); 
+        renderCmsQuestions();
+    }
+}
+
+function cmsSave() {
+    db.collection("fallstudie_config").doc("content").set({ questions: cmsQuestions }, { merge: true }).then(() => {
+        alert("Aufgaben gespeichert und live geschaltet!");
+    }).catch(err => alert("Fehler: " + err.message));
+}
+
+let cmsMarket = {};
+
+function loadCmsMarketData() {
+    db.collection("fallstudie_config").doc("market").get().then(doc => {
+        if (doc.exists) {
+            cmsMarket = doc.data();
+        } else if (typeof companyData !== 'undefined') {
+            cmsMarket = JSON.parse(JSON.stringify(companyData.marketPrices || {}));
+        }
+        renderCmsMarketForm();
+    });
+}
+
+function renderCmsMarketForm() {
+    const f = document.getElementById("cms-market-form");
+    if (!f) return;
+    const m = cmsMarket;
+    const inp = (label, val, path) => `
+        <label style="display:block; font-size:0.8rem; font-weight:700; color:#718096; text-transform:uppercase; margin-bottom:4px; margin-top:10px;">${label}</label>
+        <input type="number" step="any" value="${val || 0}" onchange="setNestedValue(cmsMarket, '${path}', +this.value)" style="width:100%; padding:10px; background:white; border:1px solid #e2e8f0; border-radius:8px; color:#2D3748; font-family:inherit; font-size:0.95rem;">
+    `;
+    f.innerHTML = `
+        <div class="cms-card">
+            <label>Datum / Stand</label>
+            <input type="text" value="${m.date || ''}" onchange="cmsMarket.date=this.value" style="width:100%; padding:10px; background:white; border:1px solid #e2e8f0; border-radius:8px; color:#2D3748; font-family:inherit; font-size:0.95rem;">
+        </div>
+        <div class="cms-card">
+            <strong style="color:var(--brand-red);">Kupfer (LME)</strong>
+            ${inp("Spot USD/t", (m.copper||{}).spotUsd, "copper.spotUsd")}
+            ${inp("Spot EUR/t", (m.copper||{}).spotEur, "copper.spotEur")}
+            ${inp("3M Forward USD/t", (m.copper||{}).forward3m, "copper.forward3m")}
+            ${inp("6M Forward USD/t", (m.copper||{}).forward6m, "copper.forward6m")}
+            ${inp("12M Forward USD/t", (m.copper||{}).forward12m, "copper.forward12m")}
+        </div>
+        <div class="cms-card">
+            <strong style="color:var(--brand-red);">Gasoil (ICE)</strong>
+            ${inp("Spot USD/mT", (m.diesel||{}).spotUsd, "diesel.spotUsd")}
+            ${inp("Spot EUR/mT", (m.diesel||{}).spotEur, "diesel.spotEur")}
+            ${inp("6M Forward USD/mT", (m.diesel||{}).forward6m, "diesel.forward6m")}
+            ${inp("12M Forward USD/mT", (m.diesel||{}).forward12m, "diesel.forward12m")}
+        </div>
+        <div class="cms-card">
+            <strong style="color:var(--brand-red);">EUA (ICE)</strong>
+            ${inp("Spot EUR/t CO₂", (m.eua||{}).spot, "eua.spot")}
+            ${inp("12M Forward EUR/t CO₂", (m.eua||{}).forward12m, "eua.forward12m")}
+        </div>
+        <div class="cms-card">
+            <strong style="color:var(--brand-red);">EUR/USD</strong>
+            ${inp("Spot-Kurs", m.eurUsd, "eurUsd")}
+        </div>
+    `;
+}
+
+function setNestedValue(obj, path, value) {
+    const parts = path.split('.');
+    let cur = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+        if (!cur[parts[i]]) cur[parts[i]] = {};
+        cur = cur[parts[i]];
+    }
+    cur[parts[parts.length - 1]] = value;
+}
+
+function cmsMarketSave() {
+    db.collection("fallstudie_config").doc("market").set(cmsMarket).then(() => {
+        alert("Marktdaten aktualisiert!");
+    }).catch(err => alert("Fehler: " + err.message));
 }
