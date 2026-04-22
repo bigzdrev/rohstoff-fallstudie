@@ -1,3 +1,6 @@
+// ============================================================
+// ADMIN.JS – Dozenten-Cockpit (v5 Clean)
+// ============================================================
 let currentAdminGroup = "Gruppe 1";
 let activeAdminChatType = "bank";
 let totalGroups = 4;
@@ -5,12 +8,15 @@ let unsubSettings = null;
 let unsubGlobal = null;
 let unsubChat = null;
 let unsubTasks = null;
+let activeSessionId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Hide dashboard initially
     document.getElementById("dashboard-view").style.display = "none";
 });
 
+// ============================================================
+// LOGIN
+// ============================================================
 function loginAdmin() {
     const pw = document.getElementById("admin-password").value;
     if (pw === "ZWRMSVM") {
@@ -22,10 +28,14 @@ function loginAdmin() {
     }
 }
 
+// ============================================================
+// INIT
+// ============================================================
 function initAdminData() {
-    loadTemplates();
-
     if (!db) return alert("Firebase ist nicht geladen/konfiguriert!");
+
+    loadTemplates();
+    loadSessionState();
 
     unsubGlobal = db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
         if (doc.exists) {
@@ -46,11 +56,13 @@ function updateTotalGroups() {
     db.collection("fallstudie_config").doc("settings").set({ group_count: count }, { merge: true });
 }
 
+// ============================================================
+// GROUP TABS
+// ============================================================
 function renderGroupTabs() {
     const container = document.getElementById("admin-group-tabs");
     container.innerHTML = "";
     
-    // Safety check if active group doesn't exist anymore
     let groupNum = parseInt(currentAdminGroup.replace("Gruppe ", "")) || 1;
     if (groupNum > totalGroups) currentAdminGroup = "Gruppe 1";
 
@@ -59,13 +71,11 @@ function renderGroupTabs() {
         const active = name === currentAdminGroup ? 'background: var(--brand-red); color: white; border-color: var(--brand-red);' : 'background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);';
         container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.8rem; padding: 6px 12px; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
     }
-
-
 }
 
 function switchGroupContext(groupName) {
     currentAdminGroup = groupName;
-    renderGroupTabs(); // repopulate styling
+    renderGroupTabs();
     
     document.getElementById("current-group-title").innerText = `Regiepult: ${groupName}`;
     document.querySelectorAll(".active-group-name").forEach(el => el.innerText = groupName);
@@ -75,10 +85,12 @@ function switchGroupContext(groupName) {
     bindTasks();
 }
 
+// ============================================================
+// SETTINGS (CHECKBOXES)
+// ============================================================
 function bindSettings() {
     if (unsubSettings) unsubSettings();
     
-    // Clear checks
     document.getElementById("check-produkte").checked = false;
     document.getElementById("check-bilanz").checked = false;
     document.getElementById("check-lagebericht").checked = false;
@@ -113,8 +125,6 @@ function saveGroupSettings(forceTabTarget = null) {
         show_aufgaben: document.getElementById("check-aufgaben").checked
     };
     
-    // Only force navigation if the triggered checkbox is actually ACTIVED (checked).
-    // We check this by scanning which key is associated with the forceTabTarget and if it is true.
     let isChecked = false;
     if (forceTabTarget === 'tab-products' && payload.show_produkte) isChecked = true;
     if (forceTabTarget === 'tab-bilanz' && payload.show_bilanz) isChecked = true;
@@ -132,18 +142,24 @@ function saveGroupSettings(forceTabTarget = null) {
     db.collection("group_controls").doc(currentAdminGroup).set(payload, { merge: true });
 }
 
+// ============================================================
+// CHAT (Bank + Unternehmen toggle)
+// ============================================================
 function bindChat() {
     if (unsubChat) unsubChat();
     const cont = document.getElementById("admin-chat-messages");
     cont.innerHTML = "";
 
-    unsubChat = db.collection("chat_rooms").doc(currentAdminGroup).onSnapshot(doc => {
+    const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
+    
+    unsubChat = db.collection(collectionName).doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
             const msgs = doc.data().messages || [];
             cont.innerHTML = "";
             msgs.forEach(m => {
-                const isBot = m.sender === 'bank';
-                const senderCls = isBot ? 'chat-user' : 'chat-contact'; // From admin's perspective, they are the 'user' (bank), student is 'contact'
+                const isAdmin = (activeAdminChatType === "bank" && m.sender === "bank") ||
+                                (activeAdminChatType === "unternehmen" && m.sender === "unternehmen");
+                const senderCls = isAdmin ? 'chat-user' : 'chat-contact';
                 let timeStr = "";
                 if (m.time) {
                     timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -157,11 +173,11 @@ function bindChat() {
     });
 }
 
-function sendAdminMessage(templateText = null) {
+function sendAdminMessage() {
     const inp = document.getElementById("admin-chat-input");
-    const text = templateText || inp.value.trim();
+    const text = inp.value.trim();
     if(!text || !db) return;
-    if(!templateText) inp.value = "";
+    inp.value = "";
 
     const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
     const senderName = activeAdminChatType === "bank" ? "bank" : "unternehmen";
@@ -175,19 +191,23 @@ function sendAdminMessage(templateText = null) {
 
 function switchAdminChatType(type) {
     activeAdminChatType = type;
-    document.getElementById("btn-chat-bank").className = type === "bank" ? "btn btn-primary" : "btn btn-secondary";
-    document.getElementById("btn-chat-unternehmen").className = type === "unternehmen" ? "btn btn-primary" : "btn btn-secondary";
+    document.getElementById("btn-chat-bank").className = type === "bank" ? "btn active-toggle" : "btn btn-secondary";
+    document.getElementById("btn-chat-unternehmen").className = type === "unternehmen" ? "btn active-toggle" : "btn btn-secondary";
     bindChat();
 }
 
 function clearAdminChat() {
     if(!db) return;
     const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
-    if(confirm(`Möchtest du den Chat für ${currentAdminGroup} wirklich löschen?`)) {
+    const chatType = activeAdminChatType === "bank" ? "Bank" : "Unternehmens";
+    if(confirm(`${chatType}-Chat für ${currentAdminGroup} wirklich löschen?`)) {
         db.collection(collectionName).doc(currentAdminGroup).set({ messages: [] }, { merge: true });
     }
 }
 
+// ============================================================
+// MONITORING (Tasks)
+// ============================================================
 function bindTasks() {
     if (unsubTasks) unsubTasks();
     const mon = document.getElementById("monitoring-container");
@@ -199,48 +219,33 @@ function bindTasks() {
             let html = "";
             let keys = Object.keys(d).sort();
             keys.forEach(k => {
-                html += `<div style="background: rgba(0,0,0,0.2); padding: 8px; margin-bottom: 8px; border-radius: 4px;">
-                    <span style="color:var(--brand-red); font-weight:600; display:block; margin-bottom:4px;">${k.toUpperCase()}</span>
+                if (k === "gruppe" || k === "timestamp") return;
+                html += `<div style="background: rgba(0,0,0,0.2); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
+                    <span style="color:var(--brand-red); font-weight:600; display:block; margin-bottom:6px;">${k.toUpperCase()}</span>
                     ${d[k] || "-"}
                 </div>`;
             });
-            mon.innerHTML = html || "Die Gruppe hat noch nichts in den Risiko-Formularen abgespeichert.";
+            mon.innerHTML = html || "Die Gruppe hat noch nichts abgespeichert.";
         }
     });
 }
 
-function archiveSession() {
-    if(!db) return;
-    const sessionName = prompt("Name für diese Session (z.B. Kurs vom 22.04.):", "Session " + new Date().toLocaleDateString());
-    if(!sessionName) return;
-
-    db.collection("archived_sessions").add({
-        name: sessionName,
-        date: Date.now(),
-        data: "Session data placeholder"
-    }).then(() => {
-        alert("Session wurde archiviert!");
-    });
-}
-
-// ===================================
+// ============================================================
 // TEMPLATES
-// ===================================
+// ============================================================
 function loadTemplates() {
     if(!db) return;
     db.collection("admin_settings").doc("templates").onSnapshot(doc => {
         const cont = document.getElementById("admin-templates-container");
         if(!cont) return;
-        cont.innerHTML = `<button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px; flex-shrink:0;" onclick="addTemplate()">+ Neue Vorlage</button>`;
+        cont.innerHTML = "";
         if(doc.exists && doc.data().items) {
             doc.data().items.forEach((t, index) => {
-                const btn = document.createElement("button");
-                btn.className = "btn btn-secondary";
-                btn.style.cssText = "font-size:0.75rem; padding:4px 8px; flex-shrink:0; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
-                btn.innerText = t.title;
-                btn.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
-                btn.oncontextmenu = (e) => { e.preventDefault(); deleteTemplate(index); };
-                cont.appendChild(btn);
+                const div = document.createElement("div");
+                div.className = "tpl-btn";
+                div.innerHTML = `${escapeHtml(t.title)}<span class="tpl-tooltip">${escapeHtml(t.text)}</span><span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${index})">✕</span>`;
+                div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
+                cont.appendChild(div);
             });
         }
     });
@@ -249,7 +254,7 @@ function loadTemplates() {
 function addTemplate() {
     const title = prompt("Titel der Vorlage (kurz):");
     if(!title) return;
-    const text = prompt("Text der Vorlage (wird in den Chat eingefügt):");
+    const text = prompt("Volltext der Vorlage (wird in den Chat eingefügt):");
     if(!text) return;
 
     db.collection("admin_settings").doc("templates").get().then(doc => {
@@ -270,76 +275,268 @@ function deleteTemplate(index) {
     });
 }
 
-// Call loadTemplates in initAdminData
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
 
-// ===================================
-// CMS
-// ===================================
+// ============================================================
+// SESSIONS (Start / Stop / Save / Load / Delete)
+// ============================================================
+function loadSessionState() {
+    db.collection("admin_settings").doc("active_session").onSnapshot(doc => {
+        if(doc.exists && doc.data().active) {
+            activeSessionId = doc.data().sessionId;
+            document.getElementById("session-indicator").className = "session-indicator active";
+            document.getElementById("session-indicator").innerText = doc.data().name || "Session aktiv";
+            document.getElementById("btn-session-toggle").innerText = "Session beenden";
+            document.getElementById("btn-session-toggle").style.color = "var(--danger)";
+        } else {
+            activeSessionId = null;
+            document.getElementById("session-indicator").className = "session-indicator inactive";
+            document.getElementById("session-indicator").innerText = "Keine Session";
+            document.getElementById("btn-session-toggle").innerText = "Session starten";
+            document.getElementById("btn-session-toggle").style.color = "";
+        }
+    });
+}
+
+function toggleSession() {
+    if (activeSessionId) {
+        // Stop session: save all data to the session
+        if(!confirm("Session beenden und alle aktuellen Daten speichern?")) return;
+        saveSessionData(activeSessionId).then(() => {
+            db.collection("admin_settings").doc("active_session").set({ active: false });
+            alert("Session wurde gespeichert und beendet.");
+        });
+    } else {
+        // Start new session
+        const name = prompt("Name für die neue Session:", "Seminar " + new Date().toLocaleDateString("de-DE"));
+        if(!name) return;
+        const sessionRef = db.collection("archived_sessions").doc();
+        sessionRef.set({
+            name: name,
+            startTime: Date.now(),
+            endTime: null,
+            data: {}
+        }).then(() => {
+            db.collection("admin_settings").doc("active_session").set({
+                active: true,
+                sessionId: sessionRef.id,
+                name: name
+            });
+        });
+    }
+}
+
+async function saveSessionData(sessionId) {
+    // Collect all group data
+    const sessionData = {};
+    for (let i = 1; i <= totalGroups; i++) {
+        const groupName = `Gruppe ${i}`;
+        const [bankChat, unterChat, ergebnisse] = await Promise.all([
+            db.collection("chat_rooms").doc(groupName).get(),
+            db.collection("chat_rooms_unternehmen").doc(groupName).get(),
+            db.collection("fallstudie_ergebnisse").doc(groupName).get()
+        ]);
+        sessionData[groupName] = {
+            bankChat: bankChat.exists ? bankChat.data() : {},
+            unternehmenChat: unterChat.exists ? unterChat.data() : {},
+            ergebnisse: ergebnisse.exists ? ergebnisse.data() : {}
+        };
+    }
+    return db.collection("archived_sessions").doc(sessionId).update({
+        endTime: Date.now(),
+        data: sessionData
+    });
+}
+
+function openSessionManager() {
+    document.getElementById("session-modal").style.display = "flex";
+    loadSessionList();
+}
+
+function loadSessionList() {
+    const list = document.getElementById("session-list");
+    list.innerHTML = "<p style='color:var(--text-muted);'>Lade...</p>";
+    
+    db.collection("archived_sessions").orderBy("startTime", "desc").get().then(snap => {
+        if (snap.empty) {
+            list.innerHTML = "<p style='color:var(--text-muted);'>Noch keine Sessions vorhanden.</p>";
+            return;
+        }
+        list.innerHTML = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            const date = d.startTime ? new Date(d.startTime).toLocaleString("de-DE") : "—";
+            const endDate = d.endTime ? new Date(d.endTime).toLocaleString("de-DE") : "läuft noch";
+            const div = document.createElement("div");
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px;";
+            div.innerHTML = `
+                <div>
+                    <strong style="font-size:0.95rem;">${escapeHtml(d.name || "Unbenannt")}</strong>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">${date} → ${endDate}</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 10px;" onclick="loadSession('${doc.id}')">Laden</button>
+                    <button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 10px; color:var(--danger);" onclick="deleteSession('${doc.id}')">Löschen</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    });
+}
+
+async function loadSession(sessionId) {
+    if(!confirm("Achtung: Alle aktuellen Daten werden mit den Session-Daten überschrieben! Fortfahren?")) return;
+    const doc = await db.collection("archived_sessions").doc(sessionId).get();
+    if(!doc.exists || !doc.data().data) { alert("Session enthält keine Daten."); return; }
+    
+    const sessionData = doc.data().data;
+    const promises = [];
+    for (const groupName of Object.keys(sessionData)) {
+        const gd = sessionData[groupName];
+        if (gd.bankChat) promises.push(db.collection("chat_rooms").doc(groupName).set(gd.bankChat));
+        if (gd.unternehmenChat) promises.push(db.collection("chat_rooms_unternehmen").doc(groupName).set(gd.unternehmenChat));
+        if (gd.ergebnisse) promises.push(db.collection("fallstudie_ergebnisse").doc(groupName).set(gd.ergebnisse));
+    }
+    await Promise.all(promises);
+    alert("Session erfolgreich geladen!");
+    document.getElementById("session-modal").style.display = "none";
+}
+
+function deleteSession(sessionId) {
+    if(!confirm("Session unwiderruflich löschen?")) return;
+    db.collection("archived_sessions").doc(sessionId).delete().then(() => loadSessionList());
+}
+
+// ============================================================
+// CMS: Aufgaben
+// ============================================================
 let cmsQuestions = [];
 
 function openCMS() {
     document.getElementById("cms-modal").style.display = "flex";
-    if (!db) return;
+    switchCmsTab("aufgaben");
+    loadCmsQuestions();
+    loadCmsMarketData();
+}
+
+function switchCmsTab(tab) {
+    document.getElementById("cms-tab-aufgaben").className = tab === "aufgaben" ? "btn active-toggle" : "btn btn-secondary";
+    document.getElementById("cms-tab-marktdaten").className = tab === "marktdaten" ? "btn active-toggle" : "btn btn-secondary";
+    document.getElementById("cms-aufgaben-view").style.display = tab === "aufgaben" ? "block" : "none";
+    document.getElementById("cms-marktdaten-view").style.display = tab === "marktdaten" ? "block" : "none";
+}
+
+function loadCmsQuestions() {
     db.collection("fallstudie_config").doc("content").get().then(doc => {
         if (doc.exists && doc.data().questions) {
             cmsQuestions = doc.data().questions;
+        } else if (typeof companyData !== 'undefined') {
+            cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
         } else {
-            // Load defaults from data.js if no firebase config yet (assuming companyData is available)
-            if (typeof companyData !== 'undefined') {
-                cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
-            } else {
-                cmsQuestions = [];
-            }
+            cmsQuestions = [];
         }
-        renderCMS();
+        renderCmsQuestions();
     });
 }
 
-function renderCMS() {
+function renderCmsQuestions() {
     const list = document.getElementById("cms-questions-list");
     list.innerHTML = "";
     cmsQuestions.forEach((q, i) => {
         const div = document.createElement("div");
-        div.style.cssText = "padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #F7FAFC; position:relative;";
+        div.className = "cms-card";
         div.innerHTML = `
             <button class="btn btn-secondary" style="position:absolute; top:16px; right:16px; padding:4px 8px; font-size:0.7rem; color:var(--danger);" onclick="cmsDelete(${i})">Löschen</button>
-            <label style="font-size:0.8rem; font-weight:bold;">ID (intern, darf keine Leerzeichen haben):</label>
-            <input type="text" class="sidebar-input" value="${q.id}" onchange="cmsUpdate(${i}, 'id', this.value)" style="width:100%; margin-bottom:8px;">
-            <label style="font-size:0.8rem; font-weight:bold;">Titel:</label>
-            <input type="text" class="sidebar-input" value="${q.title}" onchange="cmsUpdate(${i}, 'title', this.value)" style="width:100%; margin-bottom:8px;">
-            <label style="font-size:0.8rem; font-weight:bold;">Fragestellung / Prompt:</label>
-            <textarea class="sidebar-input" onchange="cmsUpdate(${i}, 'prompt', this.value)" style="width:100%; min-height:80px;">${q.prompt}</textarea>
+            <label>ID (intern):</label>
+            <input type="text" value="${escapeHtml(q.id)}" onchange="cmsUpdate(${i}, 'id', this.value)">
+            <label>Titel:</label>
+            <input type="text" value="${escapeHtml(q.title)}" onchange="cmsUpdate(${i}, 'title', this.value)">
+            <label>Fragestellung / Prompt:</label>
+            <textarea onchange="cmsUpdate(${i}, 'prompt', this.value)">${escapeHtml(q.prompt)}</textarea>
         `;
         list.appendChild(div);
     });
 }
 
-function cmsUpdate(index, field, value) {
-    cmsQuestions[index][field] = value;
-}
+function cmsUpdate(index, field, value) { cmsQuestions[index][field] = value; }
 
 function cmsAddQuestion() {
-    cmsQuestions.push({
-        id: "q_neu_" + Date.now(),
-        title: "Neue Aufgabe",
-        prompt: "Beschreiben Sie die Aufgabe hier..."
-    });
-    renderCMS();
+    cmsQuestions.push({ id: "q_neu_" + Date.now(), title: "Neue Aufgabe", prompt: "Beschreiben Sie die Aufgabe hier..." });
+    renderCmsQuestions();
 }
 
 function cmsDelete(index) {
-    if(confirm("Aufgabe entfernen?")) {
-        cmsQuestions.splice(index, 1);
-        renderCMS();
-    }
+    if(confirm("Aufgabe entfernen?")) { cmsQuestions.splice(index, 1); renderCmsQuestions(); }
 }
 
 function cmsSave() {
     if(!db) return;
-    db.collection("fallstudie_config").doc("content").set({
-        questions: cmsQuestions
-    }, { merge: true }).then(() => {
-        alert("Inhalte gespeichert!");
-        document.getElementById("cms-modal").style.display = "none";
+    db.collection("fallstudie_config").doc("content").set({ questions: cmsQuestions }, { merge: true }).then(() => {
+        alert("Aufgaben gespeichert!");
+    });
+}
+
+// ============================================================
+// CMS: Marktdaten
+// ============================================================
+let cmsMarket = {};
+
+function loadCmsMarketData() {
+    db.collection("fallstudie_config").doc("market").get().then(doc => {
+        if (doc.exists) {
+            cmsMarket = doc.data();
+        } else if (typeof companyData !== 'undefined') {
+            cmsMarket = JSON.parse(JSON.stringify(companyData.marketPrices));
+        } else {
+            cmsMarket = {};
+        }
+        renderCmsMarketForm();
+    });
+}
+
+function renderCmsMarketForm() {
+    const form = document.getElementById("cms-market-form");
+    const mp = cmsMarket;
+    
+    form.innerHTML = `
+        <div class="cms-card">
+            <label>Datum / Stand:</label>
+            <input type="text" id="cms-market-date" value="${mp.date || ''}" onchange="cmsMarket.date = this.value">
+        </div>
+        <div class="cms-card">
+            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">Kupfer (LME)</h4>
+            <label>Spot USD/t:</label><input type="number" value="${(mp.copper||{}).spotUsd||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.spotUsd=+this.value">
+            <label>Spot EUR/t:</label><input type="number" value="${(mp.copper||{}).spotEur||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.spotEur=+this.value">
+            <label>3M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward3m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward3m=+this.value">
+            <label>6M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward6m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward6m=+this.value">
+            <label>12M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward12m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward12m=+this.value">
+        </div>
+        <div class="cms-card">
+            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">Gasoil (ICE)</h4>
+            <label>Spot USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).spotUsd||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.spotUsd=+this.value">
+            <label>Spot EUR/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).spotEur||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.spotEur=+this.value">
+            <label>6M Forward USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).forward6m||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.forward6m=+this.value">
+            <label>12M Forward USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).forward12m||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.forward12m=+this.value">
+        </div>
+        <div class="cms-card">
+            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">EUA (ICE)</h4>
+            <label>Spot EUR/t CO₂:</label><input type="number" step="0.01" value="${(mp.eua||{}).spot||0}" onchange="if(!cmsMarket.eua)cmsMarket.eua={}; cmsMarket.eua.spot=+this.value">
+            <label>12M Forward EUR/t CO₂:</label><input type="number" step="0.01" value="${(mp.eua||{}).forward12m||0}" onchange="if(!cmsMarket.eua)cmsMarket.eua={}; cmsMarket.eua.forward12m=+this.value">
+        </div>
+        <div class="cms-card">
+            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">EUR/USD</h4>
+            <label>Spot-Kurs:</label><input type="number" step="0.0001" value="${mp.eurUsd||0}" onchange="cmsMarket.eurUsd=+this.value">
+        </div>
+    `;
+}
+
+function cmsMarketSave() {
+    if(!db) return;
+    db.collection("fallstudie_config").doc("market").set(cmsMarket).then(() => {
+        alert("Marktdaten gespeichert!");
     });
 }

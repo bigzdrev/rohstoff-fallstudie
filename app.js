@@ -137,12 +137,10 @@ function loginAs(role) {
         });
     }
     
-    if (true) {
-        document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
-        document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
-        loadSavedAnswers();
-        switchTab("tab-company");
-    }
+    document.querySelectorAll(".student-only").forEach(el => el.classList.remove("hidden"));
+    document.querySelectorAll(".lecturer-only").forEach(el => el.classList.add("hidden"));
+    loadSavedAnswers();
+    switchTab("tab-company");
 }
 
 function logout() {
@@ -589,7 +587,7 @@ function addTypingIndicator(contactId) {
     const el = document.createElement("div");
     el.className = "chat-bubble chat-contact typing-indicator";
     el.id = id;
-    el.innerHTML = `<span class="bubble-avatar">${contact.avatar}</span><div class="bubble-text"><span class="dot-pulse"><span></span><span></span><span></span></span> <em>${contact.name} tippt...</em></div>`;
+    el.innerHTML = `<div class="bubble-text"><span class="dot-pulse"><span></span><span></span><span></span></span> <em>${contact.name} tippt...</em></div>`;
     container.appendChild(el);
     container.scrollTop = container.scrollHeight;
     return id;
@@ -626,10 +624,8 @@ function loadSavedAnswers() {
 }
 
 // ============================================================
-// LECTURER
+// LECTURER (Removed)
 // ============================================================
-}
-
 // ============================================================
 // UTILITIES
 // ============================================================
@@ -674,6 +670,13 @@ setTimeout(() => {
                 renderDynamicButtons(doc.data().group_count);
                 const input = document.getElementById("group-count-input");
                 if(input) input.value = doc.data().group_count;
+            }
+        });
+        // Listen for market data updates from admin CMS
+        db.collection("fallstudie_config").doc("market").onSnapshot(doc => {
+            if (doc.exists) {
+                companyData.marketPrices = doc.data();
+                injectMarketData();
             }
         });
     }

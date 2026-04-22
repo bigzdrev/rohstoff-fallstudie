@@ -6,6 +6,40 @@
     <title>Admin-Konsole | Rohstoffmanagement Fallstudie</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css?v=1776440643">
+    <style>
+        /* Admin-specific overrides */
+        .chat-toggle-bar { display: flex; gap: 4px; }
+        .chat-toggle-bar .btn { padding: 5px 14px; font-size: 0.8rem; border-radius: 6px; }
+        .chat-toggle-bar .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
+
+        .templates-sidebar { width: 220px; display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; }
+        .templates-sidebar h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin: 0 0 4px 0; }
+        .tpl-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; font-size: 0.8rem; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.15s; position: relative; }
+        .tpl-btn:hover { background: rgba(255,255,255,0.18); }
+        .tpl-tooltip { display: none; position: absolute; left: -10px; top: 100%; transform: translateX(-100%); min-width: 250px; max-width: 350px; padding: 12px; background: #1a1a2e; color: #eee; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.8rem; white-space: normal; line-height: 1.5; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; }
+        .tpl-btn:hover .tpl-tooltip { display: block; }
+        .tpl-del { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.7rem; padding: 2px 4px; opacity: 0; transition: opacity 0.15s; }
+        .tpl-btn:hover .tpl-del { opacity: 1; }
+
+        .session-bar { display: flex; gap: 8px; align-items: center; }
+        .session-bar .btn { padding: 5px 12px; font-size: 0.78rem; }
+        .session-indicator { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .session-indicator.active { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+        .session-indicator.inactive { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* CMS modal improvements */
+        .cms-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .cms-modal-content { background: var(--surface); width: 92%; max-width: 900px; max-height: 90vh; overflow-y: auto; padding: 32px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 24px 48px rgba(0,0,0,0.3); }
+        .cms-card { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.04); position: relative; }
+        .cms-card label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+        .cms-card input, .cms-card textarea { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: var(--font); font-size: 0.9rem; margin-bottom: 12px; transition: border-color 0.2s; }
+        .cms-card input:focus, .cms-card textarea:focus { outline: none; border-color: var(--brand-red); }
+        .cms-card textarea { min-height: 80px; resize: vertical; }
+
+        .cms-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+        .cms-tabs .btn { padding: 6px 16px; font-size: 0.85rem; border-radius: 6px; }
+        .cms-tabs .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
+    </style>
 </head>
 <body class="dark-mode">
     
@@ -26,19 +60,23 @@
     <div id="dashboard-view" class="view" style="display: none; height: 100vh; display: flex; flex-direction: column;">
         
         <header class="topbar">
-            <h1 style="margin-right: 20px;">Dozenten-Cockpit</h1>
+            <h1 style="margin-right: 20px; flex-shrink:0;">Dozenten-Cockpit</h1>
             <div id="admin-group-tabs" style="display: flex; gap: 4px; overflow-x: auto; flex: 1; padding: 0 10px;">
                 <!-- Group tabs injected here -->
             </div>
-            <button class="btn btn-secondary" onclick="archiveSession()" style="margin-right: 8px;">Session speichern</button>
-            <button class="btn btn-secondary" onclick="openCMS()" style="margin-right: 8px; color: var(--brand-red);">Inhalte bearbeiten</button>
-            <button class="btn btn-secondary" onclick="window.location.reload()">Abmelden</button>
+            <div class="session-bar">
+                <span id="session-indicator" class="session-indicator inactive">Keine Session</span>
+                <button class="btn btn-secondary" id="btn-session-toggle" onclick="toggleSession()">Session starten</button>
+                <button class="btn btn-secondary" onclick="openSessionManager()">Sessions verwalten</button>
+                <button class="btn btn-secondary" onclick="openCMS()" style="color: var(--brand-red);">Inhalte</button>
+                <button class="btn btn-secondary" onclick="window.location.reload()">Abmelden</button>
+            </div>
         </header>
 
         <div style="display: flex; flex: 1; overflow: hidden; padding: 24px; gap: 24px;">
             
             <!-- LEFT: Settings -->
-            <div style="width: 320px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto;">
+            <div style="width: 300px; display: flex; flex-direction: column; gap: 24px; overflow-y: auto; flex-shrink: 0;">
                 <div class="glass-panel" style="padding: 24px;">
                     <h3>Globale Settings</h3>
                     <label style="font-size: 0.85rem; color: var(--text-primary); display: block; margin-top: 12px;">Anzahl der Gruppen (1-12)</label>
@@ -50,7 +88,7 @@
                 
                 <div class="glass-panel" style="padding: 24px; flex: 1; border-color: var(--brand-red);">
                     <h3 id="current-group-title" style="color: var(--brand-red);">Regiepult: Gruppe X</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Setzen Sie Hooks, um für diese Gruppe Menü-Tabs freizuschalten. Die Schüler werden sofort zum aktivierten Tab "gezwungen".</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Tabs für diese Gruppe freischalten:</p>
                     <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
                         <label><input type="checkbox" id="check-produkte" onchange="saveGroupSettings('tab-products')"> Produkte</label>
                         <label><input type="checkbox" id="check-bilanz" onchange="saveGroupSettings('tab-bilanz')"> Jahresabschluss</label>
@@ -63,31 +101,37 @@
                 </div>
             </div>
             
-            <!-- MIDDLE: Chat -->
+            <!-- MIDDLE: Chat + Templates sidebar -->
             <div style="flex: 1.2; display: flex; flex-direction: column;" class="glass-panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px 0 24px;">
-                    <h3 style="margin: 0;">Bank-Händler Chat</h3>
+                    <div class="chat-toggle-bar">
+                        <button id="btn-chat-bank" class="btn active-toggle" onclick="switchAdminChatType('bank')">Bank</button>
+                        <button id="btn-chat-unternehmen" class="btn btn-secondary" onclick="switchAdminChatType('unternehmen')">Unternehmen</button>
+                    </div>
                     <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; color: var(--brand-red); border-color: var(--brand-red);" onclick="clearAdminChat()">Chat leeren</button>
                 </div>
-                <p style="padding: 8px 24px 16px 24px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); margin: 0;">Live-Chat mit <span class="active-group-name">Gruppe X</span></p>
-                <div class="chat-container" style="flex: 1; margin: 16px; min-height: 250px;">
-                    <div class="chat-messages" id="admin-chat-messages"></div>
-
-                    <div class="chat-templates" style="padding: 12px 24px; background: #F0F4F8; border-top: 1px solid var(--border);">
-                        <strong style="font-size:0.8rem;">Vorlagen (Schnellantworten):</strong>
-                        <div id="admin-templates-container" style="display:flex; gap:8px; margin-top:8px; overflow-x:auto;">
-                            <button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="addTemplate()">+ Neue Vorlage</button>
+                <p style="padding: 8px 24px 12px 24px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); margin: 0;">Live-Chat mit <span class="active-group-name">Gruppe X</span></p>
+                
+                <div style="display: flex; flex: 1; overflow: hidden;">
+                    <!-- Chat area -->
+                    <div class="chat-container" style="flex: 1; margin: 0; border: none; border-radius: 0; box-shadow: none;">
+                        <div class="chat-messages" id="admin-chat-messages"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="admin-chat-input" placeholder="Nachricht an die Gruppe..." onkeydown="if(event.key==='Enter') sendAdminMessage()">
+                            <button onclick="sendAdminMessage()">Senden</button>
                         </div>
                     </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="admin-chat-input" placeholder="Nachricht an die Gruppe..." onkeydown="if(event.key==='Enter') sendAdminMessage()">
-                        <button onclick="sendAdminMessage()">Senden</button>
+                    <!-- Templates sidebar -->
+                    <div class="templates-sidebar">
+                        <h4>Vorlagen</h4>
+                        <div id="admin-templates-container"></div>
+                        <button class="btn btn-secondary" style="font-size:0.75rem; padding:6px 8px; margin-top: auto;" onclick="addTemplate()">+ Neue Vorlage</button>
                     </div>
                 </div>
             </div>
 
             <!-- RIGHT: Monitoring Table -->
-            <div style="flex: 1.5; overflow-y: auto; display: flex; flex-direction: column;" class="glass-panel">
+            <div style="flex: 1.2; overflow-y: auto; display: flex; flex-direction: column;" class="glass-panel">
                 <h3 style="padding: 16px 24px 0 24px; margin: 0;">Aufgaben-Erfassungen</h3>
                 <p style="padding: 0 24px 16px 24px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1);">Live-Mitschrift von <span class="active-group-name">Gruppe X</span></p>
                 <div id="monitoring-container" style="padding: 24px; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.5; flex: 1;">
@@ -98,26 +142,54 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="admin.js?v=1776440643"></script>
-
     <!-- CMS MODAL -->
-    <div id="cms-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div class="glass-panel" style="background:var(--surface); width:90%; max-width:800px; max-height:90vh; overflow-y:auto; padding:32px; display:flex; flex-direction:column; gap:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px;">
-                <h2>Inhalte bearbeiten (Aufgaben)</h2>
+    <div id="cms-modal" class="cms-modal-overlay">
+        <div class="cms-modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:20px;">
+                <h2 style="margin:0;">Inhalte bearbeiten</h2>
                 <button class="btn btn-secondary" onclick="document.getElementById('cms-modal').style.display='none'">Schließen</button>
             </div>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Änderungen hier überschreiben die Standardaufgaben bei allen Studenten sofort.</p>
-            <div id="cms-questions-list" style="display:flex; flex-direction:column; gap:16px;"></div>
-            <div style="display:flex; gap:8px; margin-top:16px;">
-                <button class="btn btn-secondary" onclick="cmsAddQuestion()">+ Neue Frage hinzufügen</button>
-                <button class="btn btn-primary" onclick="cmsSave()" style="margin-left:auto;">Speichern & Veröffentlichen</button>
+            <div class="cms-tabs">
+                <button id="cms-tab-aufgaben" class="btn active-toggle" onclick="switchCmsTab('aufgaben')">Aufgaben</button>
+                <button id="cms-tab-marktdaten" class="btn btn-secondary" onclick="switchCmsTab('marktdaten')">Marktdaten</button>
+            </div>
+            <!-- Aufgaben CMS -->
+            <div id="cms-aufgaben-view">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Änderungen überschreiben die Standardaufgaben bei allen Studenten sofort.</p>
+                <div id="cms-questions-list" style="display:flex; flex-direction:column; gap:16px;"></div>
+                <div style="display:flex; gap:8px; margin-top:16px;">
+                    <button class="btn btn-secondary" onclick="cmsAddQuestion()">+ Neue Frage</button>
+                    <button class="btn btn-primary" onclick="cmsSave()" style="margin-left:auto;">Speichern & Veröffentlichen</button>
+                </div>
+            </div>
+            <!-- Marktdaten CMS -->
+            <div id="cms-marktdaten-view" style="display:none;">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Marktdaten anpassen. Änderungen werden sofort bei allen Studenten sichtbar.</p>
+                <div id="cms-market-form" style="display:flex; flex-direction:column; gap:16px;"></div>
+                <div style="display:flex; gap:8px; margin-top:16px;">
+                    <button class="btn btn-primary" onclick="cmsMarketSave()" style="margin-left:auto;">Speichern & Veröffentlichen</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- SESSION MANAGER MODAL -->
+    <div id="session-modal" class="cms-modal-overlay">
+        <div class="cms-modal-content" style="max-width:650px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:20px;">
+                <h2 style="margin:0;">Sessions verwalten</h2>
+                <button class="btn btn-secondary" onclick="document.getElementById('session-modal').style.display='none'">Schließen</button>
+            </div>
+            <div id="session-list" style="display:flex; flex-direction:column; gap:12px;">
+                <p style="color:var(--text-muted);">Lade Sessions...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js?v=17764406432"></script>
 </body>
 </html>

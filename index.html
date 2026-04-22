@@ -52,8 +52,7 @@
                 <div class="student-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Aufgabe</div>
                 <button id="nav-aufgaben" class="nav-btn student-only" style="display: none;" onclick="switchTab('tab-task')">Risikoanalyse</button>
 
-                <div class="lecturer-only" style="font-size: 0.75rem; text-transform: uppercase; color: var(--brand-red); font-weight: 700; padding: 16px 16px 4px; margin-top: 8px;">Seminarleitung</div>
-                <button class="nav-btn lecturer-only" onclick="switchTab('tab-lecturer')">Ergebnisse</button>
+
             </div>
 
             <div class="sidebar-footer">
@@ -204,23 +203,7 @@
                     </form>
                 </div>
 
-                <!-- TAB: LECTURER (DOZENT) -->
-                <div id="tab-lecturer" class="tab-content">
-                    <div class="company-header" style="text-align: left;">
-                        <h2>Ergebnisse einsehen</h2>
-                        <p>Wählen Sie eine Gruppe aus, um deren gespeicherte Risikoanalysen live zu überprüfen.</p>
-                    </div>
-                    <div class="group-selector">
-                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 1')">Gruppe 1</button>
-                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 2')">Gruppe 2</button>
-                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 3')">Gruppe 3</button>
-                        <button class="btn btn-secondary" onclick="loadGroupAnswers('Gruppe 4')">Gruppe 4</button>
-                    </div>
-                    <div id="presentation-board" class="presentation-board hidden">
-                        <h3 class="presentation-title">Ergebnisse: <span id="presentation-group-name" style="font-weight: 800;">-</span></h3>
-                        <div id="presentation-answers"></div>
-                    </div>
-                </div>
+
 
             </div>
         </main>
