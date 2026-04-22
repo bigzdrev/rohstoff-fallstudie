@@ -1,5 +1,5 @@
 // ============================================================
-// ADMIN.JS – Dozenten-Cockpit (v5.3 Clean)
+// ADMIN.JS – Dozenten-Cockpit (v5.4 Pro)
 // ============================================================
 let currentAdminGroup = "Gruppe 1";
 let activeAdminChatType = "bank";
@@ -49,7 +49,7 @@ function initAdminData() {
             renderGroupTabs();
             if(!unsubChat) switchGroupContext(currentAdminGroup);
         }
-    });
+    }, err => console.error("Snapshot error (Global):", err));
 }
 
 function updateTotalGroups() {
@@ -65,8 +65,11 @@ function switchMainTab(tab) {
     document.querySelectorAll(".dashboard-nav-item").forEach(el => el.classList.remove("active"));
     document.querySelectorAll(".main-tab-content").forEach(el => el.classList.remove("active"));
     
-    document.getElementById(`nav-item-${tab}`).classList.add("active");
-    document.getElementById(`tab-${tab}-view`).classList.add("active");
+    const navItem = document.getElementById(`nav-item-${tab}`);
+    const tabContent = document.getElementById(`tab-${tab}-view`);
+    
+    if (navItem) navItem.classList.add("active");
+    if (tabContent) tabContent.classList.add("active");
 }
 
 // ============================================================
@@ -74,6 +77,7 @@ function switchMainTab(tab) {
 // ============================================================
 function renderGroupTabs() {
     const container = document.getElementById("admin-group-tabs");
+    if (!container) return;
     container.innerHTML = "";
     
     let groupNum = parseInt(currentAdminGroup.replace("Gruppe ", "")) || 1;
@@ -81,8 +85,8 @@ function renderGroupTabs() {
 
     for (let i = 1; i <= totalGroups; i++) {
         const name = `Gruppe ${i}`;
-        const active = name === currentAdminGroup ? 'background: var(--brand-red); color: white; border-color: var(--brand-red);' : 'background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);';
-        container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.8rem; padding: 6px 12px; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
+        const active = name === currentAdminGroup ? 'background: var(--brand-red); color: white; border-color: var(--brand-red); box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);' : 'background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);';
+        container.innerHTML += `<button class="btn" style="white-space: nowrap; font-size: 0.85rem; padding: 8px 16px; border-radius: 8px; font-weight: 600; ${active}" onclick="switchGroupContext('${name}')">${name}</button>`;
     }
 }
 
@@ -90,7 +94,7 @@ function switchGroupContext(groupName) {
     currentAdminGroup = groupName;
     renderGroupTabs();
     
-    document.getElementById("current-group-title").innerText = `Regiepult: ${groupName}`;
+    document.getElementById("current-group-title").innerText = `Regie: ${groupName}`;
     document.querySelectorAll(".active-group-name").forEach(el => el.innerText = groupName);
 
     bindSettings();
@@ -104,38 +108,36 @@ function switchGroupContext(groupName) {
 function bindSettings() {
     if (unsubSettings) unsubSettings();
     
-    document.getElementById("check-produkte").checked = false;
-    document.getElementById("check-bilanz").checked = false;
-    document.getElementById("check-lagebericht").checked = false;
-    document.getElementById("check-marktdaten").checked = false;
-    document.getElementById("check-chat").checked = false;
-    document.getElementById("check-bank-chat").checked = false;
-    document.getElementById("check-aufgaben").checked = false;
+    const checkboxes = ["produkte", "bilanz", "lagebericht", "marktdaten", "chat", "bank-chat", "aufgaben"];
+    checkboxes.forEach(id => {
+        const el = document.getElementById(`check-${id}`);
+        if (el) el.checked = false;
+    });
 
     unsubSettings = db.collection("group_controls").doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
             const d = doc.data();
-            document.getElementById("check-produkte").checked = !!d.show_produkte;
-            document.getElementById("check-bilanz").checked = !!d.show_bilanz;
-            document.getElementById("check-lagebericht").checked = !!d.show_lagebericht;
-            document.getElementById("check-marktdaten").checked = !!d.show_marktdaten;
-            document.getElementById("check-chat").checked = !!d.show_chat;
-            document.getElementById("check-bank-chat").checked = !!d.show_bank_chat;
-            document.getElementById("check-aufgaben").checked = !!d.show_aufgaben;
+            if (document.getElementById("check-produkte")) document.getElementById("check-produkte").checked = !!d.show_produkte;
+            if (document.getElementById("check-bilanz")) document.getElementById("check-bilanz").checked = !!d.show_bilanz;
+            if (document.getElementById("check-lagebericht")) document.getElementById("check-lagebericht").checked = !!d.show_lagebericht;
+            if (document.getElementById("check-marktdaten")) document.getElementById("check-marktdaten").checked = !!d.show_marktdaten;
+            if (document.getElementById("check-chat")) document.getElementById("check-chat").checked = !!d.show_chat;
+            if (document.getElementById("check-bank-chat")) document.getElementById("check-bank-chat").checked = !!d.show_bank_chat;
+            if (document.getElementById("check-aufgaben")) document.getElementById("check-aufgaben").checked = !!d.show_aufgaben;
         }
-    });
+    }, err => console.error("Snapshot error (Settings):", err));
 }
 
 function saveGroupSettings(forceTabTarget = null) {
     if(!db) return;
     const payload = {
-        show_produkte: document.getElementById("check-produkte").checked,
-        show_bilanz: document.getElementById("check-bilanz").checked,
-        show_lagebericht: document.getElementById("check-lagebericht").checked,
-        show_marktdaten: document.getElementById("check-marktdaten").checked,
-        show_chat: document.getElementById("check-chat").checked,
-        show_bank_chat: document.getElementById("check-bank-chat").checked,
-        show_aufgaben: document.getElementById("check-aufgaben").checked
+        show_produkte: document.getElementById("check-produkte")?.checked || false,
+        show_bilanz: document.getElementById("check-bilanz")?.checked || false,
+        show_lagebericht: document.getElementById("check-lagebericht")?.checked || false,
+        show_marktdaten: document.getElementById("check-marktdaten")?.checked || false,
+        show_chat: document.getElementById("check-chat")?.checked || false,
+        show_bank_chat: document.getElementById("check-bank-chat")?.checked || false,
+        show_aufgaben: document.getElementById("check-aufgaben")?.checked || false
     };
     
     let isChecked = false;
@@ -161,6 +163,7 @@ function saveGroupSettings(forceTabTarget = null) {
 function bindChat() {
     if (unsubChat) unsubChat();
     const cont = document.getElementById("admin-chat-messages");
+    if (!cont) return;
     cont.innerHTML = "";
 
     const collectionName = activeAdminChatType === "bank" ? "chat_rooms" : "chat_rooms_unternehmen";
@@ -183,7 +186,7 @@ function bindChat() {
         } else {
             cont.innerHTML = "";
         }
-    });
+    }, err => console.error("Snapshot error (Chat):", err));
 }
 
 function sendAdminMessage() {
@@ -199,7 +202,7 @@ function sendAdminMessage() {
         let msgs = doc.exists ? doc.data().messages || [] : [];
         msgs.push({ sender: senderName, text: text, time: Date.now() });
         db.collection(collectionName).doc(currentAdminGroup).set({ messages: msgs });
-    });
+    }).catch(err => console.error("Error sending message:", err));
 }
 
 function switchAdminChatType(type) {
@@ -224,7 +227,8 @@ function clearAdminChat() {
 function bindTasks() {
     if (unsubTasks) unsubTasks();
     const mon = document.getElementById("monitoring-container");
-    mon.innerHTML = "Wacht auf Eingaben der Gruppe...";
+    if (!mon) return;
+    mon.innerHTML = "<p style='color:var(--text-muted); font-style:italic;'>Warte auf Eingaben der Gruppe...</p>";
 
     unsubTasks = db.collection("fallstudie_ergebnisse").doc(currentAdminGroup).onSnapshot(doc => {
         if(doc.exists) {
@@ -233,14 +237,14 @@ function bindTasks() {
             let keys = Object.keys(d).sort();
             keys.forEach(k => {
                 if (k === "gruppe" || k === "timestamp") return;
-                html += `<div style="background: rgba(0,0,0,0.2); padding: 20px; margin-bottom: 16px; border-radius: 12px; border-left: 4px solid var(--brand-red);">
-                    <span style="color:var(--brand-red); font-size:0.75rem; font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px; opacity:0.8;">${k.toUpperCase()}</span>
-                    <div style="font-size:1rem; line-height:1.6; color:var(--text-primary); white-space:pre-wrap;">${d[k] || "-"}</div>
+                html += `<div style="background: rgba(0,0,0,0.3); padding: 24px; margin-bottom: 20px; border-radius: 16px; border-left: 5px solid var(--brand-red); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <span style="color:var(--brand-red); font-size:0.8rem; font-weight:800; text-transform:uppercase; display:block; margin-bottom:12px; letter-spacing:0.05em; opacity:0.9;">${k.toUpperCase()}</span>
+                    <div style="font-size:1.05rem; line-height:1.7; color:var(--text-primary); white-space:pre-wrap;">${d[k] || "-"}</div>
                 </div>`;
             });
-            mon.innerHTML = html || "Die Gruppe hat noch nichts abgespeichert.";
+            mon.innerHTML = html || "<p style='color:var(--text-muted);'>Die Gruppe hat noch nichts abgespeichert.</p>";
         }
-    });
+    }, err => console.error("Snapshot error (Tasks):", err));
 }
 
 // ============================================================
@@ -251,13 +255,14 @@ function loadTemplates() {
     db.collection("admin_settings").doc("templates").onSnapshot(doc => {
         const cont = document.getElementById("admin-templates-container");
         const tabCont = document.getElementById("admin-template-tabs");
+        const datalist = document.getElementById("category-list");
         if(!cont || !tabCont) return;
 
         allTemplates = [];
         if(doc.exists && doc.data().items && doc.data().items.length > 0) {
             allTemplates = doc.data().items;
         } else {
-            // Fallback: Default templates from data.js
+            // Initial Fallback from data.js
             if(typeof companyData !== 'undefined') {
                 const unternehmen = companyData.chatContacts.unternehmen.responses.map(r => ({ category: "Kunde", title: r.keywords[0], text: r.answer }));
                 const bank = companyData.chatContacts.bank.responses.map(r => ({ category: "Handel", title: r.keywords[0], text: r.answer }));
@@ -266,50 +271,74 @@ function loadTemplates() {
             }
         }
 
-        // Generate Category Tabs
-        const categories = ["Alle", ...new Set(allTemplates.map(t => t.category || "Allgemein"))];
+        // Categories list for tabs & datalist
+        const uniqueCats = [...new Set(allTemplates.map(t => t.category || "Allgemein"))];
+        const categories = ["Alle", ...uniqueCats.sort()];
+        
+        // Update Tabs
         tabCont.innerHTML = "";
         categories.forEach(cat => {
             const cls = activeTemplateTab === cat ? "tpl-tab active" : "tpl-tab";
             tabCont.innerHTML += `<div class="${cls}" onclick="switchTemplateTab('${cat}')">${cat}</div>`;
         });
 
+        // Update Datalist for Modal
+        if (datalist) {
+            datalist.innerHTML = "";
+            uniqueCats.forEach(cat => {
+                datalist.innerHTML += `<option value="${cat}">`;
+            });
+        }
+
         renderTemplates();
-    });
+    }, err => console.error("Snapshot error (Templates):", err));
 }
 
 function renderTemplates() {
     const cont = document.getElementById("admin-templates-container");
+    if (!cont) return;
     cont.innerHTML = "";
     
     const filtered = activeTemplateTab === "Alle" 
         ? allTemplates 
         : allTemplates.filter(t => (t.category || "Allgemein") === activeTemplateTab);
 
-    filtered.forEach((t, index) => {
-        // Find actual index in allTemplates for edit/delete
+    filtered.forEach((t) => {
         const actualIndex = allTemplates.indexOf(t);
-        
         const div = document.createElement("div");
         div.className = "tpl-btn";
+        div.title = t.text; // Native tooltip as fallback
         div.innerHTML = `
             ${escapeHtml(t.title)}
             <span class="tpl-tooltip">${escapeHtml(t.text)}</span>
-            <span class="tpl-edit" onclick="event.stopPropagation(); openTemplateEditor(${actualIndex})">✎</span>
-            <span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${actualIndex})">✕</span>
+            <span class="tpl-edit" title="Bearbeiten" onclick="event.stopPropagation(); openTemplateEditor(${actualIndex})">✎</span>
+            <span class="tpl-del" title="Löschen" onclick="event.stopPropagation(); deleteTemplate(${actualIndex})">✕</span>
         `;
-        div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
+        div.onclick = () => { 
+            const inp = document.getElementById("admin-chat-input");
+            if (inp) {
+                inp.value = t.text; 
+                inp.focus();
+            }
+        };
         cont.appendChild(div);
     });
 }
 
 function switchTemplateTab(cat) {
     activeTemplateTab = cat;
-    loadTemplates();
+    renderTemplates();
+    // Update active class on tabs
+    document.querySelectorAll(".tpl-tab").forEach(t => {
+        t.classList.toggle("active", t.innerText === cat);
+    });
 }
 
 function openTemplateEditor(index = -1) {
-    document.getElementById("tpl-modal").style.display = "flex";
+    const modal = document.getElementById("tpl-modal");
+    if (!modal) return;
+    
+    modal.style.display = "flex";
     if (index >= 0) {
         const t = allTemplates[index];
         document.getElementById("tpl-modal-title").innerText = "Vorlage bearbeiten";
@@ -327,13 +356,15 @@ function openTemplateEditor(index = -1) {
 }
 
 function saveTemplate() {
-    const idx = parseInt(document.getElementById("tpl-edit-index").value);
+    const idxInput = document.getElementById("tpl-edit-index");
+    const idx = idxInput ? parseInt(idxInput.value) : -1;
     const category = document.getElementById("tpl-category").value.trim() || "Allgemein";
     const title = document.getElementById("tpl-title").value.trim();
     const text = document.getElementById("tpl-text").value.trim();
 
-    if (!title || !text) return alert("Bitte Titel und Text ausfüllen.");
+    if (!title || !text) return alert("Bitte Titel und Antwort-Text ausfüllen.");
 
+    // Ensure allTemplates is up to date before saving
     if (idx >= 0) {
         allTemplates[idx] = { category, title, text };
     } else {
@@ -342,13 +373,20 @@ function saveTemplate() {
 
     db.collection("admin_settings").doc("templates").set({ items: allTemplates }).then(() => {
         document.getElementById("tpl-modal").style.display = "none";
+        // If it was a new category, maybe switch to it
+        if (activeTemplateTab !== "Alle" && activeTemplateTab !== category) {
+            activeTemplateTab = category;
+        }
+    }).catch(err => {
+        console.error("Error saving template:", err);
+        alert("Fehler beim Speichern in Firebase: " + err.message);
     });
 }
 
 function deleteTemplate(index) {
-    if(!confirm("Vorlage wirklich löschen?")) return;
+    if(!confirm("Vorlage wirklich unwiderruflich löschen?")) return;
     allTemplates.splice(index, 1);
-    db.collection("admin_settings").doc("templates").set({ items: allTemplates });
+    db.collection("admin_settings").doc("templates").set({ items: allTemplates }).catch(err => alert("Löschfehler: " + err.message));
 }
 
 function escapeHtml(text) {
@@ -362,33 +400,35 @@ function escapeHtml(text) {
 // ============================================================
 function loadSessionState() {
     db.collection("admin_settings").doc("active_session").onSnapshot(doc => {
+        const ind = document.getElementById("session-indicator");
+        const btn = document.getElementById("btn-session-toggle");
+        if(!ind || !btn) return;
+
         if(doc.exists && doc.data().active) {
             activeSessionId = doc.data().sessionId;
-            document.getElementById("session-indicator").className = "session-indicator active";
-            document.getElementById("session-indicator").innerText = doc.data().name || "Session aktiv";
-            document.getElementById("btn-session-toggle").innerText = "Session beenden";
-            document.getElementById("btn-session-toggle").style.color = "var(--danger)";
+            ind.className = "session-indicator active";
+            ind.innerText = doc.data().name || "Session aktiv";
+            btn.innerText = "Session beenden";
+            btn.style.color = "var(--danger)";
         } else {
             activeSessionId = null;
-            document.getElementById("session-indicator").className = "session-indicator inactive";
-            document.getElementById("session-indicator").innerText = "Keine Session";
-            document.getElementById("btn-session-toggle").innerText = "Session starten";
-            document.getElementById("btn-session-toggle").style.color = "";
+            ind.className = "session-indicator inactive";
+            ind.innerText = "Keine Session";
+            btn.innerText = "Session starten";
+            btn.style.color = "";
         }
-    });
+    }, err => console.error("Snapshot error (Session):", err));
 }
 
 function toggleSession() {
     if (activeSessionId) {
-        // Stop session: save all data to the session
-        if(!confirm("Session beenden und alle aktuellen Daten speichern?")) return;
+        if(!confirm("Session beenden und alle aktuellen Daten sichern?")) return;
         saveSessionData(activeSessionId).then(() => {
             db.collection("admin_settings").doc("active_session").set({ active: false });
-            alert("Session wurde gespeichert und beendet.");
+            alert("Session erfolgreich archiviert.");
         });
     } else {
-        // Start new session
-        const name = prompt("Name für die neue Session:", "Seminar " + new Date().toLocaleDateString("de-DE"));
+        const name = prompt("Name der Session (z.B. Kurs 2026):", "Seminar " + new Date().toLocaleDateString("de-DE"));
         if(!name) return;
         const sessionRef = db.collection("archived_sessions").doc();
         sessionRef.set({
@@ -407,7 +447,6 @@ function toggleSession() {
 }
 
 async function saveSessionData(sessionId) {
-    // Collect all group data
     const sessionData = {};
     for (let i = 1; i <= totalGroups; i++) {
         const groupName = `Gruppe ${i}`;
@@ -435,7 +474,8 @@ function openSessionManager() {
 
 function loadSessionList() {
     const list = document.getElementById("session-list");
-    list.innerHTML = "<p style='color:var(--text-muted);'>Lade...</p>";
+    if (!list) return;
+    list.innerHTML = "<p style='color:var(--text-muted);'>Lade Sessions...</p>";
     
     db.collection("archived_sessions").orderBy("startTime", "desc").get().then(snap => {
         if (snap.empty) {
@@ -448,15 +488,15 @@ function loadSessionList() {
             const date = d.startTime ? new Date(d.startTime).toLocaleString("de-DE") : "—";
             const endDate = d.endTime ? new Date(d.endTime).toLocaleString("de-DE") : "läuft noch";
             const div = document.createElement("div");
-            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px;";
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:16px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:12px;";
             div.innerHTML = `
                 <div>
-                    <strong style="font-size:0.95rem;">${escapeHtml(d.name || "Unbenannt")}</strong>
+                    <strong style="font-size:1rem;">${escapeHtml(d.name || "Unbenannt")}</strong>
                     <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">${date} → ${endDate}</div>
                 </div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 10px;" onclick="loadSession('${doc.id}')">Laden</button>
-                    <button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 10px; color:var(--danger);" onclick="deleteSession('${doc.id}')">Löschen</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px;" onclick="loadSession('${doc.id}')">Laden</button>
+                    <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; color:var(--danger);" onclick="deleteSession('${doc.id}')">Löschen</button>
                 </div>
             `;
             list.appendChild(div);
@@ -465,9 +505,9 @@ function loadSessionList() {
 }
 
 async function loadSession(sessionId) {
-    if(!confirm("Achtung: Alle aktuellen Daten werden mit den Session-Daten überschrieben! Fortfahren?")) return;
+    if(!confirm("Achtung: Überschreibt alle aktuellen Daten der Gruppen! Fortfahren?")) return;
     const doc = await db.collection("archived_sessions").doc(sessionId).get();
-    if(!doc.exists || !doc.data().data) { alert("Session enthält keine Daten."); return; }
+    if(!doc.exists || !doc.data().data) return alert("Session-Daten unvollständig.");
     
     const sessionData = doc.data().data;
     const promises = [];
@@ -478,47 +518,38 @@ async function loadSession(sessionId) {
         if (gd.ergebnisse) promises.push(db.collection("fallstudie_ergebnisse").doc(groupName).set(gd.ergebnisse));
     }
     await Promise.all(promises);
-    alert("Session erfolgreich geladen!");
+    alert("Session erfolgreich wiederhergestellt!");
     document.getElementById("session-modal").style.display = "none";
 }
 
 function deleteSession(sessionId) {
-    if(!confirm("Session unwiderruflich löschen?")) return;
+    if(!confirm("Session wirklich löschen?")) return;
     db.collection("archived_sessions").doc(sessionId).delete().then(() => loadSessionList());
 }
 
 // ============================================================
-// CMS: Aufgaben
+// CMS (Aufgaben & Marktdaten)
 // ============================================================
 let cmsQuestions = [];
-
 function openCMS() {
     document.getElementById("cms-modal").style.display = "flex";
     switchCmsTab("aufgaben");
     loadCmsQuestions();
     loadCmsMarketData();
 }
-
 function switchCmsTab(tab) {
     document.getElementById("cms-tab-aufgaben").className = tab === "aufgaben" ? "btn active-toggle" : "btn btn-secondary";
     document.getElementById("cms-tab-marktdaten").className = tab === "marktdaten" ? "btn active-toggle" : "btn btn-secondary";
     document.getElementById("cms-aufgaben-view").style.display = tab === "aufgaben" ? "block" : "none";
     document.getElementById("cms-marktdaten-view").style.display = tab === "marktdaten" ? "block" : "none";
 }
-
 function loadCmsQuestions() {
     db.collection("fallstudie_config").doc("content").get().then(doc => {
-        if (doc.exists && doc.data().questions) {
-            cmsQuestions = doc.data().questions;
-        } else if (typeof companyData !== 'undefined') {
-            cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
-        } else {
-            cmsQuestions = [];
-        }
+        if (doc.exists && doc.data().questions) cmsQuestions = doc.data().questions;
+        else if (typeof companyData !== 'undefined') cmsQuestions = JSON.parse(JSON.stringify(companyData.questions));
         renderCmsQuestions();
     });
 }
-
 function renderCmsQuestions() {
     const list = document.getElementById("cms-questions-list");
     list.innerHTML = "";
@@ -526,93 +557,44 @@ function renderCmsQuestions() {
         const div = document.createElement("div");
         div.className = "cms-card";
         div.innerHTML = `
-            <button class="btn btn-secondary" style="position:absolute; top:16px; right:16px; padding:4px 8px; font-size:0.7rem; color:var(--danger);" onclick="cmsDelete(${i})">Löschen</button>
-            <label>ID (intern):</label>
-            <input type="text" value="${escapeHtml(q.id)}" onchange="cmsUpdate(${i}, 'id', this.value)">
-            <label>Titel:</label>
-            <input type="text" value="${escapeHtml(q.title)}" onchange="cmsUpdate(${i}, 'title', this.value)">
-            <label>Fragestellung / Prompt:</label>
-            <textarea onchange="cmsUpdate(${i}, 'prompt', this.value)">${escapeHtml(q.prompt)}</textarea>
+            <button class="btn btn-secondary" style="position:absolute; top:20px; right:20px; color:var(--danger);" onclick="cmsDelete(${i})">Löschen</button>
+            <label>ID</label><input type="text" value="${escapeHtml(q.id)}" onchange="cmsQuestions[${i}].id=this.value">
+            <label>Titel</label><input type="text" value="${escapeHtml(q.title)}" onchange="cmsQuestions[${i}].title=this.value">
+            <label>Prompt</label><textarea onchange="cmsQuestions[${i}].prompt=this.value">${escapeHtml(q.prompt)}</textarea>
         `;
         list.appendChild(div);
     });
 }
-
-function cmsUpdate(index, field, value) { cmsQuestions[index][field] = value; }
-
-function cmsAddQuestion() {
-    cmsQuestions.push({ id: "q_neu_" + Date.now(), title: "Neue Aufgabe", prompt: "Beschreiben Sie die Aufgabe hier..." });
-    renderCmsQuestions();
-}
-
-function cmsDelete(index) {
-    if(confirm("Aufgabe entfernen?")) { cmsQuestions.splice(index, 1); renderCmsQuestions(); }
-}
-
+function cmsAddQuestion() { cmsQuestions.push({ id: "q_"+Date.now(), title: "Neu", prompt: "..." }); renderCmsQuestions(); }
+function cmsDelete(i) { cmsQuestions.splice(i, 1); renderCmsQuestions(); }
 function cmsSave() {
-    if(!db) return;
-    db.collection("fallstudie_config").doc("content").set({ questions: cmsQuestions }, { merge: true }).then(() => {
-        alert("Aufgaben gespeichert!");
-    });
+    db.collection("fallstudie_config").doc("content").set({ questions: cmsQuestions }, { merge: true }).then(() => alert("Gespeichert!"));
 }
 
-// ============================================================
-// CMS: Marktdaten
-// ============================================================
 let cmsMarket = {};
-
 function loadCmsMarketData() {
     db.collection("fallstudie_config").doc("market").get().then(doc => {
-        if (doc.exists) {
-            cmsMarket = doc.data();
-        } else if (typeof companyData !== 'undefined') {
-            cmsMarket = JSON.parse(JSON.stringify(companyData.marketPrices));
-        } else {
-            cmsMarket = {};
-        }
+        if (doc.exists) cmsMarket = doc.data();
+        else if (typeof companyData !== 'undefined') cmsMarket = JSON.parse(JSON.stringify(companyData.marketPrices));
         renderCmsMarketForm();
     });
 }
-
 function renderCmsMarketForm() {
-    const form = document.getElementById("cms-market-form");
-    const mp = cmsMarket;
-    
-    form.innerHTML = `
+    const f = document.getElementById("cms-market-form");
+    const m = cmsMarket;
+    f.innerHTML = `
         <div class="cms-card">
-            <label>Datum / Stand:</label>
-            <input type="text" id="cms-market-date" value="${mp.date || ''}" onchange="cmsMarket.date = this.value">
+            <label>Datum</label><input type="text" value="${m.date||''}" onchange="cmsMarket.date=this.value">
+            <h4 style="color:var(--brand-red); margin:12px 0;">Kupfer</h4>
+            <label>Spot USD</label><input type="number" value="${(m.copper||{}).spotUsd||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={};cmsMarket.copper.spotUsd=+this.value">
+            <label>3M USD</label><input type="number" value="${(m.copper||{}).forward3m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={};cmsMarket.copper.forward3m=+this.value">
         </div>
         <div class="cms-card">
-            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">Kupfer (LME)</h4>
-            <label>Spot USD/t:</label><input type="number" value="${(mp.copper||{}).spotUsd||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.spotUsd=+this.value">
-            <label>Spot EUR/t:</label><input type="number" value="${(mp.copper||{}).spotEur||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.spotEur=+this.value">
-            <label>3M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward3m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward3m=+this.value">
-            <label>6M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward6m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward6m=+this.value">
-            <label>12M Forward USD/t:</label><input type="number" value="${(mp.copper||{}).forward12m||0}" onchange="if(!cmsMarket.copper)cmsMarket.copper={}; cmsMarket.copper.forward12m=+this.value">
-        </div>
-        <div class="cms-card">
-            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">Gasoil (ICE)</h4>
-            <label>Spot USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).spotUsd||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.spotUsd=+this.value">
-            <label>Spot EUR/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).spotEur||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.spotEur=+this.value">
-            <label>6M Forward USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).forward6m||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.forward6m=+this.value">
-            <label>12M Forward USD/mT:</label><input type="number" step="0.01" value="${(mp.diesel||{}).forward12m||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={}; cmsMarket.diesel.forward12m=+this.value">
-        </div>
-        <div class="cms-card">
-            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">EUA (ICE)</h4>
-            <label>Spot EUR/t CO₂:</label><input type="number" step="0.01" value="${(mp.eua||{}).spot||0}" onchange="if(!cmsMarket.eua)cmsMarket.eua={}; cmsMarket.eua.spot=+this.value">
-            <label>12M Forward EUR/t CO₂:</label><input type="number" step="0.01" value="${(mp.eua||{}).forward12m||0}" onchange="if(!cmsMarket.eua)cmsMarket.eua={}; cmsMarket.eua.forward12m=+this.value">
-        </div>
-        <div class="cms-card">
-            <h4 style="margin: 0 0 12px 0; color:var(--brand-red);">EUR/USD</h4>
-            <label>Spot-Kurs:</label><input type="number" step="0.0001" value="${mp.eurUsd||0}" onchange="cmsMarket.eurUsd=+this.value">
+            <h4 style="color:var(--brand-red); margin:0 0 12px 0;">Gasoil</h4>
+            <label>Spot USD</label><input type="number" step="0.01" value="${(m.diesel||{}).spotUsd||0}" onchange="if(!cmsMarket.diesel)cmsMarket.diesel={};cmsMarket.diesel.spotUsd=+this.value">
         </div>
     `;
 }
-
 function cmsMarketSave() {
-    if(!db) return;
-    db.collection("fallstudie_config").doc("market").set(cmsMarket).then(() => {
-        alert("Marktdaten gespeichert!");
-    });
+    db.collection("fallstudie_config").doc("market").set(cmsMarket).then(() => alert("Marktdaten live!"));
 }
