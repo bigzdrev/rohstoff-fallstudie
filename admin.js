@@ -1,14 +1,16 @@
 // ============================================================
-// ADMIN.JS – Dozenten-Cockpit (v5.2 Clean)
+// ADMIN.JS – Dozenten-Cockpit (v5.3 Clean)
 // ============================================================
 let currentAdminGroup = "Gruppe 1";
 let activeAdminChatType = "bank";
+let activeTemplateTab = "Alle";
 let totalGroups = 4;
 let unsubSettings = null;
 let unsubGlobal = null;
 let unsubChat = null;
 let unsubTasks = null;
 let activeSessionId = null;
+let allTemplates = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("dashboard-view").style.display = "none";
@@ -231,9 +233,9 @@ function bindTasks() {
             let keys = Object.keys(d).sort();
             keys.forEach(k => {
                 if (k === "gruppe" || k === "timestamp") return;
-                html += `<div style="background: rgba(0,0,0,0.2); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
-                    <span style="color:var(--brand-red); font-weight:600; display:block; margin-bottom:6px;">${k.toUpperCase()}</span>
-                    ${d[k] || "-"}
+                html += `<div style="background: rgba(0,0,0,0.2); padding: 20px; margin-bottom: 16px; border-radius: 12px; border-left: 4px solid var(--brand-red);">
+                    <span style="color:var(--brand-red); font-size:0.75rem; font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px; opacity:0.8;">${k.toUpperCase()}</span>
+                    <div style="font-size:1rem; line-height:1.6; color:var(--text-primary); white-space:pre-wrap;">${d[k] || "-"}</div>
                 </div>`;
             });
             mon.innerHTML = html || "Die Gruppe hat noch nichts abgespeichert.";
@@ -242,61 +244,111 @@ function bindTasks() {
 }
 
 // ============================================================
-// TEMPLATES
+// TEMPLATES (Grouping & Grid)
 // ============================================================
 function loadTemplates() {
     if(!db) return;
     db.collection("admin_settings").doc("templates").onSnapshot(doc => {
         const cont = document.getElementById("admin-templates-container");
-        if(!cont) return;
-        cont.innerHTML = "";
-        
-        let items = [];
+        const tabCont = document.getElementById("admin-template-tabs");
+        if(!cont || !tabCont) return;
+
+        allTemplates = [];
         if(doc.exists && doc.data().items && doc.data().items.length > 0) {
-            items = doc.data().items;
+            allTemplates = doc.data().items;
         } else {
             // Fallback: Default templates from data.js
             if(typeof companyData !== 'undefined') {
-                const unternehmen = companyData.chatContacts.unternehmen.responses.map(r => ({ title: "Kunde: " + r.keywords[0], text: r.answer }));
-                const bank = companyData.chatContacts.bank.responses.map(r => ({ title: "Handel: " + r.keywords[0], text: r.answer }));
-                items = [...unternehmen, ...bank];
-                // Save these as initial defaults
-                db.collection("admin_settings").doc("templates").set({ items });
+                const unternehmen = companyData.chatContacts.unternehmen.responses.map(r => ({ category: "Kunde", title: r.keywords[0], text: r.answer }));
+                const bank = companyData.chatContacts.bank.responses.map(r => ({ category: "Handel", title: r.keywords[0], text: r.answer }));
+                allTemplates = [...unternehmen, ...bank];
+                db.collection("admin_settings").doc("templates").set({ items: allTemplates });
             }
         }
 
-        items.forEach((t, index) => {
-            const div = document.createElement("div");
-            div.className = "tpl-btn";
-            div.innerHTML = `${escapeHtml(t.title)}<span class="tpl-tooltip">${escapeHtml(t.text)}</span><span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${index})">✕</span>`;
-            div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
-            cont.appendChild(div);
+        // Generate Category Tabs
+        const categories = ["Alle", ...new Set(allTemplates.map(t => t.category || "Allgemein"))];
+        tabCont.innerHTML = "";
+        categories.forEach(cat => {
+            const cls = activeTemplateTab === cat ? "tpl-tab active" : "tpl-tab";
+            tabCont.innerHTML += `<div class="${cls}" onclick="switchTemplateTab('${cat}')">${cat}</div>`;
         });
+
+        renderTemplates();
     });
 }
 
-function addTemplate() {
-    const title = prompt("Titel der Vorlage (kurz):");
-    if(!title) return;
-    const text = prompt("Volltext der Vorlage (wird in den Chat eingefügt):");
-    if(!text) return;
+function renderTemplates() {
+    const cont = document.getElementById("admin-templates-container");
+    cont.innerHTML = "";
+    
+    const filtered = activeTemplateTab === "Alle" 
+        ? allTemplates 
+        : allTemplates.filter(t => (t.category || "Allgemein") === activeTemplateTab);
 
-    db.collection("admin_settings").doc("templates").get().then(doc => {
-        let items = doc.exists ? doc.data().items || [] : [];
-        items.push({ title, text });
-        db.collection("admin_settings").doc("templates").set({ items });
+    filtered.forEach((t, index) => {
+        // Find actual index in allTemplates for edit/delete
+        const actualIndex = allTemplates.indexOf(t);
+        
+        const div = document.createElement("div");
+        div.className = "tpl-btn";
+        div.innerHTML = `
+            ${escapeHtml(t.title)}
+            <span class="tpl-tooltip">${escapeHtml(t.text)}</span>
+            <span class="tpl-edit" onclick="event.stopPropagation(); openTemplateEditor(${actualIndex})">✎</span>
+            <span class="tpl-del" onclick="event.stopPropagation(); deleteTemplate(${actualIndex})">✕</span>
+        `;
+        div.onclick = () => { document.getElementById("admin-chat-input").value = t.text; };
+        cont.appendChild(div);
+    });
+}
+
+function switchTemplateTab(cat) {
+    activeTemplateTab = cat;
+    loadTemplates();
+}
+
+function openTemplateEditor(index = -1) {
+    document.getElementById("tpl-modal").style.display = "flex";
+    if (index >= 0) {
+        const t = allTemplates[index];
+        document.getElementById("tpl-modal-title").innerText = "Vorlage bearbeiten";
+        document.getElementById("tpl-edit-index").value = index;
+        document.getElementById("tpl-category").value = t.category || "Allgemein";
+        document.getElementById("tpl-title").value = t.title;
+        document.getElementById("tpl-text").value = t.text;
+    } else {
+        document.getElementById("tpl-modal-title").innerText = "Neue Vorlage";
+        document.getElementById("tpl-edit-index").value = -1;
+        document.getElementById("tpl-category").value = activeTemplateTab === "Alle" ? "" : activeTemplateTab;
+        document.getElementById("tpl-title").value = "";
+        document.getElementById("tpl-text").value = "";
+    }
+}
+
+function saveTemplate() {
+    const idx = parseInt(document.getElementById("tpl-edit-index").value);
+    const category = document.getElementById("tpl-category").value.trim() || "Allgemein";
+    const title = document.getElementById("tpl-title").value.trim();
+    const text = document.getElementById("tpl-text").value.trim();
+
+    if (!title || !text) return alert("Bitte Titel und Text ausfüllen.");
+
+    if (idx >= 0) {
+        allTemplates[idx] = { category, title, text };
+    } else {
+        allTemplates.push({ category, title, text });
+    }
+
+    db.collection("admin_settings").doc("templates").set({ items: allTemplates }).then(() => {
+        document.getElementById("tpl-modal").style.display = "none";
     });
 }
 
 function deleteTemplate(index) {
-    if(!confirm("Vorlage löschen?")) return;
-    db.collection("admin_settings").doc("templates").get().then(doc => {
-        if(doc.exists) {
-            let items = doc.data().items || [];
-            items.splice(index, 1);
-            db.collection("admin_settings").doc("templates").set({ items });
-        }
-    });
+    if(!confirm("Vorlage wirklich löschen?")) return;
+    allTemplates.splice(index, 1);
+    db.collection("admin_settings").doc("templates").set({ items: allTemplates });
 }
 
 function escapeHtml(text) {

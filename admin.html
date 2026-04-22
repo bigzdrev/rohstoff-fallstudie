@@ -12,14 +12,29 @@
         .chat-toggle-bar .btn { padding: 5px 14px; font-size: 0.8rem; border-radius: 6px; }
         .chat-toggle-bar .btn.active-toggle { background: var(--brand-red); color: white; border-color: var(--brand-red); }
 
-        .templates-sidebar { width: 350px; display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; }
+        .templates-sidebar { width: 40%; display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(0,0,0,0.25); border-left: 1px solid rgba(255,255,255,0.08); overflow-y: auto; flex-shrink: 0; }
         .templates-sidebar h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin: 0 0 4px 0; }
-        .tpl-btn { display: block; width: 100%; text-align: left; padding: 10px 12px; font-size: 0.85rem; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.15s; position: relative; margin-bottom: 4px; }
-        .tpl-btn:hover { background: rgba(255,255,255,0.18); }
-        .tpl-tooltip { display: none; position: absolute; right: 10px; top: 0; transform: translateX(-100%); min-width: 250px; max-width: 400px; padding: 12px; background: #1a1a2e; color: #eee; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 0.85rem; white-space: normal; line-height: 1.5; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,0.4); pointer-events: none; }
+        
+        .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; align-content: start; }
+        .tpl-btn { display: block; width: 100%; text-align: left; padding: 12px 14px; font-size: 0.85rem; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.2s; position: relative; }
+        .tpl-btn:hover { background: rgba(255,255,255,0.12); border-color: var(--brand-red); transform: translateY(-1px); }
+        .tpl-tooltip { display: none; position: absolute; right: 20px; top: 0; transform: translateX(-100%); min-width: 250px; max-width: 400px; padding: 14px; background: #1e1e32; color: #eee; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; font-size: 0.85rem; white-space: normal; line-height: 1.6; z-index: 999; box-shadow: 0 12px 32px rgba(0,0,0,0.5); pointer-events: none; }
         .tpl-btn:hover .tpl-tooltip { display: block; }
-        .tpl-del { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.7rem; padding: 2px 4px; opacity: 0; transition: opacity 0.15s; }
+        .tpl-del { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; padding: 4px; opacity: 0; transition: opacity 0.15s; }
         .tpl-btn:hover .tpl-del { opacity: 1; }
+        .tpl-edit { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; padding: 4px; opacity: 0; transition: opacity 0.15s; }
+        .tpl-btn:hover .tpl-edit { opacity: 1; }
+
+        .tpl-tabs { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+        .tpl-tab { padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; color: var(--text-muted); border: 1px solid transparent; transition: all 0.15s; }
+        .tpl-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .tpl-tab.active { background: var(--brand-red); color: white; }
+
+        .tpl-modal-body { display: grid; gap: 20px; }
+        .tpl-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .tpl-input-group label { font-size: 0.75rem; font-weight: 700; color: var(--brand-red); text-transform: uppercase; letter-spacing: 0.05em; }
+        .tpl-input-group input, .tpl-input-group textarea { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; color: white; font-family: inherit; font-size: 0.9rem; transition: all 0.2s; }
+        .tpl-input-group input:focus, .tpl-input-group textarea:focus { outline: none; border-color: var(--brand-red); box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.2); }
 
         .session-bar { display: flex; gap: 8px; align-items: center; }
         .session-bar .btn { padding: 5px 12px; font-size: 0.78rem; }
@@ -136,9 +151,14 @@
                     </div>
                     <!-- Templates sidebar -->
                     <div class="templates-sidebar">
-                        <h4>Vorlagen</h4>
-                        <div id="admin-templates-container"></div>
-                        <button class="btn btn-secondary" style="font-size:0.75rem; padding:6px 8px; margin-top: auto;" onclick="addTemplate()">+ Neue Vorlage</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h4>Vorlagen</h4>
+                            <button class="btn btn-secondary" style="font-size:0.7rem; padding:2px 8px;" onclick="openTemplateEditor()">+ Neu</button>
+                        </div>
+                        <div class="tpl-tabs" id="admin-template-tabs">
+                            <!-- Template tabs injected here -->
+                        </div>
+                        <div id="admin-templates-container" class="tpl-grid"></div>
                     </div>
                 </div>
             </div>
@@ -185,7 +205,31 @@
         </div>
     </div>
 
-    <!-- SESSION MANAGER MODAL -->
+    <!-- TEMPLATE EDITOR MODAL -->
+    <div id="tpl-modal" class="cms-modal-overlay">
+        <div class="cms-modal-content" style="max-width:500px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:20px;">
+                <h2 id="tpl-modal-title" style="margin:0;">Vorlage bearbeiten</h2>
+                <button class="btn btn-secondary" onclick="document.getElementById('tpl-modal').style.display='none'">Schließen</button>
+            </div>
+            <div class="tpl-modal-body">
+                <input type="hidden" id="tpl-edit-index">
+                <div class="tpl-input-group">
+                    <label>Kategorie / Tab</label>
+                    <input type="text" id="tpl-category" placeholder="z.B. Kunde, Handel, Allgemein">
+                </div>
+                <div class="tpl-input-group">
+                    <label>Titel (Button-Label)</label>
+                    <input type="text" id="tpl-title" placeholder="Kurzer Titel">
+                </div>
+                <div class="tpl-input-group">
+                    <label>Antwort-Text (Volltext)</label>
+                    <textarea id="tpl-text" style="min-height: 180px;" placeholder="Dieser Text wird in den Chat kopiert..."></textarea>
+                </div>
+                <button class="btn btn-primary" style="padding: 14px; font-weight: 700; margin-top: 10px;" onclick="saveTemplate()">Vorlage speichern</button>
+            </div>
+        </div>
+    </div>
     <div id="session-modal" class="cms-modal-overlay">
         <div class="cms-modal-content" style="max-width:650px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:20px;">
