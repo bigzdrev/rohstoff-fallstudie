@@ -4,6 +4,7 @@
 
 let currentRole = "";
 let saveTimeout = null;
+let unsubBankChat = null;
 
 // ---- KI-MODUL ----
 let aiStatus = "idle"; // idle | loading | ready | error
@@ -103,8 +104,9 @@ function loginAs(role) {
     
     // Bind Firebase chat if not Dozent
     if(role !== "Dozent" && typeof db !== 'undefined' && db !== null) {
-        db.collection("chat_rooms").doc(role).onSnapshot(doc => {
-            if(doc.exists) renderBankChat(doc.data().messages || []);
+        if (unsubBankChat) unsubBankChat();
+        unsubBankChat = db.collection("chat_rooms").doc(role).onSnapshot(doc => {
+            renderBankChat(doc.exists ? doc.data().messages || [] : []);
         });
         
         // Listen to per-group config
@@ -584,7 +586,8 @@ function addChatBubble(contactId, text, sender) {
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble chat-${sender}`;
     const avatar = sender === "contact" ? companyData.chatContacts[contactId].avatar : "";
-    bubble.innerHTML = `<span class="bubble-avatar">${avatar}</span><div class="bubble-text">${text}</div>`;
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    bubble.innerHTML = `<span class="bubble-avatar">${avatar}</span><div class="bubble-text">${text}<span class="chat-time">${timeStr}</span></div>`;
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
 }
@@ -695,7 +698,13 @@ function renderBankChat(msgs) {
     cont.innerHTML = "";
     msgs.forEach(m => {
         const isBot = m.sender === 'bank';
-        cont.innerHTML += `<div class="msg-bubble ${isBot ? 'bot-msg' : 'user-msg'}">${m.text}</div>`;
+        const senderCls = isBot ? 'chat-contact' : 'chat-user';
+        const avatar = isBot ? '🏦' : '';
+        let timeStr = "";
+        if (m.time) {
+            timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        cont.innerHTML += `<div class="chat-bubble ${senderCls}"><span class="bubble-avatar">${avatar}</span><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
     });
     cont.scrollTo(0, cont.scrollHeight);
 }

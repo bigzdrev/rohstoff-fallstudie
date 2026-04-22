@@ -140,9 +140,17 @@ function bindChat() {
             cont.innerHTML = "";
             msgs.forEach(m => {
                 const isBot = m.sender === 'bank';
-                cont.innerHTML += `<div class="msg-bubble ${isBot ? 'bot-msg' : 'user-msg'}">${m.text}</div>`;
+                const senderCls = isBot ? 'chat-user' : 'chat-contact'; // From admin's perspective, they are the 'user' (bank), student is 'contact'
+                const avatar = isBot ? '🏦' : '🧑‍💻';
+                let timeStr = "";
+                if (m.time) {
+                    timeStr = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+                cont.innerHTML += `<div class="chat-bubble ${senderCls}"><span class="bubble-avatar">${avatar}</span><div class="bubble-text">${m.text}<span class="chat-time">${timeStr}</span></div></div>`;
             });
             cont.scrollTo(0, cont.scrollHeight);
+        } else {
+            cont.innerHTML = "";
         }
     });
 }
@@ -158,6 +166,13 @@ function sendAdminMessage() {
         msgs.push({ sender: 'bank', text: text, time: Date.now() });
         db.collection("chat_rooms").doc(currentAdminGroup).set({ messages: msgs });
     });
+}
+
+function clearAdminChat() {
+    if(!db) return;
+    if(confirm(`Möchtest du den gesamten Bank-Chat für ${currentAdminGroup} wirklich löschen?`)) {
+        db.collection("chat_rooms").doc(currentAdminGroup).set({ messages: [] }, { merge: true });
+    }
 }
 
 function bindTasks() {
