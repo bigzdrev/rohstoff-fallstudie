@@ -148,6 +148,7 @@
                 <span id="session-indicator" class="session-indicator inactive">Keine Session</span>
                 <button class="btn btn-secondary" id="btn-session-toggle" onclick="toggleSession()">Session starten</button>
                 <button class="btn btn-secondary" onclick="openSessionManager()">Sessions</button>
+                <button class="btn btn-secondary" id="btn-export-session" onclick="exportActiveSessionPDF()" style="display:none; color: var(--brand-red); border-color: rgba(185, 28, 28, 0.2);">PDF Export</button>
                 <button class="btn btn-secondary" onclick="openCMS()" style="color: var(--brand-red); font-weight: 800;">Inhalte</button>
                 <button class="btn btn-secondary" onclick="window.location.reload()">Abmelden</button>
             </div>
@@ -173,10 +174,20 @@
                             <input type="number" id="group-count-input" min="1" max="12" value="4" style="width: 65px; padding: 10px; background: #f1f5f9; border: 1px solid var(--admin-border); border-radius: 8px; color: var(--admin-text);">
                             <button class="btn btn-secondary" style="padding: 10px 14px; font-size:0.8rem;" onclick="updateTotalGroups()">SET</button>
                         </div>
+                        
+                        <label style="font-size: 0.8rem; color: var(--admin-text-muted); display: block; margin-top: 16px;">Bank-Chat Name</label>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="text" id="bank-chat-name-input" value="Handel (Bank)" style="flex: 1; padding: 10px; background: #f1f5f9; border: 1px solid var(--admin-border); border-radius: 8px; color: var(--admin-text);">
+                            <button class="btn btn-secondary" style="padding: 10px 14px; font-size:0.8rem;" onclick="updateBankChatName()">SET</button>
+                        </div>
                     </div>
                     
                     <div style="flex: 1;">
-                        <h3 id="current-group-title" style="color: var(--brand-red); font-size: 1.1rem; font-weight: 800; margin-bottom: 16px;">Regie: Gruppe X</h3>
+                        <h3 id="current-group-title" style="color: var(--brand-red); font-size: 1.1rem; font-weight: 800; margin-bottom: 8px;">Regie: Gruppe X</h3>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <input type="text" id="custom-group-name-input" placeholder="Gruppenname ändern" style="flex: 1; padding: 6px 10px; font-size: 0.85rem; background: #f1f5f9; border: 1px solid var(--admin-border); border-radius: 6px; color: var(--admin-text);" onkeydown="if(event.key==='Enter') saveCustomGroupName()">
+                            <button class="btn btn-secondary" style="padding: 6px 10px; font-size:0.8rem;" onclick="saveCustomGroupName()">SET</button>
+                        </div>
                         <p style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 16px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">Sichtbarkeit der Tabs:</p>
                         <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.95rem;">
                             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;"><input type="checkbox" id="check-produkte" onchange="saveGroupSettings('tab-products')"> Produkte</label>
@@ -316,5 +327,6 @@
     <script src="firebase-config.js"></script>
     <script src="data.js"></script>
     <script src="admin.js?v=17764406436"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>

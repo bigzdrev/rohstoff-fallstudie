@@ -77,7 +77,7 @@ def push_file_to_api(filepath):
         print(f"❌ [FEHLER] Upload von '{filename}' gescheitert. Code: {e.code}. Grund: {e.read().decode()}")
 
 if __name__ == "__main__":
-    files_to_upload = ["index.html", "style.css", "app.js", "data.js", "firebase-config.js"]
+    files_to_upload = ["index.html", "style.css", "app.js", "data.js", "firebase-config.js", "admin.html", "admin.js", "admin.css"]
     
     for f in files_to_upload:
         if os.path.exists(f):
