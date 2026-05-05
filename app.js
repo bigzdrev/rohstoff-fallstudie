@@ -6,6 +6,9 @@ let currentRole = "";
 let saveTimeout = null;
 let unsubBankChat = null;
 
+let groupNames = {};
+let bankChatName = "Handel (Bank)";
+
 // ---- KI-MODUL ----
 let aiStatus = "idle"; // idle | loading | ready | error
 let aiExtractor = null;
@@ -87,10 +90,12 @@ function renderDynamicButtons(count) {
     
     container.innerHTML = "";
     for (let i = 1; i <= count; i++) {
+        const groupName = "Gruppe " + i;
+        const displayName = groupNames[groupName] || groupName;
         const btn = document.createElement("button");
         btn.className = "btn btn-secondary";
-        btn.innerText = "Gruppe " + i;
-        btn.onclick = () => loginAs("Gruppe " + i);
+        btn.innerText = "Login als " + displayName;
+        btn.onclick = () => loginAs(groupName);
         container.appendChild(btn);
     }
 }
@@ -98,7 +103,8 @@ function renderDynamicButtons(count) {
 function loginAs(role) {
     currentRole = role;
     window.currentGroup = role; // global identifier for Firebase
-    document.getElementById("user-role-badge").innerText = role;
+    const displayName = groupNames[role] || role;
+    document.getElementById("user-role-badge").innerText = displayName;
     document.getElementById("login-view").classList.remove("active");
     document.getElementById("dashboard-view").classList.add("active");
     
@@ -432,10 +438,22 @@ setTimeout(() => {
 setTimeout(() => {
     if (typeof db !== 'undefined' && db !== null) {
         db.collection("fallstudie_config").doc("settings").onSnapshot(doc => {
-            if (doc.exists && doc.data().group_count) {
-                renderDynamicButtons(doc.data().group_count);
-                const input = document.getElementById("group-count-input");
-                if(input) input.value = doc.data().group_count;
+            if (doc.exists) {
+                const data = doc.data();
+                groupNames = data.groupNames || {};
+                bankChatName = data.bankChatName || "Handel (Bank)";
+                
+                const bankNav = document.getElementById("nav-chat-bank");
+                if(bankNav) bankNav.innerText = "Chat: " + bankChatName;
+                
+                const bankHeader = document.getElementById("chat-bank-name");
+                if(bankHeader) bankHeader.innerText = bankChatName;
+                
+                if (data.group_count) {
+                    renderDynamicButtons(data.group_count);
+                    const input = document.getElementById("group-count-input");
+                    if(input) input.value = data.group_count;
+                }
             }
         });
         // Listen for market data updates from admin CMS
